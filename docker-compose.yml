@@ -1,0 +1,40 @@
+version: "2"
+
+services:
+  web:
+    build:
+      dockerfile: Dockerfile
+      context: ./
+    depends_on:
+      - db
+    environment:
+      - PS_DEV_MODE=1
+      - PS_COUNTRY=it
+      - PS_DOMAIN=prestashop.emailchef
+      - PS_FOLDER_ADMIN=admin-emailchef
+      - PS_FOLDER_INSTALL=install-emailchef
+      - PS_HANDLE_DYNAMIC_DOMAIN=1
+      - PS_INSTALL_AUTO=1
+      - DB_SERVER=db
+      - DB_PASSWD=hacker20
+      - ADMIN_MAIL=test-dev@dueclic.com
+      - ADMIN_PASSWD=hacker20
+    networks:
+      - internal
+      - public
+    volumes:
+      - ./emailchef:/var/www/html/modules/emailchef
+    ports:
+      - "80:80"
+
+  db:
+    image: mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=hacker20
+      - MYSQL_DATABASE=prestashop
+    networks:
+      - internal
+
+networks:
+  internal:
+  public:
