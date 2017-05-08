@@ -1,0 +1,34 @@
+select#ps_emailchef_list.select_and_create {
+    float:left;
+}
+
+.select_and_create_btn {
+    margin-left: 30px;
+}
+
+.select_and_create_clear {
+    clear:both;
+}
+
+.list_creation {
+    display: none;
+}
+
+.bootstrap .alert.list_creation.alert-onboarding, .bootstrap #carrier_wizard .list_creation.alert-onboarding.wizard_error {
+    box-shadow: inset 140px 0 0 rgb(193, 83, 0);
+    border: 2px solid rgb(193, 83, 0);
+    color: rgb(193, 83, 0);
+}
+
+.bootstrap .form-control:focus, .bootstrap input[type="text"]:focus, .bootstrap input[type="search"]:focus, .bootstrap input[type="password"]:focus, .bootstrap textarea:focus, .bootstrap select:focus {
+    border-color: rgb(193, 83, 0);
+}
+
+.bootstrap .alert.list_creation.alert-onboarding:before, .bootstrap #carrier_wizard .alert.list_creation.alert-onboarding.wizard_error:before {
+    content: url('./img/emailchef.png');
+}
+
+.bootstrap .alert.list_creation.alert-onboarding .btn.btn-default:hover, .bootstrap .btn.btn-default:hover {
+    background-color: rgb(244, 114, 0);
+    border-color: rgb(193, 83, 0);
+}

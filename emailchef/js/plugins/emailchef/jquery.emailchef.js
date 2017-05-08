@@ -38,6 +38,7 @@ var PS_Emailchef = function($) {
     var $policyList;
     var $landingList;
     var $fpageList;
+    var $listCreation;
 
     return {
         go : go
@@ -54,44 +55,16 @@ var PS_Emailchef = function($) {
         $policyList = $("#" + prefixed_setting("policy_type"));
         $landingList = $("#" + prefixed_setting("landing_page"));
         $fpageList = $("#" + prefixed_setting("fuck_page"));
+        $listCreation = $(".list_creation");
     }
 
     function triggerElements() {
+
         $createList.on("click", function (evt) {
             evt.preventDefault();
+            $(".list_creation").slideToggle();
+            $(".list_creation").find("input").val("");
 
-            if ($(".tr-info-color").length)
-                return;
-
-            $createList.closest("tr").after('<tr class="tr-info-color" valign="top">' +
-                '<th scope="row" class="titledesc">' +
-                '<label for="wc_emailchef_new_name">Nome lista</label>' +
-                '</th>' +
-                '<td class="forminp forminp-text">' +
-                '<input name="wc_emailchef_new_name" id="wc_emailchef_new_name" type="text" dir="ltr" style="min-width:350px;" value="" class="" placeholder="Inserisci il nome della lista">‎' +
-                '</td>' +
-                '</tr>' +
-                '<tr class="tr-info-color" valign="top">' +
-                '<th scope="row" class="titledesc">' +
-                '<label for="wc_emailchef_new_description">Descrizione lista</label>' +
-                '</th>' +
-                '<td class="forminp forminp-text">' +
-                '<input name="wc_emailchef_new_description" id="wc_emailchef_new_description" type="text" dir="ltr" style="min-width:350px;" value="" class="" placeholder="Inserisci la descrizione della lista">‎' +
-                '</td>' +
-                '</tr>' +
-                '<tr class="tr-info-color" valign="top">' +
-                '<th scope="row" class="titledesc">' +
-                '<label for="wc_emailchef_new_save">Crea?</label>' +
-                '</th>' +
-                '<td class="forminp forminp-text">' +
-                '<button name="wc_emailchef_save" class="button-primary woocommerce-save-button" id="wc_emailchef_new_save" >Crea</button>‎' +
-                '&nbsp;&nbsp;' +
-                '<button name="wc_emailchef_undo" class="button woocommerce-undo-button" id="wc_emailchef_undo_save" >Annulla</button>‎' +
-                '</td>' +
-                '</tr>'+
-                '<tr class="tr-info-color" valign="top">' +
-                '<td colspan="2">Creando una nuova lista certifichi che è conforme alla politica Anti-SPAM e all\' informativa sulla privacy </td>'+
-                '</tr>');
         });
 
         $(document).on("click", "#" + prefixed_setting("new_save"), function (evt) {
@@ -101,7 +74,7 @@ var PS_Emailchef = function($) {
 
         $(document).on("click", "#" + prefixed_setting("undo_save"), function (evt) {
             evt.preventDefault();
-            $(".tr-info-color").remove();
+            $listCreation.slideUp();
         });
 
         $policyList.on("change", function(evt){
@@ -122,6 +95,30 @@ var PS_Emailchef = function($) {
     }
 
     function accessIsValid(apiUser, apiPass, apiLoad) {
+
+        var ajax_data = {
+            action: 'emailcheflogin',
+            api_user: '',
+            api_pass: ''
+        };
+
+        if (apiUser !== "islogin" && apiPass !== "islogin") {
+            ajax_data.api_user = apiUser;
+            ajax_data.api_pass = apiPass;
+        }
+
+        var query = $.ajax({
+            type: 'POST',
+            url: $(".list_creation").data("ajax-action"),
+            data: ajax_data,
+            dataType: 'json',
+            success: function(json) {
+                console.log(json);
+            },
+            error: function(jxqr, textStatus, thrown){
+                alert(jxqr.status+" "+thrown+" "+textStatus);
+            }
+        });
 
         /*formContent('hide');
 
@@ -182,12 +179,18 @@ var PS_Emailchef = function($) {
 
     function mainListChanges() {
 
-        $selList.closest("tr").hide();
+        $(".form-wrapper > div").each(function(key, div){
+
+            if (key > 3)
+                $(div).hide();
+
+        });
 
         $("#" + prefixed_setting("username") + ", " + "#" + prefixed_setting("password")).change(function () {
             accessIsValid($apiUser.val(), $apiPass.val(), false);
         });
-        accessIsValid($apiUser.val(), $apiPass.val(), false);
+
+        accessIsValid("islogin", "islogin", false);
 
     }
 
