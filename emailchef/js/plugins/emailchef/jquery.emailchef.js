@@ -96,6 +96,7 @@ var PS_Emailchef = function($) {
 
     function accessIsValid(apiUser, apiPass, apiLoad) {
 
+        var ajax_url = $(".list_creation").data("ajax-action");
         var ajax_data = {
             action: 'emailcheflogin',
             api_user: '',
@@ -107,89 +108,79 @@ var PS_Emailchef = function($) {
             ajax_data.api_pass = apiPass;
         }
 
-        var query = $.ajax({
-            type: 'POST',
-            url: $(".list_creation").data("ajax-action"),
-            data: ajax_data,
-            dataType: 'json',
-            success: function(json) {
-                console.log(json);
-            },
-            error: function(jxqr, textStatus, thrown){
-                alert(jxqr.status+" "+thrown+" "+textStatus);
-            }
-        });
+        formContent('hide');
+        $("button[name='submitemailchef']").attr("disabled", "disabled");
 
-        /*formContent('hide');
-
-        $(".submit input[name='save']").attr("disabled", "disabled");
-
-        $("#check_login_data").remove();
-
-        if (apiUser === '' || apiPass === '')
+        if (apiUser === '' || apiPass === '' || apiUser === "islogin" || apiPass === "islogin")
             return;
 
-        $('<span id="check_login_data">Controllo dati di accesso in corso...</span>').insertAfter($apiUser);
+        $(".status-login").hide();
+        $(".check-login").show();
 
-        $selList.attr("disabled", "disabled");
+        $.ajax({
+            type: 'POST',
+            url: ajax_url,
+            data: ajax_data,
+            dataType: 'json',
+            success: function(response) {
 
-        $.post(ajaxurl, {
-                'action': '' + prefixed_setting('account'),
-                'data': {
-                    'api_user': apiUser,
-                    'api_pass': apiPass
-                }
-            },
-            function (response) {
-
-                $(".submit input[name='save']").removeAttr("disabled");
-
-                var result = $.parseJSON(response);
-
-                if (result.type == 'error') {
-                    $("#check_login_data").removeClass().addClass("error").html('<i class="dashicons dashicons-warning"></i> I dati inseriti sono errati.');
+                if (response.type == 'error') {
+                    $(".status-login").hide();
+                    $("#error_login_data").show();
                     return;
                 }
 
-                $("#check_login_data").removeClass().addClass("success").html('<i class="dashicons dashicons-yes"></i>');
-
+                $("#success_login_data").show();
                 formContent('show');
 
-                console.log("Policy = "+result.policy);
+                console.log("Policy = "+response.policy);
 
-                if (result.policy !== 'premium'){
+                if (response.policy !== 'premium'){
                     console.log("Policy != premium, remove other policy options");
-                    formPolicy('hide');
+                    //formPolicy('hide');
                 }
                 else {
-                    formPolicy('show');
+                    //formPolicy('show');
                 }
 
-                $selList.removeAttr("disabled");
-
-                if (apiLoad) {
+                /*if (apiLoad) {
                     console.log("Loading lists...");
                     loadLists(apiUser, apiPass, -1);
-                }
+                }*/
 
+                $("button[name='submitemailchef']").removeAttr("disabled");
+
+            },
+            error: function(jxqr, textStatus, thrown){
+                $("#server_failure_login_data").show();
+            },
+            complete: function() {
+                $(".check-login").hide();
             }
-        );*/
+        });
+    }
+
+    function formContent(status) {
+
+        $(".form-wrapper > div").each(function(key, div) {
+            if (key > 5) {
+                if (status == 'hide')
+                    $(div).hide();
+                else {
+                    $(div).show();
+                }
+            }
+        });
+
+        $(".list_creation").hide();
 
     }
 
     function mainListChanges() {
 
-        $(".form-wrapper > div").each(function(key, div){
-
-            if (key > 3)
-                $(div).hide();
-
-        });
-
         $("#" + prefixed_setting("username") + ", " + "#" + prefixed_setting("password")).change(function () {
             accessIsValid($apiUser.val(), $apiPass.val(), false);
         });
-
         accessIsValid("islogin", "islogin", false);
 
     }

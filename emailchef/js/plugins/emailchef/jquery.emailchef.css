@@ -32,3 +32,15 @@ select#ps_emailchef_list.select_and_create {
     background-color: rgb(244, 114, 0);
     border-color: rgb(193, 83, 0);
 }
+
+.loading-spinner-emailchef {
+    width:16px;
+    height: 16px;
+    display:inline-block;
+    background:url('./img/spinner.gif') no-repeat;
+    padding-right:20px;
+}
+
+.check-login, .response-login {
+    display: none;
+}

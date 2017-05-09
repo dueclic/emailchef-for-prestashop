@@ -70,7 +70,7 @@
                     {/foreach}
                 {/if}
             </select>
-            <button class="select_and_create_btn btn btn-default" id="{$create_list_id}">Crea Lista</button>
+            <button class="select_and_create_btn btn btn-default" id="{$create_list_id}">{$i18n['create_list']}</button>
             <div class="select_and_create_clear"></div>
         {/if}
 
@@ -92,35 +92,35 @@
 
 
             <div class="form-group">
-                <label class="col-lg-3 control-label required" for="{$new_name_id}">Nome lista</label>
+                <label class="col-lg-3 control-label required" for="{$new_name_id}">{$i18n['name_list']}</label>
                 <div class="col-lg-6">
                     <input type="text" class="form-control" name="{$new_name_id}"
-                           placeholder="Inserisci il nome della nuova lista">
+                           placeholder="{$i18n['name_list_placeholder']}">
                 </div>
             </div>
 
             <div class="form-group">
-                <label class="col-lg-3 control-label required" for="{$new_desc_id}">Descrizione lista</label>
+                <label class="col-lg-3 control-label required" for="{$new_desc_id}">{$i18n['desc_list']}</label>
                 <div class="col-lg-6">
                     <input type="text" class="form-control" name="{$new_desc_id}"
-                           placeholder="Inserisci la descrizione della nuova lista">
+                           placeholder="{$i18n['desc_list_placeholder']}">
                 </div>
             </div>
 
             <div class="form-group">
                 <div class="col-lg-12">
-                    * Creando una nuova lista certifichi che è conforme alla politica Anti-SPAM e all' informativa sulla privacy.
+                    * {$i18n['accept_privacy']}
                 </div>
             </div>
 
             <div class="form-group">
 
                 <button type="submit" value="1" id="{$undo_id}" name="{$undo_id}" class="btn btn-default pull-right">
-                    <i class="icon-undo"></i> Annulla
+                    <i class="icon-undo"></i> {$i18n['undo_btn']}
                 </button>
                 &nbsp;
                 <button type="submit" value="1" id="{$save_id}" name="{$save_id}" class="btn btn-default pull-right">
-                    <i class="icon-plus"></i> Crea lista
+                    <i class="icon-plus"></i> {$i18n['create_list']}
                 </button>
 
             </div>
@@ -128,9 +128,54 @@
         </div>
     {/if}
 
-    {if $input.type == "text" && $input.name == $password_field}
-        <div>
-            <i class="process-icon-loading"></i> Controllo dei dati in corso...
+    {if $input.type == "password" && $input.name == $password_field}
+        <div id="check_login_data" class="check-login">
+            <div class="row">
+                <div class="col-lg-offset-3 col-lg-9">
+                    <div class="alert alert-info alert-check">
+
+                        <h4>
+                            <span class="loading-spinner-emailchef"></span> {$i18n['check_login_data']}
+                        </h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="error_login_data" class="status-login response-login">
+            <div class="row">
+                <div class="col-lg-offset-3 col-lg-9">
+                    <div class="alert alert-danger alert-check">
+
+                        <h4>
+                            {$i18n['error_login_data']}
+                        </h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="server_failure_login_data" class="status-login response-login">
+            <div class="row">
+                <div class="col-lg-offset-3 col-lg-9">
+                    <div class="alert alert-danger alert-check">
+
+                        <h4>
+                            {$i18n['server_failure_login_data']}
+                        </h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="success_login_data" class="status-login response-login">
+            <div class="row">
+                <div class="col-lg-offset-3 col-lg-9">
+                    <div class="alert alert-success alert-check">
+
+                        <h4>
+                            {$i18n['success_login_data']}
+                        </h4>
+                    </div>
+                </div>
+            </div>
         </div>
     {/if}
 
