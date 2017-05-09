@@ -91,7 +91,6 @@ class Emailchef extends Module
     {
 
         $output = null;
-
         if (Tools::isSubmit('submit' . $this->name)) {
             $ec_username = strval(Tools::getValue($this->prefix_setting('username')));
             $ec_password = strval(Tools::getValue($this->prefix_setting('password')));
@@ -99,6 +98,8 @@ class Emailchef extends Module
             $ec_policy_type = strval(Tools::getValue($this->prefix_setting('policy_type')));
             $ec_landing_page = strval(Tools::getValue($this->prefix_setting('landing_page')));
             $ec_fuck_page = strval(Tools::getValue($this->prefix_setting('fuck_page')));
+
+            $ec_list_old = $this->_getConf("list");
 
             if (!$ec_username || empty($ec_username) || !Validate::isGenericName($ec_username)) {
                 $output .= $this->displayError($this->l('Inserisci uno username valido.'));
@@ -117,6 +118,19 @@ class Emailchef extends Module
                         Configuration::updateValue($this->prefix_setting('fuck_page'), $ec_fuck_page);
 
                         $output .= $this->displayConfirmation($this->l('Impostazioni salvate con successo.'));
+                        $emailchef_cron_url = $this->_path."/ajax.php";
+                        $output .= <<<EOF
+<script>
+    var emailchef_cron_url = '$emailchef_cron_url';
+</script>
+EOF;
+                        if ($ec_list_old != $ec_list) {
+                            $output .= $this->adminDisplayInformation($this->l("E' in esecuzione un processo automatico di esportazione dei dati relativi ai tuoi clienti verso eMailChef"));
+
+                            $this->context->controller->addJs($this->_path."js/plugins/emailchef/jquery.emailchef.cron.js");
+                        }
+
+
                     }
                 }
             }
@@ -134,6 +148,10 @@ class Emailchef extends Module
     public function _getConf($config)
     {
         return Configuration::get($this->prefix_setting($config));
+    }
+
+    public function log($message, $severity = 1){
+        return PrestaShopLogger::addLog( "[eMailChef Plugin] " . $message, $severity, null, null , null, true );
     }
 
     private function get_lists()

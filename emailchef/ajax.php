@@ -89,7 +89,12 @@ final class EmailchefAjaxRequest{
                 $response['type'] = "success";
                 $response['msg'] = $this->module->l("Custom fields creati con successo.");
 
-                /* @TODO Log list custom fields created */
+                $this->module->log(
+                    sprintf(
+                        $this->module->l('Creati custom fields per la lista %d'),
+                        $args['list_id']
+                    )
+                );
 
                 return $response;
 
@@ -97,7 +102,13 @@ final class EmailchefAjaxRequest{
 
             $response['msg']  = $psec->lastError;
 
-            /* @TODO Log not created custom fields */
+            $this->module->log(
+                sprintf(
+                    $this->module->l('Tentativo fallito di creazione dei custom fields per la lista %d'),
+                    $args['list_id']
+                ),
+                3
+            );
 
 
         }
@@ -135,7 +146,14 @@ final class EmailchefAjaxRequest{
                 $response['msg'] = $this->module->l("Lista creata con successo.");
                 $response['list_id'] = $list_id;
 
-                /* @TODO Log list created */
+                $this->module->log(
+                    sprintf(
+                        $this->module->l('Creata lista %d (Nome: %s, Descrizione: %s)'),
+                        $list_id,
+                        $args['list_name'],
+                        $args['list_desc']
+                    )
+                );
 
                 return $response;
 
@@ -143,8 +161,15 @@ final class EmailchefAjaxRequest{
 
             $response['msg']  = $psec->lastError;
 
-            /* @TODO Log not created list */
-
+            $this->module->log(
+                sprintf(
+                    $this->module->l('Tentativo fallito di creazione della lista %d (Nome: %s, Descrizione: %s)'),
+                    $list_id,
+                    $args['list_name'],
+                    $args['list_desc']
+                ),
+                3
+            );
 
         }
 
@@ -186,6 +211,15 @@ final class EmailchefAjaxRequest{
 		return $response;
 
 	}
+
+	public function ajax_emailchefsync($args){
+
+	    for ($i=0; $i<100; $i++){
+	        $this->module->log( $this->module->_getConf("list")." cron ".$i );
+	        sleep(1);
+        }
+
+    }
 
 }
 

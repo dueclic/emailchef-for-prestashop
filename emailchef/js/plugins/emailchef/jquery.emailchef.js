@@ -309,11 +309,6 @@ var PS_Emailchef = function($) {
 
                 createCustomFields(apiUser, apiPass, response.list_id);
 
-                /*
-                $btnSave.removeAttr("disabled");
-                $selList.removeAttr("disabled");
-                */
-
             },
             error: function(jxqr, textStatus, thrown){
                 $("#error_status_list_data").find(".reason").text(jxqr.error +" "+textStatus+" "+thrown);
