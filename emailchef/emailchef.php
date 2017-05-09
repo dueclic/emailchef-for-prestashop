@@ -95,7 +95,7 @@ class Emailchef extends Module
         if (Tools::isSubmit('submit' . $this->name)) {
             $ec_username = strval(Tools::getValue($this->prefix_setting('username')));
             $ec_password = strval(Tools::getValue($this->prefix_setting('password')));
-            $ec_list = strval(Tools::getValue($this->prefix_setting('list')));
+            $ec_list = intval(Tools::getValue($this->prefix_setting('list')));
             $ec_policy_type = strval(Tools::getValue($this->prefix_setting('policy_type')));
             $ec_landing_page = strval(Tools::getValue($this->prefix_setting('landing_page')));
             $ec_fuck_page = strval(Tools::getValue($this->prefix_setting('fuck_page')));
@@ -138,7 +138,16 @@ class Emailchef extends Module
 
     private function get_lists()
     {
-
+        if ($this->emailchef->isLogged()) {
+            return $this->emailchef->get_lists();
+        } else {
+            return array(
+                array(
+                    'id'    => -1,
+                    'name' => $this->l('Accedi per visualizzare le tue liste.')
+                )
+            );
+        }
     }
 
     private function get_pages()
@@ -190,8 +199,11 @@ class Emailchef extends Module
                     'desc'     => $this->l('Lista di destinazione'),
                     'name'     => $this->prefix_setting('list'),
                     'required' => true,
-                    /* @TODO get_lists() */
-                    'options'  => $this->get_lists()
+                    'options'  => array(
+                        'query' => $this->get_lists(),
+                        'id'    => 'id',
+                        'name'  => 'name'
+                    )
                 ),
                 array(
                     'type'     => 'select',
@@ -260,7 +272,7 @@ class Emailchef extends Module
                 'new_desc_id'    => $this->prefix_setting('new_description'),
                 'save_id'        => $this->prefix_setting('save'),
                 'undo_id'        => $this->prefix_setting('undo'),
-                'ajax_url'       => $this->_path . "/ajax.php",
+                'ajax_url'       => $this->_path . "ajax.php",
                 'password_field' => $this->prefix_setting('password'),
             )
         );
@@ -276,7 +288,16 @@ class Emailchef extends Module
             'check_login_data'          => $this->l('Controllo dei dati di accesso in corso...'),
             'error_login_data'          => $this->l('I dati di accesso inseriti sono errati.'),
             'server_failure_login_data' => $this->l('Errore interno del server, riprova.'),
-            'success_login_data'        => $this->l('Login con eMailChef effettuato con successo.')
+            'success_login_data'        => $this->l('Login con eMailChef effettuato con successo.'),
+            'no_list_found' => $this->l('Nessuna lista trovata.'),
+            'check_status_list_data' => $this->l('Creazione della lista in corso...'),
+            'check_status_list_data_cf' => $this->l('Stiamo creando i custom fields per la lista appena creata...'),
+            'error_status_list_data' => $this->l('Errore nella creazione della lista indicata.'),
+            'error_status_list_data_cf' => $this->l('Errore nella creazione dei custom fields per la lista creata.'),
+            'server_error_status_list_data' => $this->l('Errore interno del server, riprova.'),
+            'success_status_list_data' => $this->l('La lista è stata creata con successo, ora verranno creati i custom fields.'),
+            'success_status_list_data_cf' => $this->l('Creazione dei custom fields per la lista avvenuta con successo.')
+
         ));
 
         $helper->default_form_language = $default_lang;

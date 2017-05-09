@@ -78,6 +78,19 @@
             {$smarty.block.parent}
         {/block}
 
+    {elseif $input.type == "password"}
+        <div class="input-group fixed-width-lg">
+                                            <span class="input-group-addon">
+                                                <i class="icon-key"></i>
+                                            </span>
+            <input type="password"
+                   id="{if isset($input.id)}{$input.id}{else}{$input.name}{/if}"
+                   name="{$input.name}"
+                   class="{if isset($input.class)}{$input.class}{/if}"
+                   value="{$fields_value[$input.name]}"
+                   {if isset($input.autocomplete) && !$input.autocomplete}autocomplete="off"{/if}
+                    {if isset($input.required) && $input.required } required="required" {/if} />
+        </div>
     {else}
         {$smarty.block.parent}
     {/if}
@@ -85,46 +98,164 @@
 {/block}
 
 {block name="input_row"}
+
     {$smarty.block.parent}
 
     {if $input.type == "select_and_create"}
-        <div class="list_creation alert alert-onboarding" data-ajax-action="{$ajax_url}">
+        <div class="list_creation" data-ajax-action="{$ajax_url}">
+            <div class="row">
+                <div class="col-lg-offset-3 col-lg-9">
 
+                    <div class="list_creation_form alert alert-onboarding">
 
-            <div class="form-group">
-                <label class="col-lg-3 control-label required" for="{$new_name_id}">{$i18n['name_list']}</label>
-                <div class="col-lg-6">
-                    <input type="text" class="form-control" name="{$new_name_id}"
-                           placeholder="{$i18n['name_list_placeholder']}">
+                        <div class="form-group">
+                            <label class="col-lg-3 control-label required"
+                                   for="{$new_name_id}">{$i18n['name_list']}</label>
+                            <div class="col-lg-6">
+                                <input type="text" class="form-control" id="{$new_name_id}" name="{$new_name_id}"
+                                       placeholder="{$i18n['name_list_placeholder']}">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-lg-3 control-label required"
+                                   for="{$new_desc_id}">{$i18n['desc_list']}</label>
+                            <div class="col-lg-6">
+                                <input type="text" class="form-control" id="{$new_desc_id}" name="{$new_desc_id}"
+                                       placeholder="{$i18n['desc_list_placeholder']}">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-lg-12">
+                                * {$i18n['accept_privacy']}
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+
+                            <button type="submit" value="1" id="{$undo_id}" name="{$undo_id}"
+                                    class="btn btn-default pull-right">
+                                <i class="icon-undo"></i> {$i18n['undo_btn']}
+                            </button>
+                            &nbsp;
+                            <button type="submit" value="1" id="{$save_id}" name="{$save_id}"
+                                    class="btn btn-default pull-right">
+                                <i class="icon-plus"></i> {$i18n['create_list']}
+                            </button>
+
+                        </div>
+
+                    </div>
+
                 </div>
             </div>
+        </div>
+        <!--
+        creazione lista
+        -->
+        <div id="success_status_list_data" class="status-list response-list">
+            <div class="row">
+                <div class="col-lg-offset-3 col-lg-9">
+                    <div class="alert alert-success alert-check">
 
-            <div class="form-group">
-                <label class="col-lg-3 control-label required" for="{$new_desc_id}">{$i18n['desc_list']}</label>
-                <div class="col-lg-6">
-                    <input type="text" class="form-control" name="{$new_desc_id}"
-                           placeholder="{$i18n['desc_list_placeholder']}">
+                        <h4>
+                            {$i18n['success_status_list_data']}
+                        </h4>
+                    </div>
                 </div>
             </div>
+        </div>
+        <div id="check_status_list_data" class="check-list">
+            <div class="row">
+                <div class="col-lg-offset-3 col-lg-9">
+                    <div class="alert alert-info alert-check">
 
-            <div class="form-group">
-                <div class="col-lg-12">
-                    * {$i18n['accept_privacy']}
+                        <h4>
+                            <span class="loading-spinner-emailchef"></span> {$i18n['check_status_list_data']}
+                        </h4>
+                    </div>
                 </div>
             </div>
+        </div>
+        <div id="error_status_list_data" class="status-list response-list">
+            <div class="row">
+                <div class="col-lg-offset-3 col-lg-9">
+                    <div class="alert alert-danger alert-check">
 
-            <div class="form-group">
-
-                <button type="submit" value="1" id="{$undo_id}" name="{$undo_id}" class="btn btn-default pull-right">
-                    <i class="icon-undo"></i> {$i18n['undo_btn']}
-                </button>
-                &nbsp;
-                <button type="submit" value="1" id="{$save_id}" name="{$save_id}" class="btn btn-default pull-right">
-                    <i class="icon-plus"></i> {$i18n['create_list']}
-                </button>
-
+                        <h4>
+                            {$i18n['error_status_list_data']}
+                        </h4>
+                        <p class="reason"></p>
+                    </div>
+                </div>
             </div>
+        </div>
+        <div id="server_error_status_list_data" class="status-list response-list">
+            <div class="row">
+                <div class="col-lg-offset-3 col-lg-9">
+                    <div class="alert alert-danger alert-check">
 
+                        <h4>
+                            {$i18n['server_error_status_list_data']}
+                        </h4>
+                        <p class="reason"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--
+        creazione custom fields
+        -->
+        <div id="success_status_list_data_cf" class="status-list-cf response-list-cf">
+            <div class="row">
+                <div class="col-lg-offset-3 col-lg-9">
+                    <div class="alert alert-success alert-check">
+
+                        <h4>
+                            {$i18n['success_status_list_data_cf']}
+                        </h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="check_status_list_data_cf" class="check-list-cf">
+            <div class="row">
+                <div class="col-lg-offset-3 col-lg-9">
+                    <div class="alert alert-info alert-check">
+
+                        <h4>
+                            <span class="loading-spinner-emailchef"></span> {$i18n['check_status_list_data_cf']}
+                        </h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="error_status_list_data_cf" class="status-list-cf response-list-cf">
+            <div class="row">
+                <div class="col-lg-offset-3 col-lg-9">
+                    <div class="alert alert-danger alert-check">
+
+                        <h4>
+                            {$i18n['error_status_list_data_cf']}
+                        </h4>
+                        <p class="reason"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="server_error_status_list_data_cf" class="status-list-cf response-list-cf">
+            <div class="row">
+                <div class="col-lg-offset-3 col-lg-9">
+                    <div class="alert alert-danger alert-check">
+
+                        <h4>
+                            {$i18n['server_error_status_list_data']}
+                        </h4>
+                        <p class="reason"></p>
+                    </div>
+                </div>
+            </div>
         </div>
     {/if}
 
@@ -179,4 +310,13 @@
         </div>
     {/if}
 
+{/block}
+{block name="footer"}
+    {$smarty.block.parent}
+    <script>
+        var i18n = {
+            'no_list_found': '{$i18n['no_list_found']}',
+            'create_list': '{$i18n['create_list']}'
+        };
+    </script>
 {/block}

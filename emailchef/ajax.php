@@ -36,8 +36,17 @@ final class EmailchefAjaxRequest{
 
 		$response = $this->_errorRequest();
 
-		if (method_exists($this, $method))
-			$response = call_user_func(array($this, $method), $args);
+		if (method_exists($this, $method)) {
+		    try {
+                $response = call_user_func(array($this, $method), $args);
+            }
+            catch (\Exception $e){
+                array(
+                    'type' => 'error',
+                    'msg' => $this->module->l('Errore: eccezione ').$e->getMessage()
+                );
+            }
+        }
 
 		die(
 			Tools::jsonEncode($response)
@@ -51,6 +60,97 @@ final class EmailchefAjaxRequest{
 			'msg' => $this->module->l('Route non valida')
 		);
 	}
+
+	public function ajax_emailchefaddcustomfields($args){
+
+        if (isset($args['api_user']) && isset($args['api_pass'])) {
+            $psec = $this->module->emailchef( $args['api_user'], $args['api_pass'] );
+        }
+        else {
+            $psec = $this->module->emailchef();
+        }
+
+        $response = array(
+            'type' => 'error',
+            'msg'  => $this->module->l( 'Username o password non corretti.' )
+        );
+
+        if ($psec->isLogged()){
+
+            if ( ! $args['list_id'] || empty( $args['list_id'] ) ) {
+                $response['msg'] = $this->module->l('Lista assegnata non valida.');
+                return $response;
+            }
+
+            $init = $psec->initialize_custom_fields($args['list_id']);
+
+            if ( $init ) {
+
+                $response['type'] = "success";
+                $response['msg'] = $this->module->l("Custom fields creati con successo.");
+
+                /* @TODO Log list custom fields created */
+
+                return $response;
+
+            }
+
+            $response['msg']  = $psec->lastError;
+
+            /* @TODO Log not created custom fields */
+
+
+        }
+
+        return $response;
+
+    }
+
+	public function ajax_emailchefaddlist($args) {
+
+	    if (isset($args['api_user']) && isset($args['api_pass'])) {
+            $psec = $this->module->emailchef( $args['api_user'], $args['api_pass'] );
+        }
+        else {
+            $psec = $this->module->emailchef();
+        }
+
+        $response = array(
+            'type' => 'error',
+            'msg'  => $this->module->l( 'Username o password non corretti.' )
+        );
+
+        if ($psec->isLogged()){
+
+            if ( ! $args['list_name'] || empty( $args['list_name'] ) || ! $args['list_desc'] || empty( $args['list_desc'] ) ) {
+                $response['msg'] = $this->module->l('Inserisci un nome e una descrizione per la nuova lista');
+                return $response;
+            }
+
+            $list_id = $psec->create_list($args['list_name'], $args['list_desc']);
+
+            if ( $list_id !== false ) {
+
+                $response['type'] = "success";
+                $response['msg'] = $this->module->l("Lista creata con successo.");
+                $response['list_id'] = $list_id;
+
+                /* @TODO Log list created */
+
+                return $response;
+
+            }
+
+            $response['msg']  = $psec->lastError;
+
+            /* @TODO Log not created list */
+
+
+        }
+
+        return $response;
+
+    }
 
 	public function ajax_emailcheflogin($args){
 
@@ -66,8 +166,13 @@ final class EmailchefAjaxRequest{
 			$response = array(
 				'status' => 'success',
 				'msg'    => $this->module->l( 'Utente loggato con successo.' ),
-				'policy' => $psec->get_policy()
+				'policy' => $psec->get_policy(),
+                'lists' => $psec->get_lists()
 			);
+
+			if (isset($_POST['fetch']) && $_POST['fetch'])
+			    $response['list'] = $this->module->_getConf('list');
+
 
 		} else {
 

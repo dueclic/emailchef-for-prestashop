@@ -31,93 +31,100 @@ use \Httpful\Httpful as Httpful;
 use \Httpful\Mime as Mime;
 use \Httpful\Handlers\JsonHandler as JsonHandler;
 
-class PS_Emailchef_Api {
+class PS_Emailchef_Api
+{
 
-	protected $api_url = "https://app.emailchef.com/api";
-	public $lastError;
-	private $isLogged = false;
-	private $authkey = false;
+    protected $api_url = "https://app.emailchef.com/api";
+    public $lastError;
+    private $isLogged = false;
+    private $authkey = false;
 
-	public function __construct( $username, $password ) {
-		$this->process_login( $username, $password );
-	}
+    public function __construct($username, $password)
+    {
+        $this->process_login($username, $password);
+    }
 
-	public function isLogged() {
-		return $this->isLogged;
-	}
+    public function isLogged()
+    {
+        return $this->isLogged;
+    }
 
-	private function process_login( $username, $password ) {
+    private function process_login($username, $password)
+    {
 
-		$response = $this->get( "/login", array(
+        $response = $this->get("/login", array(
 
-			'username' => $username,
-			'password' => $password
+            'username' => $username,
+            'password' => $password
 
-		), "POST", true );
+        ), "POST", true);
 
-		if ( ! isset( $response['authkey'] ) ) {
-			$this->lastError = $response['message'];
-		} else {
-			$this->authkey  = $response['authkey'];
-			$this->isLogged = true;
-		}
+        if (!isset($response['authkey'])) {
+            $this->lastError = $response['message'];
+        } else {
+            $this->authkey = $response['authkey'];
+            $this->isLogged = true;
+        }
 
-	}
+    }
 
-	private function getRequest( $url, $payload, $type ) {
+    private function getRequest($url, $payload, $type)
+    {
 
-		Httpful::register(
-			Mime::JSON,
-			new JsonHandler(
-				array( 'decode_as_array' => true )
-			)
-		);
+        Httpful::register(
+            Mime::JSON,
+            new JsonHandler(
+                array('decode_as_array' => true)
+            )
+        );
 
-		$response = null;
-		switch ( $type ) {
-			case 'POST':
-				$response = Request::post( $url, $payload )
-				                   ->send();
-				break;
-			case 'DELETE':
-				$response = Request::init( Http::DELETE )
-				                   ->uri( $url )
-				                   ->body( $payload, 'application/json' )
-				                   ->send();
-				break;
-			case 'PUT':
-				$response = Request::put( $url, $payload )
-				                   ->send();
-				break;
-			case 'GET':
-			default:
-				$response = Request::get( $url )
-				                   ->body( $payload, 'application/json' )
-				                   ->send();
-				break;
-		}
+        $response = null;
+        switch ($type) {
+            case 'POST':
+                $response = Request::post($url)
+                    ->body($payload, 'application/json')
+                    ->send();
+                break;
+            case 'DELETE':
+                $response = Request::init(Http::DELETE)
+                    ->uri($url)
+                    ->body($payload, 'application/json')
+                    ->send();
+                break;
+            case 'PUT':
+                $response = Request::put($url, $payload)
+                    ->send();
+                break;
+            case 'GET':
+            default:
+                $response = Request::get($url)
+                    ->body($payload, 'application/json')
+                    ->send();
+                break;
+        }
 
-		return $response;
-	}
+        return $response;
+    }
 
-	protected function get( $route, $args = array(), $type = "POST", $encoded = false ) {
+    protected function get($route, $args = array(), $type = "POST", $encoded = false)
+    {
 
-		$url  = $this->api_url . $route;
-		$auth = array();
+        $url = $this->api_url . $route;
+        $auth = array();
 
-		if ( $this->authkey !== false ) {
-			$auth = array(
-				'authkey' => $this->authkey
-			);
-		}
+        if ($this->authkey !== false) {
+            $auth = array(
+                'authkey' => $this->authkey
+            );
+        }
 
-		$payload = array_merge( $auth, $args );
+        $payload = array_merge($auth, $args);
 
-		if ( $encoded ) {
-			$payload = json_encode( $payload );
-		}
+        if ($encoded) {
+            $payload = json_encode($payload);
+        }
 
-		return json_decode( $this->getRequest( $url, $payload, $type ), true );
-	}
+        return json_decode($this->getRequest($url, $payload, $type), true);
+    }
 
 }

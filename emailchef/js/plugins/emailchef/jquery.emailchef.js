@@ -39,6 +39,7 @@ var PS_Emailchef = function($) {
     var $landingList;
     var $fpageList;
     var $listCreation;
+    var $btnSave;
 
     return {
         go : go
@@ -55,6 +56,7 @@ var PS_Emailchef = function($) {
         $policyList = $("#" + prefixed_setting("policy_type"));
         $landingList = $("#" + prefixed_setting("landing_page"));
         $fpageList = $("#" + prefixed_setting("fuck_page"));
+        $btnSave = $("button[name='submitemailchef']");
         $listCreation = $(".list_creation");
     }
 
@@ -62,18 +64,27 @@ var PS_Emailchef = function($) {
 
         $createList.on("click", function (evt) {
             evt.preventDefault();
-            $(".list_creation").slideToggle();
-            $(".list_creation").find("input").val("");
+            $listCreation.slideToggle('slow', function(){
 
+                if ($(this).is(":hidden")){
+                    $createList.text(i18n.create_list);
+                }
+                else {
+                    $createList.html('<span class="icon icon-times icon-lg"></span>');
+                }
+
+            });
+            $listCreation.find("input").val("");
         });
 
-        $(document).on("click", "#" + prefixed_setting("new_save"), function (evt) {
+        $(document).on("click", "#" + prefixed_setting("save"), function (evt) {
             evt.preventDefault();
             addList($apiUser.val(), $apiPass.val(), $("#" + prefixed_setting("new_name")).val(), $("#" + prefixed_setting("new_description")).val());
         });
 
-        $(document).on("click", "#" + prefixed_setting("undo_save"), function (evt) {
+        $(document).on("click", "#" + prefixed_setting("undo"), function (evt) {
             evt.preventDefault();
+            $createList.text(i18n.create_list);
             $listCreation.slideUp();
         });
 
@@ -82,21 +93,30 @@ var PS_Emailchef = function($) {
             evt.preventDefault();
 
             if ($(this).val() === 'sopt'){
-                $landingList.closest("tr").fadeOut();
-                $fpageList.closest("tr").fadeOut();
+                $landingList.closest(".form-group").fadeOut();
+                $fpageList.closest(".form-group").fadeOut();
             }
             else {
-                $landingList.closest("tr").fadeIn();
-                $fpageList.closest("tr").fadeIn();
+                $landingList.closest(".form-group").fadeIn();
+                $fpageList.closest(".form-group").fadeIn();
             }
 
         });
 
     }
 
-    function accessIsValid(apiUser, apiPass, apiLoad) {
+    function policyContent(status) {
+        if (status == 'hide') {
+            $policyList.closest(".form-group").hide();
+        }
+        else {
+            $policyList.closest(".form-group").hide();
+        }
+    }
 
-        var ajax_url = $(".list_creation").data("ajax-action");
+    function accessIsValid(apiUser, apiPass) {
+
+        var ajax_url = $listCreation.data("ajax-action");
         var ajax_data = {
             action: 'emailcheflogin',
             api_user: '',
@@ -107,11 +127,14 @@ var PS_Emailchef = function($) {
             ajax_data.api_user = apiUser;
             ajax_data.api_pass = apiPass;
         }
+        else {
+            ajax_data.fetch = true
+        }
 
         formContent('hide');
-        $("button[name='submitemailchef']").attr("disabled", "disabled");
+        $btnSave.attr("disabled", "disabled");
 
-        if (apiUser === '' || apiPass === '' || apiUser === "islogin" || apiPass === "islogin")
+        if (apiUser === '' || apiPass === '')
             return;
 
         $(".status-login").hide();
@@ -130,25 +153,36 @@ var PS_Emailchef = function($) {
                     return;
                 }
 
-                $("#success_login_data").show();
+                $("#success_login_data").show().delay(3000).fadeOut();
+
+                $selList.empty();
+                if (response.lists.length > 0) {
+
+                    $.each(response.lists, function (key, list) {
+                        $selList.append($('<option>').text(list.name).attr('value', list.id));
+                    });
+
+                }
+
+                else {
+                    $selList.append($('<option>').text(i18n.no_list_found).attr('value', -1))
+                }
+
                 formContent('show');
 
                 console.log("Policy = "+response.policy);
 
                 if (response.policy !== 'premium'){
-                    console.log("Policy != premium, remove other policy options");
-                    //formPolicy('hide');
+                    policyContent('hide');
                 }
                 else {
-                    //formPolicy('show');
+                    policyContent('show');
                 }
 
-                /*if (apiLoad) {
-                    console.log("Loading lists...");
-                    loadLists(apiUser, apiPass, -1);
-                }*/
+                if (response.list !== undefined)
+                    $selList.val(response.list).attr("selected", "selected");
 
-                $("button[name='submitemailchef']").removeAttr("disabled");
+                $btnSave.removeAttr("disabled");
 
             },
             error: function(jxqr, textStatus, thrown){
@@ -172,16 +206,123 @@ var PS_Emailchef = function($) {
             }
         });
 
-        $(".list_creation").hide();
+        $listCreation.hide();
+        $(".check-list, .response-list").hide();
+        $(".check-list-cf, .response-list-cf").hide();
 
     }
 
     function mainListChanges() {
 
         $("#" + prefixed_setting("username") + ", " + "#" + prefixed_setting("password")).change(function () {
-            accessIsValid($apiUser.val(), $apiPass.val(), false);
+            accessIsValid($apiUser.val(), $apiPass.val());
         });
-        accessIsValid("islogin", "islogin", false);
+        accessIsValid("islogin", "islogin");
+
+    }
+
+    function createCustomFields(apiUser, apiPass, listId) {
+
+        var ajax_data = {
+            action: 'emailchefaddcustomfields',
+            api_user: apiUser,
+            api_pass: apiPass,
+            list_id: listId
+        };
+
+        var ajax_url = $listCreation.data("ajax-action");
+
+        $(".status-list-cf").hide();
+        $(".check-list-cf").show();
+
+        $.ajax({
+            type: 'POST',
+            url: ajax_url,
+            data: ajax_data,
+            dataType: 'json',
+            success: function(response) {
+
+                if (response.type == 'error') {
+                    $(".status-list-cf").hide();
+                    $("#error_status_list_data_cf").find(".reason").text(response.msg);
+                    $("#error_status_list_data_cf").show();
+                    return;
+                }
+
+                $("#success_status_list_data_cf").show().delay(3000).fadeOut();
+
+            },
+            error: function(jxqr, textStatus, thrown){
+                $("#error_status_list_data_cf").find(".reason").text(jxqr.error +" "+textStatus+" "+thrown);
+                $("#server_error_status_list_data_cf").show();
+            },
+            complete: function() {
+                $(".check-list-cf").hide();
+                $btnSave.removeAttr("disabled");
+                $selList.removeAttr("disabled");
+            }
+        });
+
+    }
+
+    function addList(apiUser, apiPass, listName, listDesc) {
+
+        var ajax_data = {
+            action: 'emailchefaddlist',
+            api_user: apiUser,
+            api_pass: apiPass,
+            list_name: listName,
+            list_desc: listDesc
+        };
+
+        var ajax_url = $listCreation.data("ajax-action");
+
+        $btnSave.attr("disabled", "disabled");
+        $selList.attr("disabled", "disabled");
+
+        $(".status-list").hide();
+        $(".check-list").show();
+
+        $.ajax({
+            type: 'POST',
+            url: ajax_url,
+            data: ajax_data,
+            dataType: 'json',
+            success: function(response) {
+
+                if (response.type == 'error') {
+                    $(".status-list").hide();
+                    $("#error_status_list_data").find(".reason").text(response.msg);
+                    $("#error_status_list_data").show();
+                    return;
+                }
+
+                $createList.text(i18n.create_list);
+                $listCreation.slideUp();
+
+                $("#success_status_list_data").show().delay(3000).fadeOut();
+
+                if (response.list_id !== undefined) {
+                    $selList.append($('<option>').text(listName).attr('value', response.list_id))
+                    $selList.val(response.list_id).attr("selected", "selected");
+                }
+
+                createCustomFields(apiUser, apiPass, response.list_id);
+
+                /*
+                $btnSave.removeAttr("disabled");
+                $selList.removeAttr("disabled");
+                */
+
+            },
+            error: function(jxqr, textStatus, thrown){
+                $("#error_status_list_data").find(".reason").text(jxqr.error +" "+textStatus+" "+thrown);
+                $("#server_error_status_list_data").show();
+            },
+            complete: function() {
+                $(".check-list").hide();
+            }
+        });
 
     }
 
