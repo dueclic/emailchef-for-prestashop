@@ -214,10 +214,7 @@ final class EmailchefAjaxRequest{
 
 	public function ajax_emailchefsync($args){
 
-	    for ($i=0; $i<100; $i++){
-	        $this->module->log( $this->module->_getConf("list")." cron ".$i );
-	        sleep(1);
-        }
+	    CustomerCore::getCustomers();
 
     }
 

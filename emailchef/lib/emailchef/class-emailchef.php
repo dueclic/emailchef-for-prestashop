@@ -111,7 +111,7 @@ class PS_Emailchef extends PS_Emailchef_Api
      * @return mixed
      */
 
-    private function get_custom_fields()
+    protected function get_custom_fields()
     {
         $custom_fields = require(PS_EMAILCHEF_DIR . "/conf/custom_fields.php");
         return $custom_fields;
