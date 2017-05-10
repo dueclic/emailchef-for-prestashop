@@ -1,0 +1,12 @@
+
+[/{shop_url}]
+
+Hi {customer_name},
+
+thank you for subscribing to our email list.<br>To finalize your subscription, you'll need to confirm that you have received this email by clicking the link below:
+
+{verif_url} [/{verif_url}]
+
+If you subscribed by mistake or no longer wish to hear from us, please click the link below to remove your email address from our list:
+
+{unsub_url} [/{unsub_url}]

@@ -1,0 +1,13 @@
+
+[/{shop_url}] 
+
+Ciao {customer_name},
+
+grazie per esserti iscritto alla nostra mailing list.<br>Per confermare la sottoscrizione, devi dimostrare di aver ricevuto questa email cliccando sul link seguente:
+
+{verif_url} [/{verif_url}] 		 
+
+Se invece hai richiesto la sottoscrizione per sbaglio, o non l'hai proprio richiesta clicca il link seguente per essere rimosso dalla nostra lista:
+
+{unsub_url} [/{unsub_url}]
+
