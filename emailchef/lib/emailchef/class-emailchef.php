@@ -291,4 +291,154 @@ class PS_Emailchef extends PS_Emailchef_Api
 
     }
 
+	/**
+	 *
+	 * Insert customer
+	 *
+	 * @param $list_id
+	 * @param $customer
+	 *
+	 * @return bool
+	 */
+
+	private function insert_customer( $list_id, $customer ) {
+
+		$collection = $this->get_collection( $list_id );
+
+		$custom_fields = array_map( function ( $field ) use ( $customer ) {
+
+			$field['value'] = $customer[ $field['place_holder'] ];
+
+			if ( $field['value'] == null ) {
+				$field['value'] = "";
+			}
+
+			return $field;
+
+		}, $collection );
+
+		$args = array(
+
+			"instance_in" => array(
+				"list_id"       => $list_id,
+				"status"        => "ACTIVE",
+				"email"         => $customer['user_email'],
+				"firstname"     => $customer['first_name'],
+				"lastname"      => $customer['last_name'],
+				"custom_fields" => $custom_fields,
+				"mode"          => "ADMIN"
+			)
+
+		);
+
+		$response = $this->get( "/contacts", $args, "POST" );
+
+		if ( isset( $response['contact_added_to_list'] ) && $response['contact_added_to_list'] ) {
+			return true;
+		}
+
+		$this->lastError = $response['message'];
+
+		return false;
+
+	}
+
+	/**
+	 *
+	 * Update customer
+	 *
+	 * @param $list_id
+	 * @param $customer
+	 * @param $ec_id
+	 * @param bool $abandoned_cart
+	 *
+	 * @return bool
+	 */
+
+	private function update_customer( $list_id, $customer, $ec_id, $abandoned_cart = false ) {
+
+		$path  = "/contacts";
+		$route = sprintf( "%s/%d", $path, $ec_id );
+
+		$custom_fields = array();
+		$collection    = $this->get_collection( $list_id );
+
+		foreach ( $collection as $custom ) {
+
+			$my_custom = $custom;
+
+			if (!isset($customer[ $my_custom['place_holder'] ]))
+				continue;
+
+			$my_custom['value'] = $customer[ $my_custom['place_holder'] ];
+
+			if ( ! $abandoned_cart && $my_custom['value'] == null ) {
+				continue;
+			}
+
+			if ( $abandoned_cart && strpos( $my_custom['place_holder'], 'abandoned_cart' ) === false ) {
+				continue;
+			}
+
+			$custom_fields[] = $my_custom;
+
+		}
+
+		$args = array(
+
+			"instance_in" => array(
+				"list_id"       => $list_id,
+				"status"        => "ACTIVE",
+				"email"         => $customer['user_email'],
+				"firstname"     => $customer['first_name'],
+				"lastname"      => $customer['last_name'],
+				"custom_fields" => $custom_fields,
+				"mode"          => "ADMIN"
+			)
+
+		);
+
+		$update = $this->get( $route, $args, "PUT" );
+
+		if ( isset( $update['status'] ) && $update['status'] == "OK" ) {
+			return true;
+		}
+
+		$this->lastError = $update['message'];
+
+		return false;
+
+	}
+
+	/**
+	 *
+	 * Upsert customer
+	 *
+	 * @param $list_id
+	 * @param $customer
+	 *
+	 * @return bool
+	 */
+
+	public function upsert_customer( $list_id, $customer ) {
+
+		$path = "/contacts";
+
+		$route = sprintf( "%s?query_string=%s&limit=10&offset=0&list_id=%d&orderby=e&ordertype=a", $path, $customer['user_email'], $list_id );
+
+		$ec_customer = $this->get( $route, array(), "GET" );
+
+		if ( empty( $ec_customer ) ) {
+			return $this->insert_customer( $list_id, $customer );
+		}
+
+		/*if ( $opt_in != 0 ) {
+			return $this->dopt_confirm( $list_id, $ec_customer[0]['id'], $customer['firstname'], $customer['lastname'], $opt_in );
+		}*/
+
+		return $this->update_customer( $list_id, $customer, $ec_customer[0]['id'] );
+
+
+	}
+
 }

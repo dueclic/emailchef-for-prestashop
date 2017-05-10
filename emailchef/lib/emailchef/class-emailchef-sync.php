@@ -27,14 +27,14 @@
 
 require_once(PS_EMAILCHEF_DIR . '/lib/emailchef/class-emailchef.php');
 
-class PS_Emailchef_Sync extends PS_Emailchef
+class PS_Emailchef_Sync
 {
 
     private $custom_field;
 
     public function __construct()
     {
-        $this->custom_fields = $this->get_custom_fields();
+        //$this->custom_fields = $this->get_custom_fields();
     }
 
 
@@ -104,9 +104,54 @@ class PS_Emailchef_Sync extends PS_Emailchef
         return null;
     }
 
-    /**
-     * @param array $customer
-     */
+	/**
+	 * Get all ordered product ids
+	 * @param $customer_id
+	 * @return string
+	 */
+
+    private function getAllOrderedProductIDS($customer_id){
+
+	    $orders = Db::getInstance()->executeS('SELECT `id_order` FROM '._DB_PREFIX_.'orders WHERE `id_customer`='.(int) $customer_id.' ORDER BY `id_order`');
+
+	    if (array_key_exists(0, $orders)) {
+
+		    $all_ordered = array();
+
+		    foreach ($orders as $key => $order){
+
+		    	$order = new OrderCore($order['id_order']);
+
+	    		$list_products = $order->getProducts();
+	    		foreach ($list_products as $product){
+	    			if (!in_array($product['product_id'], $all_ordered))
+	    			    $all_ordered[] = $product['product_id'];
+			    }
+
+		    }
+
+		    return implode(",", $all_ordered);
+
+	    }
+
+	    return "";
+    }
+
+    private function getLastOrderProductIDS(OrderCore $latest_order){
+		$products = $latest_order->getProducts();
+		$all_ordered = array();
+		foreach ($products as $product) {
+			$all_ordered[] = $product['product_id'];
+		}
+
+		return implode(",", $all_ordered);
+    }
+
+	/**
+	 * Get customer data
+	 * @param array $customer
+	 * @return array
+	 */
     private function getCustomerData(array $customer)
     {
 
@@ -115,9 +160,9 @@ class PS_Emailchef_Sync extends PS_Emailchef
         );
 
         $latest_order_id = $this->getLastOrder($customer['id_customer'], 'id_order');
-        $latest_order = new Order($latest_order_id);
+        $latest_order = new OrderCore($latest_order_id);
         $latest_order_date = new DateTime($latest_order->date_add);
-        $latest_order_status = $latest_order->getCurrentStateFull((int)Configuration::get('PS_LANG_DEFAULT'));
+        $latest_order_status = $latest_order->getCurrentStateFull((int)Configuration::get('PS_LANG_DEFAULT'))['name'];
 
         $data = array(
             'first_name' => $customer['firstname'],
@@ -130,7 +175,7 @@ class PS_Emailchef_Sync extends PS_Emailchef
             'billing_city' => $address->city,
             'billing_phone' => $address->phone,
             'billing_state' => StateCore::getNameById($address->id_state),
-            'billing_country' => CountryCore::getNameById($address->country),
+            'billing_country' => $address->country,
             'currency' => CurrencyCore::getDefaultCurrency()->name,
             'total_ordered' => $this->getTotalOrdered($customer['id_customer']),
             'total_ordered_30d' => $this->getTotalOrdered30d($customer['id_customer']),
@@ -139,9 +184,14 @@ class PS_Emailchef_Sync extends PS_Emailchef
             'latest_order_id' => $latest_order_id,
             'latest_order_date' => $latest_order_date->format('Y-m-d'),
             'latest_order_status' => $latest_order_status,
-            'latest_order_amount' => CartCore::getCartByOrderId($latest_order_id)->getOrderTotal()
+            'latest_order_amount' => CartCore::getCartByOrderId($latest_order_id)->getOrderTotal(),
+	        'all_ordered_product_ids' => $this->getAllOrderedProductIDS($customer['id_customer']),
+	        'latest_order_product_ids' => $this->getLastOrderProductIDS($latest_order),
+			'newsletter' => 'no'
 
         );
+
+        return $data;
 
     }
 
@@ -150,7 +200,7 @@ class PS_Emailchef_Sync extends PS_Emailchef
 
         $data = array();
 
-        foreach (CustomerCore::getCustomers as $customer) {
+        foreach (CustomerCore::getCustomers() as $customer) {
             $data[] = $this->getCustomerData($customer);
         }
 

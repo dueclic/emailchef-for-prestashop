@@ -19,6 +19,13 @@ services:
       - DB_PASSWD=hacker20
       - ADMIN_MAIL=test-dev@dueclic.com
       - ADMIN_PASSWD=hacker20
+      - PS_MAIL_METHOD=2
+      - PS_MAIL_SERVER=mail.2clic.it
+      - PS_MAIL_DOMAIN=mail.2clic.it
+      - PS_MAIL_SMTP_PORT=587
+      - PS_MAIL_SMTP_ENCRYPTION=tls
+      - PS_MAIL_USER=test-dev@dueclic.com
+      - PS_MAIL_PASSWD=TestDev2017
     networks:
       - internal
       - public

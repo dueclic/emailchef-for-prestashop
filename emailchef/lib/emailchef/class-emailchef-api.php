@@ -92,7 +92,8 @@ class PS_Emailchef_Api
                     ->send();
                 break;
             case 'PUT':
-                $response = Request::put($url, $payload)
+                $response = Request::put($url)
+	                ->body($payload, 'application/json')
                     ->send();
                 break;
             case 'GET':

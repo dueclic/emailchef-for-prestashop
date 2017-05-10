@@ -106,12 +106,10 @@ var PS_Emailchef = function($) {
     }
 
     function policyContent(status) {
-        if (status == 'hide') {
+        if (status == 'hide')
             $policyList.closest(".form-group").hide();
-        }
-        else {
-            $policyList.closest(".form-group").hide();
-        }
+        else
+            $policyList.closest(".form-group").show();
     }
 
     function accessIsValid(apiUser, apiPass) {
@@ -172,10 +170,10 @@ var PS_Emailchef = function($) {
 
                 console.log("Policy = "+response.policy);
 
-                if (response.policy !== 'premium'){
+                if (response.policy !== 'premium')
                     policyContent('hide');
-                }
                 else {
+                    console.log("Premium, faccio apparire single opt-in");
                     policyContent('show');
                 }
 

@@ -212,11 +212,67 @@ final class EmailchefAjaxRequest{
 
 	}
 
-	public function ajax_emailchefsync($args){
+	public function ajax_emailchefsync($args) {
 
-	    CustomerCore::getCustomers();
+		error_reporting(0);
 
-    }
+		require_once( dirname( __FILE__ ) . "/lib/emailchef/class-emailchef-sync.php" );
+
+		$psec = $this->module->emailchef();
+		$list_id = $this->module->_getConf( "list" );
+
+		$this->module->log(
+			sprintf(
+				$this->module->l('Avviata sincronizzazione iniziale per la lista %d'),
+				$list_id
+			)
+		);
+
+		if ( $psec->isLogged() ) {
+
+			$sync = new PS_Emailchef_Sync();
+
+			$customers = $sync->getCustomersData();
+
+			foreach ( $customers as $customer ) {
+				$this->module->emailchef()->upsert_customer(
+					$list_id,
+					$customer
+				);
+			}
+
+			$response = array(
+				'status' => 'success',
+				'msg'    => $this->module->l( 'Esportazione iniziale avvenuta con successo.' ),
+			);
+
+			$this->module->log(
+				sprintf(
+					$this->module->l('Esportazione per la lista %d avvenuta con successo.'),
+					$list_id
+				)
+			);
+
+
+		} else {
+
+			$response = array(
+				'type' => 'error',
+				'msg'  => $this->module->l( 'Username o password non corretti.' )
+			);
+
+			$this->module->log(
+				sprintf(
+					$this->module->l('Esportazione per la lista %d non avvenuta. Motivo errore: %s'),
+					$list_id,
+					$response['msg']
+				)
+			);
+
+		}
+
+		return $response;
+	}
 
 }
 
