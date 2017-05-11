@@ -564,18 +564,17 @@ EOF;
                 $newsletter = 'yes';
             }
 
-            $upsert = $this->emailchef()->upsert_customer(
+	        require_once( dirname( __FILE__ ) . "/lib/emailchef/class-emailchef-sync.php" );
+
+            $sync = new PS_Emailchef_Sync();
+            $syncCustomerAccountData = $sync->getSyncCustomerAccountAdd($customer, $newsletter);
+
+	        $upsert = $this->emailchef()->upsert_customer(
                 $list_id,
-                array(
-                    'first_name'  => $customer->firstname,
-                    'last_name'   => $customer->lastname,
-                    'user_email'  => $customer->email,
-                    'newsletter'  => $newsletter,
-                    'customer_id' => $customer->id
-                )
+		        $syncCustomerAccountData
             );
 
-            if ($upsert) {
+	        if ($upsert) {
                 $this->log(
                     sprintf(
                         $this->l("Inserito nella lista %d il cliente %d (Nome: %s Cognome: %s Email: %s Consenso Newsletter: %s)"),
@@ -622,35 +621,18 @@ EOF;
 		     */
 
 		    $address = $object;
-		    $list_id  = $this->_getConf( "list" );
+		    $list_id = $this->_getConf( "list" );
 
-		    $data = array(
-			    'customer_id'       => $address->id_customer,
-			    'first_name'        => $address->firstname,
-			    'last_name'         => $address->lastname,
-			    'user_email'        => $address->email,
-			    'billing_company'   => $address->company,
-			    'billing_address_1' => $address->address1,
-			    'billing_postcode'  => $address->postcode,
-			    'billing_city'      => $address->city,
-			    'billing_phone'     => $address->phone,
-			    'billing_state'     => StateCore::getNameById( $address->id_state ),
-			    'billing_country'   => CountryCore::getNameById(
-			    	(int)Configuration::get('PS_LANG_DEFAULT'),
-				    $address->id_country
-			    )
+		    require_once( dirname( __FILE__ ) . "/lib/emailchef/class-emailchef-sync.php" );
+
+		    $sync = new PS_Emailchef_Sync();
+
+		    $syncAddressData = $sync->getSyncUpdateCustomerAddress($address);
+
+		    $upsert = $this->emailchef()->upsert_customer(
+			    $list_id,
+			    $syncAddressData
 		    );
-
-		    try {
-
-			    $upsert = $this->emailchef()->upsert_customer(
-				    $list_id,
-				    $data
-			    );
-
-		    } catch ( Exception $e ) {
-			    $upsert = false;
-		    }
 
 		    if ( $upsert ) {
 			    $this->log(
@@ -660,7 +642,7 @@ EOF;
 					    $address->id_customer,
 					    $address->firstname,
 					    $address->lastname,
-					    intval( count( $data ) - 2 )
+					    intval( count( $syncAddressData ) - 2 )
 				    )
 			    );
 		    } else {
@@ -670,15 +652,15 @@ EOF;
 					    $address->id_customer,
 					    $address->firstname,
 					    $address->lastname,
-					    intval( count( $data ) - 2 ),
+					    intval( count( $syncAddressData ) - 2 ),
 					    $list_id
 				    ),
 				    3
 			    );
 		    }
 
-
 	    }
+
     }
 
     public function hookActionOrderStatusUpdate($params)

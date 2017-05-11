@@ -432,12 +432,7 @@ class PS_Emailchef extends PS_Emailchef_Api
 			return $this->insert_customer( $list_id, $customer );
 		}
 
-		/*if ( $opt_in != 0 ) {
-			return $this->dopt_confirm( $list_id, $ec_customer[0]['id'], $customer['firstname'], $customer['lastname'], $opt_in );
-		}*/
-
 		return $this->update_customer( $list_id, $customer, $ec_customer[0]['id'] );
-
 
 	}
 

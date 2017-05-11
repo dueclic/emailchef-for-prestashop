@@ -175,11 +175,6 @@ class PS_Emailchef_Sync {
 			AddressCore::getFirstCustomerAddressId( $customer['id_customer'] )
 		);
 
-		$latest_order_id     = $this->getLastOrder( $customer['id_customer'], 'id_order' );
-		$latest_order        = new OrderCore( $latest_order_id );
-		$latest_order_date   = new DateTime( $latest_order->date_add );
-		$latest_order_status = $latest_order->getCurrentStateFull( (int) Configuration::get( 'PS_LANG_DEFAULT' ) )['name'];
-
 		$data = array(
 			'first_name'               => $customer['firstname'],
 			'last_name'                => $customer['lastname'],
@@ -193,19 +188,32 @@ class PS_Emailchef_Sync {
 			'billing_state'            => StateCore::getNameById( $address->id_state ),
 			'billing_country'          => $address->country,
 			'currency'                 => CurrencyCore::getDefaultCurrency()->name,
-			'total_ordered'            => $this->getTotalOrdered( $customer['id_customer'] ),
-			'total_ordered_30d'        => $this->getTotalOrdered30d( $customer['id_customer'] ),
-			'total_ordered_12m'        => $this->getTotalOrdered12m( $customer['id_customer'] ),
-			'total_orders'             => OrderCore::getCustomerNbOrders( $customer['id_customer'] ),
-			'latest_order_id'          => $latest_order_id,
-			'latest_order_date'        => $latest_order_date->format( 'Y-m-d' ),
-			'latest_order_status'      => $latest_order_status,
-			'latest_order_amount'      => CartCore::getCartByOrderId( $latest_order_id )->getOrderTotal(),
-			'all_ordered_product_ids'  => $this->getAllOrderedProductIDS( $customer['id_customer'] ),
-			'latest_order_product_ids' => $this->getLastOrderProductIDS( $latest_order ),
 			'newsletter'               => 'no'
 
 		);
+
+		$latest_order_id     = $this->getLastOrder( $customer['id_customer'], 'id_order' );
+
+		if ($latest_order_id !== null) {
+
+			$latest_order        = new OrderCore( $latest_order_id );
+			$latest_order_date   = new DateTime( $latest_order->date_add );
+			$latest_order_status = $latest_order->getCurrentStateFull( (int) Configuration::get( 'PS_LANG_DEFAULT' ) )['name'];
+
+			array_merge($data, array(
+				'total_ordered'            => $this->getTotalOrdered( $customer['id_customer'] ),
+				'total_ordered_30d'        => $this->getTotalOrdered30d( $customer['id_customer'] ),
+				'total_ordered_12m'        => $this->getTotalOrdered12m( $customer['id_customer'] ),
+				'total_orders'             => OrderCore::getCustomerNbOrders( $customer['id_customer'] ),
+				'latest_order_id'          => $latest_order_id,
+				'latest_order_date'        => $latest_order_date->format( 'Y-m-d' ),
+				'latest_order_status'      => $latest_order_status,
+				'latest_order_amount'      => CartCore::getCartByOrderId( $latest_order_id )->getOrderTotal(),
+				'all_ordered_product_ids'  => $this->getAllOrderedProductIDS( $customer['id_customer'] ),
+				'latest_order_product_ids' => $this->getLastOrderProductIDS( $latest_order ),
+			));
+
+		}
 
 		return $data;
 
@@ -276,6 +284,52 @@ class PS_Emailchef_Sync {
 		}
 
 		return $data;
+	}
+
+	/**
+	 * @param CustomerCore $customer
+	 * @param $newsletter
+	 * @return array
+	 */
+
+	public function getSyncCustomerAccountAdd(CustomerCore $customer, $newsletter) {
+		return array(
+			'first_name'  => $customer->firstname,
+			'last_name'   => $customer->lastname,
+			'user_email'  => $customer->email,
+			'newsletter'  => $newsletter,
+			'customer_id' => $customer->id
+		);
+	}
+
+	/**
+	 * Get Sync Update Customer Address
+	 * @param AddressCore $address
+	 * @return array
+	 */
+
+	public function getSyncUpdateCustomerAddress(AddressCore $address){
+
+		$customer = new Customer($address->id_customer);
+		$customer_email = $customer->email;
+
+		return array(
+			'customer_id'       => $address->id_customer,
+			'first_name'        => $address->firstname,
+			'last_name'         => $address->lastname,
+			'user_email'        => $customer_email,
+			'billing_company'   => $address->company,
+			'billing_address_1' => $address->address1,
+			'billing_postcode'  => $address->postcode,
+			'billing_city'      => $address->city,
+			'billing_phone'     => $address->phone,
+			'billing_state'     => StateCore::getNameById( $address->id_state ),
+			'billing_country'   => CountryCore::getNameById(
+				(int) Configuration::get( 'PS_LANG_DEFAULT' ),
+				$address->id_country
+			)
+		);
+
 	}
 
 	public function getCustomersData() {
