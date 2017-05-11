@@ -25,7 +25,7 @@
  * /
  */
 
-class EmailchefVerificationModuleFrontController extends ModuleFrontController
+class EmailchefUnsubscribeModuleFrontController extends ModuleFrontController
 {
 	private $message = '';
 
@@ -43,5 +43,7 @@ class EmailchefVerificationModuleFrontController extends ModuleFrontController
 	public function initContent()
 	{
 		parent::initContent();
+		$this->context->smarty->assign('message', $this->message);
+		$this->setTemplate('unsubscribe_emailchef.tpl');
 	}
 }

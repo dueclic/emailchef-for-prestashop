@@ -36,8 +36,6 @@ var PS_Emailchef = function($) {
     var $newListName;
     var $newListDesc;
     var $policyList;
-    var $landingList;
-    var $fpageList;
     var $listCreation;
     var $btnSave;
 
@@ -54,8 +52,6 @@ var PS_Emailchef = function($) {
         $newListDesc = $("#" + prefixed_setting("new_description"));
         $saveNewList = $("#" + prefixed_setting("new_save"));
         $policyList = $("#" + prefixed_setting("policy_type"));
-        $landingList = $("#" + prefixed_setting("landing_page"));
-        $fpageList = $("#" + prefixed_setting("fuck_page"));
         $btnSave = $("button[name='submitemailchef']");
         $listCreation = $(".list_creation");
     }

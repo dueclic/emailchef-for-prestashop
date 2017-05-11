@@ -94,6 +94,12 @@ class Emailchef extends Module
 
     public function uninstall()
     {
+
+	    Configuration::deleteByName($this->prefix_setting('username'));
+	    Configuration::deleteByName($this->prefix_setting('password'));
+	    Configuration::deleteByName($this->prefix_setting('list'));
+	    Configuration::deleteByName($this->prefix_setting('policy_type'));
+
         return (
             parent::uninstall() &&
             $this->unregisterHook('backOfficeHeader') &&
@@ -114,8 +120,6 @@ class Emailchef extends Module
             $ec_password = strval(Tools::getValue($this->prefix_setting('password')));
             $ec_list = intval(Tools::getValue($this->prefix_setting('list')));
             $ec_policy_type = strval(Tools::getValue($this->prefix_setting('policy_type')));
-            $ec_landing_page = strval(Tools::getValue($this->prefix_setting('landing_page')));
-            $ec_fuck_page = strval(Tools::getValue($this->prefix_setting('fuck_page')));
 
             $ec_list_old = $this->_getConf("list");
 
@@ -132,8 +136,6 @@ class Emailchef extends Module
                         Configuration::updateValue($this->prefix_setting('password'), $ec_password);
                         Configuration::updateValue($this->prefix_setting('list'), $ec_list);
                         Configuration::updateValue($this->prefix_setting('policy_type'), $ec_policy_type);
-                        Configuration::updateValue($this->prefix_setting('landing_page'), $ec_landing_page);
-                        Configuration::updateValue($this->prefix_setting('fuck_page'), $ec_fuck_page);
 
                         $output .= $this->displayConfirmation($this->l('Impostazioni salvate con successo.'));
                         $emailchef_cron_url = $this->_path . "/ajax.php";
@@ -266,30 +268,6 @@ EOF;
                         'id'    => 'id',
                         'name'  => 'name'
                     )
-                ),
-                array(
-                    'type'     => 'select',
-                    'label'    => $this->l('Pagina sottoscrizione lista'),
-                    'desc'     => $this->l('Thank you page dopo conferma email'),
-                    'name'     => $this->prefix_setting('landing_page'),
-                    'required' => false,
-                    'options'  => array(
-                        'query' => $this->get_pages(),
-                        'id'    => 'id',
-                        'name'  => 'name'
-                    )
-                ),
-                array(
-                    'type'     => 'select',
-                    'label'    => $this->l('Pagina disiscrizione lista'),
-                    'desc'     => $this->l('Pagina disiscrizione dopo email'),
-                    'name'     => $this->prefix_setting('fuck_page'),
-                    'required' => false,
-                    'options'  => array(
-                        'query' => $this->get_pages(),
-                        'id'    => 'id',
-                        'name'  => 'name'
-                    )
                 )
             ),
             'submit' => array(
@@ -366,8 +344,6 @@ EOF;
         $helper->fields_value[$this->prefix_setting('password')] = Configuration::get($this->prefix_setting('password'));
         $helper->fields_value[$this->prefix_setting('list')] = Configuration::get($this->prefix_setting('list'));
         $helper->fields_value[$this->prefix_setting('policy_type')] = Configuration::get($this->prefix_setting('policy_type'));
-        $helper->fields_value[$this->prefix_setting('landing_page')] = Configuration::get($this->prefix_setting('landing_page'));
-        $helper->fields_value[$this->prefix_setting('fuck_page')] = Configuration::get($this->prefix_setting('fuck_page'));
 
         return $helper->generateForm($fields_form);
 
@@ -430,6 +406,8 @@ EOF;
 	 */
 	public function unsubEmail($token)
 	{
+
+		$deactivated = false;
 
 		if ($email = $this->getUserEmailByToken($token)) {
 			$deactivated = $this->unregisterUser($email);
