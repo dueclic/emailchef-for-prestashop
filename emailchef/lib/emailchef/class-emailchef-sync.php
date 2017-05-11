@@ -201,7 +201,7 @@ class PS_Emailchef_Sync {
 
 		return array(
 			'abandoned_cart_product_name_price_higher' => $product->name,
-			'abandoned_cart_product_description_price_higher' => $product->description_short,
+			'abandoned_cart_product_description_price_higher' => strip_tags($product->description_short),
 			'abandoned_cart_product_price_price_higher' => $product->getPrice(true, null, 2),
 			'abandoned_cart_purchase_date_price_higher' => $this->get_date($cart->date_upd),
 			'abandoned_cart_product_id_price_higher' => $product->id,
@@ -261,7 +261,7 @@ class PS_Emailchef_Sync {
 			$latest_order_date   = $this->get_date( $latest_order->date_add );
 			$latest_order_status = $latest_order->getCurrentStateFull( (int) Configuration::get( 'PS_LANG_DEFAULT' ) )['name'];
 
-			array_merge($data, array(
+			$data = array_merge($data, array(
 				'total_ordered'            => $this->getTotalOrdered( $customer['id_customer'] ),
 				'total_ordered_30d'        => $this->getTotalOrdered30d( $customer['id_customer'] ),
 				'total_ordered_12m'        => $this->getTotalOrdered12m( $customer['id_customer'] ),
@@ -279,7 +279,7 @@ class PS_Emailchef_Sync {
 		$abandoned_cart = $this->getHigherProductAbandonedCart( $customer['id_customer'] );
 
 		if ($abandoned_cart !== FALSE)
-			array_merge($data, $abandoned_cart);
+			$data = array_merge($data, $abandoned_cart);
 
 		return $data;
 

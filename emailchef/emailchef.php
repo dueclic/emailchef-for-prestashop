@@ -142,11 +142,11 @@ class Emailchef extends Module
     var emailchef_cron_url = '$emailchef_cron_url';
 </script>
 EOF;
-                        if ($ec_list_old != $ec_list) {
+                        /*if ($ec_list_old != $ec_list) {*/
                             $output .= $this->adminDisplayInformation($this->l("E' in esecuzione un processo automatico di esportazione dei dati relativi ai tuoi clienti verso eMailChef"));
 
                             $this->context->controller->addJs($this->_path . "js/plugins/emailchef/jquery.emailchef.cron.js");
-                        }
+                        /*}*/
 
 
                     }
