@@ -25,188 +25,251 @@
  * /
  */
 
-require_once(PS_EMAILCHEF_DIR . '/lib/emailchef/class-emailchef.php');
+require_once( PS_EMAILCHEF_DIR . '/lib/emailchef/class-emailchef.php' );
 
-class PS_Emailchef_Sync
-{
+class PS_Emailchef_Sync {
 
-    private $custom_field;
+	private $custom_field;
 
-    public function __construct()
-    {
-        //$this->custom_fields = $this->get_custom_fields();
-    }
+	public function __construct() {
+		//$this->custom_fields = $this->get_custom_fields();
+	}
 
 
-    /**
-     * Get total ordered by customer ID
-     * @param $customer_id
-     * @return float
-     */
+	/**
+	 * Get total ordered by customer ID
+	 *
+	 * @param $customer_id
+	 *
+	 * @return float
+	 */
 
-    private function getTotalOrdered($customer_id) {
-        $fetch = Db::getInstance()->executeS('SELECT SUM(`total_paid_real`) as tot FROM '._DB_PREFIX_.'orders WHERE `id_customer`='.(int) $customer_id.' group by id_customer ORDER BY `date_add` DESC limit 1');
+	private function getTotalOrdered( $customer_id ) {
+		$fetch = Db::getInstance()->executeS( 'SELECT SUM(`total_paid_real`) as tot FROM ' . _DB_PREFIX_ . 'orders WHERE `id_customer`=' . (int) $customer_id . ' group by id_customer ORDER BY `date_add` DESC limit 1' );
 
-        if (array_key_exists(0, $fetch))
-            return (float)Tools::ps_round((float)$fetch[0]['tot'], _PS_PRICE_COMPUTE_PRECISION_);
-        return (float)0;
-    }
+		if ( array_key_exists( 0, $fetch ) ) {
+			return (float) Tools::ps_round( (float) $fetch[0]['tot'], _PS_PRICE_COMPUTE_PRECISION_ );
+		}
 
-    /**
-     * Get total ordered by customer ID in last 30 days
-     * @param $customer_id
-     * @return float
-     */
+		return (float) 0;
+	}
 
-    private function getTotalOrdered30d($customer_id){
-        $fetch = Db::getInstance()->executeS('SELECT ifnull(SUM(`total_paid_real`),0) as tot FROM '._DB_PREFIX_.'orders WHERE `id_customer`='.(int) $customer_id.' AND date_add >= DATE_SUB(CURRENT_DATE, INTERVAL 1 MONTH) group by id_customer DESC limit 1');
+	/**
+	 * Get total ordered by customer ID in last 30 days
+	 *
+	 * @param $customer_id
+	 *
+	 * @return float
+	 */
 
-        if (array_key_exists(0, $fetch))
-            return (float)Tools::ps_round((float)$fetch[0]['tot'], _PS_PRICE_COMPUTE_PRECISION_);
+	private function getTotalOrdered30d( $customer_id ) {
+		$fetch = Db::getInstance()->executeS( 'SELECT ifnull(SUM(`total_paid_real`),0) as tot FROM ' . _DB_PREFIX_ . 'orders WHERE `id_customer`=' . (int) $customer_id . ' AND date_add >= DATE_SUB(CURRENT_DATE, INTERVAL 1 MONTH) group by id_customer DESC limit 1' );
 
-        return (float)0;
-    }
+		if ( array_key_exists( 0, $fetch ) ) {
+			return (float) Tools::ps_round( (float) $fetch[0]['tot'], _PS_PRICE_COMPUTE_PRECISION_ );
+		}
 
-    /**
-     * Get total ordered by customer ID in last year
-     * @param $customer_id
-     * @return float
-     */
+		return (float) 0;
+	}
 
-    private function getTotalOrdered12m($customer_id){
-        $fetch = Db::getInstance()->executeS('SELECT ifnull(SUM(`total_paid_real`),0) as tot FROM '._DB_PREFIX_.'orders WHERE `id_customer`='.(int) $customer_id.' AND date_add >= DATE_SUB(CURRENT_DATE, INTERVAL 1 YEAR) group by id_customer DESC limit 1');
+	/**
+	 * Get total ordered by customer ID in last year
+	 *
+	 * @param $customer_id
+	 *
+	 * @return float
+	 */
 
-        if (array_key_exists(0, $fetch))
-            return (float)Tools::ps_round((float)$fetch[0]['tot'], _PS_PRICE_COMPUTE_PRECISION_);
+	private function getTotalOrdered12m( $customer_id ) {
+		$fetch = Db::getInstance()->executeS( 'SELECT ifnull(SUM(`total_paid_real`),0) as tot FROM ' . _DB_PREFIX_ . 'orders WHERE `id_customer`=' . (int) $customer_id . ' AND date_add >= DATE_SUB(CURRENT_DATE, INTERVAL 1 YEAR) group by id_customer DESC limit 1' );
 
-        return (float)0;
-    }
+		if ( array_key_exists( 0, $fetch ) ) {
+			return (float) Tools::ps_round( (float) $fetch[0]['tot'], _PS_PRICE_COMPUTE_PRECISION_ );
+		}
 
-    /**
-     * Get last order info
-     * @param $customer_id
-     * @param string $param
-     * @return null
-     */
+		return (float) 0;
+	}
 
-    private function getLastOrder($customer_id, $param = "id_order"){
-        $fetch = Db::getInstance()->executeS('SELECT `'.$param.'` FROM '._DB_PREFIX_.'orders WHERE `id_customer`='.(int) $customer_id.' ORDER BY `id_order`  DESC limit 1');
+	/**
+	 * Get last order info
+	 *
+	 * @param $customer_id
+	 * @param string $param
+	 *
+	 * @return null
+	 */
 
-        if (array_key_exists(0, $fetch)) {
+	private function getLastOrder( $customer_id, $param = "id_order" ) {
+		$fetch = Db::getInstance()->executeS( 'SELECT `' . $param . '` FROM ' . _DB_PREFIX_ . 'orders WHERE `id_customer`=' . (int) $customer_id . ' ORDER BY `id_order`  DESC limit 1' );
 
-            if ($param == "date_add"){
-                $date = new DateTime($fetch[0]['date_add']);
-                return $date->format('Y-m-d');
-            }
+		if ( array_key_exists( 0, $fetch ) ) {
 
-            return $fetch[0][$param];
-        }
-        return null;
-    }
+			if ( $param == "date_add" ) {
+				$date = new DateTime( $fetch[0]['date_add'] );
+
+				return $date->format( 'Y-m-d' );
+			}
+
+			return $fetch[0][ $param ];
+		}
+
+		return null;
+	}
 
 	/**
 	 * Get all ordered product ids
+	 *
 	 * @param $customer_id
+	 *
 	 * @return string
 	 */
 
-    private function getAllOrderedProductIDS($customer_id){
+	private function getAllOrderedProductIDS( $customer_id ) {
 
-	    $orders = Db::getInstance()->executeS('SELECT `id_order` FROM '._DB_PREFIX_.'orders WHERE `id_customer`='.(int) $customer_id.' ORDER BY `id_order`');
+		$orders = Db::getInstance()->executeS( 'SELECT `id_order` FROM ' . _DB_PREFIX_ . 'orders WHERE `id_customer`=' . (int) $customer_id . ' ORDER BY `id_order`' );
 
-	    if (array_key_exists(0, $orders)) {
+		if ( array_key_exists( 0, $orders ) ) {
 
-		    $all_ordered = array();
+			$all_ordered = array();
 
-		    foreach ($orders as $key => $order){
+			foreach ( $orders as $key => $order ) {
 
-		    	$order = new OrderCore($order['id_order']);
+				$order = new OrderCore( $order['id_order'] );
 
-	    		$list_products = $order->getProducts();
-	    		foreach ($list_products as $product){
-	    			if (!in_array($product['product_id'], $all_ordered))
-	    			    $all_ordered[] = $product['product_id'];
-			    }
+				$list_products = $order->getProducts();
+				foreach ( $list_products as $product ) {
+					if ( ! in_array( $product['product_id'], $all_ordered ) ) {
+						$all_ordered[] = $product['product_id'];
+					}
+				}
 
-		    }
+			}
 
-		    return implode(",", $all_ordered);
+			return implode( ",", $all_ordered );
 
-	    }
+		}
 
-	    return "";
-    }
+		return "";
+	}
 
-    private function getLastOrderProductIDS(OrderCore $latest_order){
-		$products = $latest_order->getProducts();
+	private function getLastOrderProductIDS( OrderCore $latest_order ) {
+		$products    = $latest_order->getProducts();
 		$all_ordered = array();
-		foreach ($products as $product) {
+		foreach ( $products as $product ) {
 			$all_ordered[] = $product['product_id'];
 		}
 
-		return implode(",", $all_ordered);
-    }
+		return implode( ",", $all_ordered );
+	}
 
 	/**
 	 * Get customer data
+	 *
 	 * @param array $customer
+	 *
 	 * @return array
 	 */
-    private function getCustomerData(array $customer)
-    {
+	private function getCustomerData( array $customer ) {
 
-        $address = new AddressCore(
-            AddressCore::getFirstCustomerAddressId($customer['id_customer'])
-        );
+		$address = new AddressCore(
+			AddressCore::getFirstCustomerAddressId( $customer['id_customer'] )
+		);
 
-        $latest_order_id = $this->getLastOrder($customer['id_customer'], 'id_order');
-        $latest_order = new OrderCore($latest_order_id);
-        $latest_order_date = new DateTime($latest_order->date_add);
-        $latest_order_status = $latest_order->getCurrentStateFull((int)Configuration::get('PS_LANG_DEFAULT'))['name'];
+		$latest_order_id     = $this->getLastOrder( $customer['id_customer'], 'id_order' );
+		$latest_order        = new OrderCore( $latest_order_id );
+		$latest_order_date   = new DateTime( $latest_order->date_add );
+		$latest_order_status = $latest_order->getCurrentStateFull( (int) Configuration::get( 'PS_LANG_DEFAULT' ) )['name'];
 
-        $data = array(
-            'first_name' => $customer['firstname'],
-            'last_name' => $customer['lastname'],
-            'user_email' => $customer['email'],
-            'customer_id' => $customer['id_customer'],
-            'billing_company' => $address->company,
-            'billing_address_1' => $address->address1,
-            'billing_postcode' => $address->postcode,
-            'billing_city' => $address->city,
-            'billing_phone' => $address->phone,
-            'billing_state' => StateCore::getNameById($address->id_state),
-            'billing_country' => $address->country,
-            'currency' => CurrencyCore::getDefaultCurrency()->name,
-            'total_ordered' => $this->getTotalOrdered($customer['id_customer']),
-            'total_ordered_30d' => $this->getTotalOrdered30d($customer['id_customer']),
-            'total_ordered_12m' => $this->getTotalOrdered12m($customer['id_customer']),
-            'total_orders' => OrderCore::getCustomerNbOrders($customer['id_customer']),
-            'latest_order_id' => $latest_order_id,
-            'latest_order_date' => $latest_order_date->format('Y-m-d'),
-            'latest_order_status' => $latest_order_status,
-            'latest_order_amount' => CartCore::getCartByOrderId($latest_order_id)->getOrderTotal(),
-	        'all_ordered_product_ids' => $this->getAllOrderedProductIDS($customer['id_customer']),
-	        'latest_order_product_ids' => $this->getLastOrderProductIDS($latest_order),
-			'newsletter' => 'no'
+		$data = array(
+			'first_name'               => $customer['firstname'],
+			'last_name'                => $customer['lastname'],
+			'user_email'               => $customer['email'],
+			'customer_id'              => $customer['id_customer'],
+			'billing_company'          => $address->company,
+			'billing_address_1'        => $address->address1,
+			'billing_postcode'         => $address->postcode,
+			'billing_city'             => $address->city,
+			'billing_phone'            => $address->phone,
+			'billing_state'            => StateCore::getNameById( $address->id_state ),
+			'billing_country'          => $address->country,
+			'currency'                 => CurrencyCore::getDefaultCurrency()->name,
+			'total_ordered'            => $this->getTotalOrdered( $customer['id_customer'] ),
+			'total_ordered_30d'        => $this->getTotalOrdered30d( $customer['id_customer'] ),
+			'total_ordered_12m'        => $this->getTotalOrdered12m( $customer['id_customer'] ),
+			'total_orders'             => OrderCore::getCustomerNbOrders( $customer['id_customer'] ),
+			'latest_order_id'          => $latest_order_id,
+			'latest_order_date'        => $latest_order_date->format( 'Y-m-d' ),
+			'latest_order_status'      => $latest_order_status,
+			'latest_order_amount'      => CartCore::getCartByOrderId( $latest_order_id )->getOrderTotal(),
+			'all_ordered_product_ids'  => $this->getAllOrderedProductIDS( $customer['id_customer'] ),
+			'latest_order_product_ids' => $this->getLastOrderProductIDS( $latest_order ),
+			'newsletter'               => 'no'
 
-        );
+		);
 
-        return $data;
+		return $data;
 
-    }
+	}
 
-    public function getCustomersData()
-    {
+	/**
+	 * Get sync order data
+	 *
+	 * @param $order_id
+	 * @param $status_id
+	 *
+	 * @return array
+	 */
+	public function getSyncOrderData( $order_id, $status_id ) {
+		$order                 = new OrderCore( $order_id );
+		$customer              = $order->getCustomer();
+		$id_customer           = $customer->id;
+		$latest_order_date     = new DateTime( $order->date_add );
+		$latest_order_date_upd = new DateTime( $order->date_upd );
+		$latest_order_status = new OrderStateCore($order_id);
+		$latest_order_status = $latest_order_status->getFieldByLang("name", (int)Configuration::get('PS_LANG_DEFAULT'));
 
-        $data = array();
+		$data = array(
+			'first_name'               => $customer->firstname,
+			'last_name'                => $customer->lastname,
+			'user_email'               => $customer->email,
+			'customer_id'              => $id_customer,
+			'total_ordered'            => $this->getTotalOrdered( $id_customer ),
+			'total_ordered_30d'        => $this->getTotalOrdered30d( $id_customer ),
+			'total_ordered_12m'        => $this->getTotalOrdered12m( $id_customer ),
+			'total_orders'             => OrderCore::getCustomerNbOrders( $id_customer ),
+			'latest_order_id'          => $order_id,
+			'latest_order_date'        => $latest_order_date->format( 'Y-m-d' ),
+			'latest_order_status'      => $latest_order_status,
+			'latest_order_amount'      => CartCore::getCartByOrderId( $order_id )->getOrderTotal(),
+			'all_ordered_product_ids'  => $this->getAllOrderedProductIDS( $id_customer ),
+			'latest_order_product_ids' => $this->getLastOrderProductIDS( $order ),
+		);
 
-        foreach (CustomerCore::getCustomers() as $customer) {
-            $data[] = $this->getCustomerData($customer);
-        }
+		if ( in_array( $status_id, array(
+			Configuration::get( "PS_OS_SHIPPING" ),
+			Configuration::get( "PS_OS_DELIVERED" )
+		) ) ) {
+			$data = array_merge( $data, array(
+				'latest_shipped_order_id'     => $order_id,
+				'latest_shipped_order_date'   => $latest_order_date_upd->format( 'Y-m-d' ),
+				'latest_shipped_order_status' => $latest_order_status
+			) );
+		}
 
-        return $data;
+		return $data;
+	}
 
-    }
+	public function getCustomersData() {
+
+		$data = array();
+
+		foreach ( CustomerCore::getCustomers() as $customer ) {
+			$data[] = $this->getCustomerData( $customer );
+		}
+
+		return $data;
+
+	}
 
 }
 

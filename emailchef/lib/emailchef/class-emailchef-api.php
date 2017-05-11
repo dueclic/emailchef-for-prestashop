@@ -71,38 +71,47 @@ class PS_Emailchef_Api
     private function getRequest($url, $payload, $type)
     {
 
-        Httpful::register(
-            Mime::JSON,
-            new JsonHandler(
-                array('decode_as_array' => true)
-            )
-        );
+    	try {
 
-        $response = null;
-        switch ($type) {
-            case 'POST':
-                $response = Request::post($url)
-                    ->body($payload, 'application/json')
-                    ->send();
-                break;
-            case 'DELETE':
-                $response = Request::init(Http::DELETE)
-                    ->uri($url)
-                    ->body($payload, 'application/json')
-                    ->send();
-                break;
-            case 'PUT':
-                $response = Request::put($url)
-	                ->body($payload, 'application/json')
-                    ->send();
-                break;
-            case 'GET':
-            default:
-                $response = Request::get($url)
-                    ->body($payload, 'application/json')
-                    ->send();
-                break;
-        }
+		    Httpful::register(
+			    Mime::JSON,
+			    new JsonHandler(
+				    array( 'decode_as_array' => true )
+			    )
+		    );
+
+		    $response = null;
+		    switch ( $type ) {
+			    case 'POST':
+				    $response = Request::post( $url )
+				                       ->body( $payload, 'application/json' )
+				                       ->send();
+				    break;
+			    case 'DELETE':
+				    $response = Request::init( Http::DELETE )
+				                       ->uri( $url )
+				                       ->body( $payload, 'application/json' )
+				                       ->send();
+				    break;
+			    case 'PUT':
+				    $response = Request::put( $url )
+				                       ->body( $payload, 'application/json' )
+				                       ->send();
+				    break;
+			    case 'GET':
+			    default:
+				    $response = Request::get( $url )
+				                       ->body( $payload, 'application/json' )
+				                       ->send();
+				    break;
+		    }
+	    }
+	    catch (\Exception $e) {
+    		$response = array(
+    			'status' => 'error',
+			    'error' => $e->getMessage()
+		    );
+	    }
 
         return $response;
     }

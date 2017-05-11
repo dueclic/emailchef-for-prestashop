@@ -87,7 +87,8 @@ class Emailchef extends Module
             $this->registerHook('backOfficeHeader') &&
             $this->registerHook('actionCustomerAccountAdd') &&
             $this->registerHook('actionOrderStatusUpdate') &&
-            $this->registerHook('actionObjectAddressAddAfter')
+            $this->registerHook('actionObjectAddressAddAfter') &&
+            $this->registerHook('actionObjectAddressUpdateAfter')
         );
     }
 
@@ -98,7 +99,8 @@ class Emailchef extends Module
             $this->unregisterHook('backOfficeHeader') &&
             $this->unregisterHook('actionCustomerAccountAdd') &&
             $this->unregisterHook('actionOrderStatusUpdate') &&
-            $this->unregisterHook('actionObjectAddressAddAfter')
+            $this->unregisterHook('actionObjectAddressAddAfter') &&
+            $this->unregisterHook('actionObjectAddressUpdateAfter')
         );
     }
 
@@ -603,80 +605,129 @@ EOF;
         }
     }
 
-    public function hookActionObjectAddressAddAfter($params){
+    public function hookActionObjectAddressAddAfter($params) {
+    	return $this->update_customer($params['object']);
+    }
 
-        /**
-         * @var CustomerCore $customer
-         */
+    public function hookActionObjectAddressUpdateAfter($params) {
+	    return $this->update_customer($params['object'], "edit");
+    }
 
-        if ($this->emailchef()->isLogged()) {
+    private function update_customer($object, $action = 'add') {
 
-            $customer = $params['object'];
-            $list_id = $this->_getConf("list");
+	    if ( $this->emailchef()->isLogged() ) {
 
-            $address = new AddressCore(
-                AddressCore::getFirstCustomerAddressId($customer->id)
-            );
+		    /**
+		     * @var AddressCore $address
+		     */
 
-            $data = array(
-                'customer_id'       => $customer->id,
-                'first_name'        => $customer->firstname,
-                'last_name'         => $customer->lastname,
-                'user_email'        => $customer->email,
-                'billing_company'   => $customer->company,
-                'billing_address_1' => $address->address1,
-                'billing_postcode'  => $address->postcode,
-                'billing_city'      => $address->city,
-                'billing_phone'     => $address->phone,
-                'billing_state'     => StateCore::getNameById($address->id_state),
-                'billing_country'   => $address->country
-            );
+		    $address = $object;
+		    $list_id  = $this->_getConf( "list" );
 
-            $this->log(print_r($data, true));
+		    $data = array(
+			    'customer_id'       => $address->id_customer,
+			    'first_name'        => $address->firstname,
+			    'last_name'         => $address->lastname,
+			    'user_email'        => $address->email,
+			    'billing_company'   => $address->company,
+			    'billing_address_1' => $address->address1,
+			    'billing_postcode'  => $address->postcode,
+			    'billing_city'      => $address->city,
+			    'billing_phone'     => $address->phone,
+			    'billing_state'     => StateCore::getNameById( $address->id_state ),
+			    'billing_country'   => CountryCore::getNameById(
+			    	(int)Configuration::get('PS_LANG_DEFAULT'),
+				    $address->id_country
+			    )
+		    );
 
-            try {
+		    try {
 
-                $upsert = $this->emailchef()->upsert_customer(
-                    $list_id,
-                    $data
-                );
+			    $upsert = $this->emailchef()->upsert_customer(
+				    $list_id,
+				    $data
+			    );
 
-            } catch (Exception $e) {
-                $upsert = false;
-            }
+		    } catch ( Exception $e ) {
+			    $upsert = false;
+		    }
 
-            if ($upsert) {
-                $this->log(
-                    sprintf(
-                        $this->l("Aggiornati nella lista %d i campi del cliente %d (Nome: %s Cognome %s e altri %d campi)"),
-                        $list_id,
-                        $customer->id,
-                        $customer->firstname,
-                        $customer->lastname,
-                        intval(count($data) - 2)
-                    )
-                );
-            } else {
-                $this->log(
-                    sprintf(
-                        $this->l("I campi del cliente %d (Nome: %s Cognome %s e altri %d campi) nella lista %d non sono stati aggiornati"),
-                        $customer->id,
-                        $customer->firstname,
-                        $customer->lastname,
-                        intval(count($data) - 2),
-                        $list_id
-                    ),
-                    3
-                );
-            }
-        }
+		    if ( $upsert ) {
+			    $this->log(
+				    sprintf(
+					    $this->l( "Aggiornati nella lista %d i campi del cliente %d (Nome: %s Cognome %s e altri %d campi)" ),
+					    $list_id,
+					    $address->id_customer,
+					    $address->firstname,
+					    $address->lastname,
+					    intval( count( $data ) - 2 )
+				    )
+			    );
+		    } else {
+			    $this->log(
+				    sprintf(
+					    $this->l( "I campi del cliente %d (Nome: %s Cognome %s e altri %d campi) nella lista %d non sono stati aggiornati" ),
+					    $address->id_customer,
+					    $address->firstname,
+					    $address->lastname,
+					    intval( count( $data ) - 2 ),
+					    $list_id
+				    ),
+				    3
+			    );
+		    }
 
 
+	    }
     }
 
     public function hookActionOrderStatusUpdate($params)
     {
+	    require_once( dirname( __FILE__ ) . "/lib/emailchef/class-emailchef-sync.php" );
 
+	    $list_id = $this->_getConf("list");
+
+	    if ($this->emailchef()->isLogged()) {
+
+		    $sync = new PS_Emailchef_Sync();
+			$syncOrderData = $sync->getSyncOrderData(
+				$params['id_order'],
+				$params['newOrderStatus']->id
+			);
+
+			$this->log(print_r($syncOrderData, true));
+
+		    $upsert = $this->emailchef()->upsert_customer(
+			    $list_id,
+			    $syncOrderData
+		    );
+
+		    if ($upsert) {
+			    $this->log(
+				    sprintf(
+					    $this->l("Inserito nella lista %d i dati aggiornati del cliente %d (Nome: %s Cognome: %s e altri %d campi)"),
+					    $list_id,
+					    $syncOrderData['customer_id'],
+					    $syncOrderData['first_name'],
+					    $syncOrderData['last_name'],
+					    intval(count($syncOrderData) - 2)
+				    )
+			    );
+		    } else {
+			    $this->log(
+				    sprintf(
+					    $this->l("Inserimento nella lista %d dei dati aggiornati del cliente %d (Nome: %s Cognome: %s e altri %d campi) non avvenuto"),
+					    $list_id,
+					    $syncOrderData['customer_id'],
+					    $syncOrderData['first_name'],
+					    $syncOrderData['last_name'],
+					    intval(count($syncOrderData) - 2)
+				    ),
+				    3
+			    );
+		    }
+
+	    }
 
     }
 
