@@ -400,7 +400,7 @@ class PS_Emailchef_Sync {
 			) );
 
 		}
-		
+
 		$abandoned_cart = $this->getHigherProductAbandonedCart( $customer['id_customer'] );
 
 		if ( $abandoned_cart !== false ) {
