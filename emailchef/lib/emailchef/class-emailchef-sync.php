@@ -104,11 +104,8 @@ class PS_Emailchef_Sync {
 
 		if ( array_key_exists( 0, $fetch ) ) {
 
-			if ( $param == "date_add" ) {
-				$date = new DateTime( $fetch[0]['date_add'] );
-
-				return $date->format( 'Y-m-d' );
-			}
+			if ( $param == "date_add" )
+				return $this->get_date( $fetch[0]['date_add'] );
 
 			return $fetch[0][ $param ];
 		}
@@ -163,6 +160,70 @@ class PS_Emailchef_Sync {
 	}
 
 	/**
+	 * Get abandoned cart for Customer ID
+	 * @param $customer_id
+	 * @return int|null
+	 */
+
+	private function getLastAbandonedCart( $customer_id ) {
+
+		$fetch = Db::getInstance()->executeS('SELECT c.`id_cart` FROM '._DB_PREFIX_.'cart c LEFT JOIN ps_orders o ON ( c.`id_cart` = o.`id_cart` ) WHERE o.`id_order` IS NULL AND c.`id_customer` = '.(int) $customer_id.' ORDER BY c.id_cart DESC LIMIT 1');
+		if (array_key_exists(0, $fetch)) {
+			return $fetch[0]['id_cart'];
+		}
+		return null;
+	}
+
+	/**
+	 * Get higher product abandoned cart for Customer ID
+	 * @param $customer_id
+	 * @return array|bool
+	 */
+
+	private function getHigherProductAbandonedCart($customer_id) {
+		$cart_id = $this->getLastAbandonedCart( $customer_id );
+
+		if ($cart_id === null)
+			return false;
+
+		$cart = new CartCore($cart_id);
+		$products = $cart->getProducts();
+
+		usort($products, function ($p1, $p2) {
+			if ($p1['price'] == $p2['price']) return 0;
+			return $p1['price'] > $p2['price'] ? -1 : 1;
+		});
+
+		$product = new ProductCore($products[0]['id_product'], false, (int)Configuration::get( 'PS_LANG_DEFAULT' ));
+
+		$image = new ImageCore($product->getCoverWs() );
+		$image_path = _PS_BASE_URL_._THEME_PROD_DIR_.$image->getExistingImgPath().".jpg";
+
+		return array(
+			'abandoned_cart_product_name_price_higher' => $product->name,
+			'abandoned_cart_product_description_price_higher' => $product->description_short,
+			'abandoned_cart_product_price_price_higher' => $product->getPrice(true, null, 2),
+			'abandoned_cart_purchase_date_price_higher' => $this->get_date($cart->date_upd),
+			'abandoned_cart_product_id_price_higher' => $product->id,
+			'abandoned_cart_product_url_price_higher' => $product->getLink(),
+			'abandoned_cart_product_url_image_price_higher' => $image_path
+		);
+
+	}
+
+	/**
+	 * Get date helper
+	 * @param $date
+	 * @param string $format
+	 * @return string
+	 */
+
+	private function get_date($date, $format = "Y-m-d") {
+		$dt = new DateTime($date);
+		return $dt->format($format);
+	}
+
+	/**
 	 * Get customer data
 	 *
 	 * @param array $customer
@@ -197,7 +258,7 @@ class PS_Emailchef_Sync {
 		if ($latest_order_id !== null) {
 
 			$latest_order        = new OrderCore( $latest_order_id );
-			$latest_order_date   = new DateTime( $latest_order->date_add );
+			$latest_order_date   = $this->get_date( $latest_order->date_add );
 			$latest_order_status = $latest_order->getCurrentStateFull( (int) Configuration::get( 'PS_LANG_DEFAULT' ) )['name'];
 
 			array_merge($data, array(
@@ -206,7 +267,7 @@ class PS_Emailchef_Sync {
 				'total_ordered_12m'        => $this->getTotalOrdered12m( $customer['id_customer'] ),
 				'total_orders'             => OrderCore::getCustomerNbOrders( $customer['id_customer'] ),
 				'latest_order_id'          => $latest_order_id,
-				'latest_order_date'        => $latest_order_date->format( 'Y-m-d' ),
+				'latest_order_date'        => $latest_order_date,
 				'latest_order_status'      => $latest_order_status,
 				'latest_order_amount'      => CartCore::getCartByOrderId( $latest_order_id )->getOrderTotal(),
 				'all_ordered_product_ids'  => $this->getAllOrderedProductIDS( $customer['id_customer'] ),
@@ -214,6 +275,11 @@ class PS_Emailchef_Sync {
 			));
 
 		}
+
+		$abandoned_cart = $this->getHigherProductAbandonedCart( $customer['id_customer'] );
+
+		if ($abandoned_cart !== FALSE)
+			array_merge($data, $abandoned_cart);
 
 		return $data;
 
@@ -231,8 +297,8 @@ class PS_Emailchef_Sync {
 		$order                 = new OrderCore( $order_id );
 		$customer              = $order->getCustomer();
 		$id_customer           = $customer->id;
-		$latest_order_date     = new DateTime( $order->date_add );
-		$latest_order_date_upd = new DateTime( $order->date_upd );
+		$latest_order_date     = $this->get_date( $order->date_add );
+		$latest_order_date_upd = $this->get_date( $order->date_upd );
 		$latest_order_status   = $status->name;
 		$status_id = $status->id;
 
@@ -246,7 +312,7 @@ class PS_Emailchef_Sync {
 			'total_ordered_12m'        => $this->getTotalOrdered12m( $id_customer ),
 			'total_orders'             => OrderCore::getCustomerNbOrders( $id_customer ),
 			'latest_order_id'          => $order_id,
-			'latest_order_date'        => $latest_order_date->format( 'Y-m-d' ),
+			'latest_order_date'        => $latest_order_date,
 			'latest_order_status'      => $latest_order_status,
 			'latest_order_amount'      => CartCore::getCartByOrderId( $order_id )->getOrderTotal(),
 			'all_ordered_product_ids'  => $this->getAllOrderedProductIDS( $id_customer ),
@@ -278,7 +344,7 @@ class PS_Emailchef_Sync {
 		) ) ) {
 			$data = array_merge( $data, array(
 				'latest_shipped_order_id'     => $order_id,
-				'latest_shipped_order_date'   => $latest_order_date_upd->format( 'Y-m-d' ),
+				'latest_shipped_order_date'   => $latest_order_date_upd,
 				'latest_shipped_order_status' => $latest_order_status
 			) );
 		}

@@ -108,6 +108,7 @@ class Emailchef extends Module
     {
 
         $output = null;
+
         if (Tools::isSubmit('submit' . $this->name)) {
             $ec_username = strval(Tools::getValue($this->prefix_setting('username')));
             $ec_password = strval(Tools::getValue($this->prefix_setting('password')));
