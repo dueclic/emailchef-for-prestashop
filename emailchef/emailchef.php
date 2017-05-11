@@ -692,7 +692,7 @@ EOF;
 		    $sync = new PS_Emailchef_Sync();
 			$syncOrderData = $sync->getSyncOrderData(
 				$params['id_order'],
-				$params['newOrderStatus']->id
+				$params['newOrderStatus']
 			);
 
 			$this->log(print_r($syncOrderData, true));

@@ -215,18 +215,18 @@ class PS_Emailchef_Sync {
 	 * Get sync order data
 	 *
 	 * @param $order_id
-	 * @param $status_id
+	 * @param OrderStateCore $status
 	 *
 	 * @return array
 	 */
-	public function getSyncOrderData( $order_id, $status_id ) {
+	public function getSyncOrderData( $order_id, OrderStateCore $status ) {
 		$order                 = new OrderCore( $order_id );
 		$customer              = $order->getCustomer();
 		$id_customer           = $customer->id;
 		$latest_order_date     = new DateTime( $order->date_add );
 		$latest_order_date_upd = new DateTime( $order->date_upd );
-		$latest_order_status = new OrderStateCore($order_id);
-		$latest_order_status = $latest_order_status->getFieldByLang("name", (int)Configuration::get('PS_LANG_DEFAULT'));
+		$latest_order_status   = $status->name;
+		$status_id = $status->id;
 
 		$data = array(
 			'first_name'               => $customer->firstname,
@@ -244,6 +244,25 @@ class PS_Emailchef_Sync {
 			'all_ordered_product_ids'  => $this->getAllOrderedProductIDS( $id_customer ),
 			'latest_order_product_ids' => $this->getLastOrderProductIDS( $order ),
 		);
+
+		if ( $customer->isGuest() ) {
+
+			$address = new AddressCore(
+				AddressCore::getFirstCustomerAddressId( $id_customer )
+			);
+
+			$data = array_merge( $data, array(
+				'billing_company'   => $address->company,
+				'billing_address_1' => $address->address1,
+				'billing_postcode'  => $address->postcode,
+				'billing_city'      => $address->city,
+				'billing_phone'     => $address->phone,
+				'billing_state'     => StateCore::getNameById( $address->id_state ),
+				'billing_country'   => $address->country,
+				'currency'          => CurrencyCore::getDefaultCurrency()->name,
+				'status_id'         => $status_id
+			) );
+		}
 
 		if ( in_array( $status_id, array(
 			Configuration::get( "PS_OS_SHIPPING" ),
