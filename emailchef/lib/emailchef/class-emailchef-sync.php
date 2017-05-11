@@ -115,6 +115,30 @@ class PS_Emailchef_Sync {
 	}
 
 	/**
+	 * Get last shipped and completed info
+	 *
+	 * @param $customer_id
+	 * @param string $param
+	 *
+	 * @return null
+	 */
+
+	private function getLastShippedCompletedOrder( $customer_id, $param = "id_order" ) {
+		$fetch = Db::getInstance()->executeS( 'SELECT `' . $param . '` FROM ' . _DB_PREFIX_ . 'orders WHERE `id_customer`=' . (int) $customer_id . ' AND `current_state` IN ('. (int) Configuration::get("PS_OS_SHIPPING") . ', ' . (int) Configuration::get("PS_OS_DELIVERED") . ') ORDER BY `id_order`  DESC limit 1' );
+
+		if ( array_key_exists( 0, $fetch ) ) {
+
+			if ( $param == "date_add" ) {
+				return $this->get_date( $fetch[0]['date_add'] );
+			}
+
+			return $fetch[0][ $param ];
+		}
+
+		return null;
+	}
+
+	/**
 	 * Get all ordered product ids
 	 *
 	 * @param $customer_id
@@ -361,6 +385,22 @@ class PS_Emailchef_Sync {
 
 		}
 
+		$latest_shipped_completed_order_id = $this->getLastShippedCompletedOrder( $customer['id_customer'], 'id_order' );
+
+		if ($latest_shipped_completed_order_id !== null) {
+
+			$latest_order        = new OrderCore( $latest_shipped_completed_order_id );
+			$latest_order_date_upd   = $this->get_date( $latest_order->date_upd );
+			$latest_order_status = $latest_order->getCurrentStateFull( (int) Configuration::get( 'PS_LANG_DEFAULT' ) )['name'];
+
+			$data = array_merge( $data, array(
+				'latest_shipped_order_id'     => $latest_shipped_completed_order_id,
+				'latest_shipped_order_date'   => $latest_order_date_upd,
+				'latest_shipped_order_status' => $latest_order_status
+			) );
+
+		}
+		
 		$abandoned_cart = $this->getHigherProductAbandonedCart( $customer['id_customer'] );
 
 		if ( $abandoned_cart !== false ) {
