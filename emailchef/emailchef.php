@@ -54,7 +54,7 @@ class Emailchef extends Module
         $this->author = 'dueclic';
         $this->need_instance = 0;
         $this->bootstrap = true;
-        $this->controllers = array('verification');
+        $this->controllers = array('verification', 'unsubscribe');
 
         parent::__construct();
 
@@ -420,6 +420,100 @@ EOF;
 
         return $this->l('Grazie per esserti registrato alla nostra newsletter.');
     }
+
+	/**
+	 * Ends the registration process to the newsletter
+	 *
+	 * @param string $token
+	 *
+	 * @return string
+	 */
+	public function unsubEmail($token)
+	{
+
+		if ($email = $this->getUserEmailByToken($token)) {
+			$deactivated = $this->unregisterUser($email);
+		}
+
+		if (!$deactivated) {
+			return $this->l("L' email fornita è già registrata o non valida.");
+		}
+
+		return $this->l('Ti sei disiscritto con successo dalla nostra newsletter.');
+	}
+
+	/**
+	 * Unsubscribe a customer to the newsletter
+	 *
+	 * @param string $email
+	 *
+	 * @return bool
+	 */
+	protected function unregisterUser($email)
+	{
+		$sql = 'UPDATE ' . _DB_PREFIX_ . 'customer
+				SET `newsletter` = 0, newsletter_date_add = NOW(), `ip_registration_newsletter` = \'' . pSQL(Tools::getRemoteAddr()) . '\'
+				WHERE `email` = \'' . pSQL($email) . '\'
+				AND id_shop = ' . $this->context->shop->id;
+
+		$exec = Db::getInstance()->execute($sql);
+
+		if ($exec) {
+			$list_id = $this->_getConf("list");
+
+			$customer_id = CustomerCore::customerExists(
+				$email,
+				true
+			);
+
+			$customer = new CustomerCore($customer_id);
+
+			try {
+
+				$upsert = $this->emailchef()->upsert_customer(
+					$list_id,
+					array(
+						'first_name'  => $customer->firstname,
+						'last_name'   => $customer->lastname,
+						'user_email'  => $email,
+						'newsletter'  => 'no',
+						'customer_id' => $customer_id
+					)
+				);
+
+			} catch (Exception $e) {
+				$upsert = false;
+			}
+
+			if ($upsert) {
+				$this->log(
+					sprintf(
+						$this->l("Disiscrizione nella lista %d del cliente %d (Nome: %s Cognome: %s Email: %s)"),
+						$list_id,
+						$customer_id,
+						$customer->firstname,
+						$customer->lastname,
+						$email
+					)
+				);
+			} else {
+				$this->log(
+					sprintf(
+						$this->l("Disiscrizione non avvenuta nella lista %d del cliente %d (Nome: %s Cognome: %s Email: %s)"),
+						$list_id,
+						$customer_id,
+						$customer->firstname,
+						$customer->lastname,
+						$email
+					),
+					3
+				);
+			}
+
+		}
+		return $exec;
+
+	}
 
     /**
      * Subscribe a customer to the newsletter
