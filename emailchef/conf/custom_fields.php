@@ -39,6 +39,18 @@ return array(
         'name' => Translate::getAdminTranslation('Email'),
         'type' => 'predefined'
     ),
+    'gender'                                      => array(
+	    'name' => Translate::getAdminTranslation('Sesso'),
+	    'type' => 'text'
+    ),
+    'language'                                      => array(
+	    'name' => Translate::getAdminTranslation('Lingua'),
+	    'type' => 'text'
+    ),
+    'birthday'                                      => array(
+	    'name' => Translate::getAdminTranslation('Data di nascita'),
+	    'type' => 'date'
+    ),
     'billing_company'                                 => array(
         'name' => Translate::getAdminTranslation('Società'),
         'type' => 'text'
@@ -56,8 +68,12 @@ return array(
         'type' => 'text'
     ),
     'billing_phone'                                   => array(
-        'name' => Translate::getAdminTranslation('Telefono'),
+        'name' => Translate::getAdminTranslation('Telefono fisso'),
         'type' => 'text'
+    ),
+    'billing_phone_2'                                   => array(
+	    'name' => Translate::getAdminTranslation('Telefono cellulare'),
+	    'type' => 'text'
     ),
     'billing_state'                                   => array(
         'name' => Translate::getAdminTranslation('Provincia'),

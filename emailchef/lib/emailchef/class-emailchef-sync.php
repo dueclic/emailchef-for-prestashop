@@ -104,8 +104,9 @@ class PS_Emailchef_Sync {
 
 		if ( array_key_exists( 0, $fetch ) ) {
 
-			if ( $param == "date_add" )
+			if ( $param == "date_add" ) {
 				return $this->get_date( $fetch[0]['date_add'] );
+			}
 
 			return $fetch[0][ $param ];
 		}
@@ -161,93 +162,144 @@ class PS_Emailchef_Sync {
 
 	/**
 	 * Get abandoned cart for Customer ID
+	 *
 	 * @param $customer_id
+	 *
 	 * @return int|null
 	 */
 
 	private function getLastAbandonedCart( $customer_id ) {
 
-		$fetch = Db::getInstance()->executeS('SELECT c.`id_cart` FROM '._DB_PREFIX_.'cart c LEFT JOIN ps_orders o ON ( c.`id_cart` = o.`id_cart` ) WHERE o.`id_order` IS NULL AND c.`id_customer` = '.(int) $customer_id.' ORDER BY c.id_cart DESC LIMIT 1');
-		if (array_key_exists(0, $fetch)) {
+		$fetch = Db::getInstance()->executeS( 'SELECT c.`id_cart` FROM ' . _DB_PREFIX_ . 'cart c LEFT JOIN ps_orders o ON ( c.`id_cart` = o.`id_cart` ) WHERE o.`id_order` IS NULL AND c.`id_customer` = ' . (int) $customer_id . ' ORDER BY c.id_cart DESC LIMIT 1' );
+		if ( array_key_exists( 0, $fetch ) ) {
 			return $fetch[0]['id_cart'];
 		}
+
 		return null;
 	}
 
 	/**
 	 * Get higher product abandoned cart for Customer ID
+	 *
 	 * @param $customer_id
+	 *
 	 * @return array|bool
 	 */
 
-	private function getHigherProductAbandonedCart($customer_id) {
+	private function getHigherProductAbandonedCart( $customer_id ) {
 		$cart_id = $this->getLastAbandonedCart( $customer_id );
 
-		if ($cart_id === null)
+		if ( $cart_id === null ) {
 			return false;
+		}
 
-		$cart = new CartCore($cart_id);
+		$cart     = new CartCore( $cart_id );
 		$products = $cart->getProducts();
 
-		usort($products, function ($p1, $p2) {
-			if ($p1['price'] == $p2['price']) return 0;
-			return $p1['price'] > $p2['price'] ? -1 : 1;
-		});
+		usort( $products, function ( $p1, $p2 ) {
+			if ( $p1['price'] == $p2['price'] ) {
+				return 0;
+			}
 
-		$product = new ProductCore($products[0]['id_product'], false, (int)Configuration::get( 'PS_LANG_DEFAULT' ));
+			return $p1['price'] > $p2['price'] ? - 1 : 1;
+		} );
 
-		$image = new ImageCore($product->getCoverWs() );
-		$image_path = _PS_BASE_URL_._THEME_PROD_DIR_.$image->getExistingImgPath().".jpg";
+		$product = new ProductCore( $products[0]['id_product'], false, (int) Configuration::get( 'PS_LANG_DEFAULT' ) );
+
+		$image      = new ImageCore( $product->getCoverWs() );
+		$image_path = _PS_BASE_URL_ . _THEME_PROD_DIR_ . $image->getExistingImgPath() . ".jpg";
 
 		return array(
-			'abandoned_cart_product_name_price_higher' => $product->name,
-			'abandoned_cart_product_description_price_higher' => strip_tags($product->description_short),
-			'abandoned_cart_product_price_price_higher' => $product->getPrice(true, null, 2),
-			'abandoned_cart_purchase_date_price_higher' => $this->get_date($cart->date_upd),
-			'abandoned_cart_product_id_price_higher' => $product->id,
-			'abandoned_cart_product_url_price_higher' => $product->getLink(),
-			'abandoned_cart_product_url_image_price_higher' => $image_path
+			'abandoned_cart_product_name_price_higher'        => $product->name,
+			'abandoned_cart_product_description_price_higher' => strip_tags( $product->description_short ),
+			'abandoned_cart_product_price_price_higher'       => $product->getPrice( true, null, 2 ),
+			'abandoned_cart_purchase_date_price_higher'       => $this->get_date( $cart->date_upd ),
+			'abandoned_cart_product_id_price_higher'          => $product->id,
+			'abandoned_cart_product_url_price_higher'         => $product->getLink(),
+			'abandoned_cart_product_url_image_price_higher'   => $image_path
 		);
 
 	}
 
 	/**
 	 * Get higher product abandoned cart or empty
+	 *
 	 * @param $customer_id
+	 *
 	 * @return array
 	 */
 
-	public function getHigherProductAbandonedCartOrEmpty($customer_id){
+	public function getHigherProductAbandonedCartOrEmpty( $customer_id ) {
 
 		/**
 		 * @var $abandoned_cart array
 		 */
-		$abandoned_cart = $this->getHigherProductAbandonedCart($customer_id);
+		$abandoned_cart = $this->getHigherProductAbandonedCart( $customer_id );
 
-		if ($abandoned_cart === false) {
+		if ( $abandoned_cart === false ) {
 			return array(
-				'abandoned_cart_product_name_price_higher' => '',
+				'abandoned_cart_product_name_price_higher'        => '',
 				'abandoned_cart_product_description_price_higher' => '',
-				'abandoned_cart_product_price_price_higher' => '',
-				'abandoned_cart_purchase_date_price_higher' => '',
-				'abandoned_cart_product_id_price_higher' => '',
-				'abandoned_cart_product_url_price_higher' => '',
-				'abandoned_cart_product_url_image_price_higher' => ''
+				'abandoned_cart_product_price_price_higher'       => '',
+				'abandoned_cart_purchase_date_price_higher'       => '',
+				'abandoned_cart_product_id_price_higher'          => '',
+				'abandoned_cart_product_url_price_higher'         => '',
+				'abandoned_cart_product_url_image_price_higher'   => ''
 			);
 		}
+
 		return $abandoned_cart;
 	}
 
 	/**
 	 * Get date helper
+	 *
 	 * @param $date
 	 * @param string $format
+	 *
 	 * @return string
 	 */
 
-	private function get_date($date, $format = "Y-m-d") {
-		$dt = new DateTime($date);
-		return $dt->format($format);
+	private function get_date( $date, $format = "Y-m-d" ) {
+		$dt = new DateTime( $date );
+
+		return $dt->format( $format );
+	}
+
+	/**
+	 * Get gender helper
+	 *
+	 * @param $id_gender
+	 *
+	 * @return string
+	 */
+
+	private function get_gender( $id_gender ) {
+		return $id_gender == 1 ? "m" : "f";
+	}
+
+	/**
+	 * Get language helper
+	 *
+	 * @param $id_lang
+	 *
+	 * @return string
+	 */
+
+	private function get_lang( $id_lang ) {
+		return LanguageCore::getIsoById( $id_lang );
+	}
+
+	/**
+	 * Get birthday helper
+	 *
+	 * @param $birthday
+	 *
+	 * @return string
+	 */
+
+	private function get_birthday( $birthday ) {
+		return $this->get_date( $birthday );
 	}
 
 	/**
@@ -263,32 +315,38 @@ class PS_Emailchef_Sync {
 			AddressCore::getFirstCustomerAddressId( $customer['id_customer'] )
 		);
 
+		$customerob = new CustomerCore( $customer['id_customer'] );
+
 		$data = array(
-			'first_name'               => $customer['firstname'],
-			'last_name'                => $customer['lastname'],
-			'user_email'               => $customer['email'],
-			'customer_id'              => $customer['id_customer'],
-			'billing_company'          => $address->company,
-			'billing_address_1'        => $address->address1,
-			'billing_postcode'         => $address->postcode,
-			'billing_city'             => $address->city,
-			'billing_phone'            => $address->phone,
-			'billing_state'            => StateCore::getNameById( $address->id_state ),
-			'billing_country'          => $address->country,
-			'currency'                 => CurrencyCore::getDefaultCurrency()->name,
-			'newsletter'               => 'no'
+			'first_name'        => $customerob->firstname,
+			'last_name'         => $customerob->lastname,
+			'user_email'        => $customerob->email,
+			'customer_id'       => $customer['id_customer'],
+			'gender'            => $this->get_gender( $customerob->id_gender ),
+			'birthday'          => $this->get_birthday( $customerob->birthday ),
+			'language'          => $this->get_lang( $customerob->id_lang ),
+			'billing_company'   => $address->company,
+			'billing_address_1' => $address->address1,
+			'billing_postcode'  => $address->postcode,
+			'billing_city'      => $address->city,
+			'billing_phone'     => $address->phone,
+			'billing_phone2'    => $address->phone_mobile,
+			'billing_state'     => StateCore::getNameById( $address->id_state ),
+			'billing_country'   => $address->country,
+			'currency'          => CurrencyCore::getDefaultCurrency()->name,
+			'newsletter'        => 'no'
 
 		);
 
-		$latest_order_id     = $this->getLastOrder( $customer['id_customer'], 'id_order' );
+		$latest_order_id = $this->getLastOrder( $customer['id_customer'], 'id_order' );
 
-		if ($latest_order_id !== null) {
+		if ( $latest_order_id !== null ) {
 
 			$latest_order        = new OrderCore( $latest_order_id );
 			$latest_order_date   = $this->get_date( $latest_order->date_add );
 			$latest_order_status = $latest_order->getCurrentStateFull( (int) Configuration::get( 'PS_LANG_DEFAULT' ) )['name'];
 
-			$data = array_merge($data, array(
+			$data = array_merge( $data, array(
 				'total_ordered'            => $this->getTotalOrdered( $customer['id_customer'] ),
 				'total_ordered_30d'        => $this->getTotalOrdered30d( $customer['id_customer'] ),
 				'total_ordered_12m'        => $this->getTotalOrdered12m( $customer['id_customer'] ),
@@ -299,14 +357,15 @@ class PS_Emailchef_Sync {
 				'latest_order_amount'      => CartCore::getCartByOrderId( $latest_order_id )->getOrderTotal(),
 				'all_ordered_product_ids'  => $this->getAllOrderedProductIDS( $customer['id_customer'] ),
 				'latest_order_product_ids' => $this->getLastOrderProductIDS( $latest_order ),
-			));
+			) );
 
 		}
 
 		$abandoned_cart = $this->getHigherProductAbandonedCart( $customer['id_customer'] );
 
-		if ($abandoned_cart !== FALSE)
-			$data = array_merge($data, $abandoned_cart);
+		if ( $abandoned_cart !== false ) {
+			$data = array_merge( $data, $abandoned_cart );
+		}
 
 		return $data;
 
@@ -327,7 +386,7 @@ class PS_Emailchef_Sync {
 		$latest_order_date     = $this->get_date( $order->date_add );
 		$latest_order_date_upd = $this->get_date( $order->date_upd );
 		$latest_order_status   = $status->name;
-		$status_id = $status->id;
+		$status_id             = $status->id;
 
 		$data = array(
 			'first_name'               => $customer->firstname,
@@ -382,28 +441,34 @@ class PS_Emailchef_Sync {
 	/**
 	 * @param CustomerCore $customer
 	 * @param $newsletter
+	 *
 	 * @return array
 	 */
 
-	public function getSyncCustomerAccountAdd(CustomerCore $customer, $newsletter) {
+	public function getSyncCustomerAccountAdd( CustomerCore $customer, $newsletter ) {
 		return array(
 			'first_name'  => $customer->firstname,
 			'last_name'   => $customer->lastname,
 			'user_email'  => $customer->email,
 			'newsletter'  => $newsletter,
-			'customer_id' => $customer->id
+			'customer_id' => $customer->id,
+			'gender'      => $this->get_gender( $customer->id_gender ),
+			'birthday'    => $this->get_birthday( $customer->birthday ),
+			'language'    => $this->get_lang( $customer->id_lang )
 		);
 	}
 
 	/**
 	 * Get Sync Update Customer Address
+	 *
 	 * @param AddressCore $address
+	 *
 	 * @return array
 	 */
 
-	public function getSyncUpdateCustomerAddress(AddressCore $address){
+	public function getSyncUpdateCustomerAddress( AddressCore $address ) {
 
-		$customer = new Customer($address->id_customer);
+		$customer       = new Customer( $address->id_customer );
 		$customer_email = $customer->email;
 
 		return array(
@@ -416,6 +481,7 @@ class PS_Emailchef_Sync {
 			'billing_postcode'  => $address->postcode,
 			'billing_city'      => $address->city,
 			'billing_phone'     => $address->phone,
+			'billing_phone_2'   => $address->phone_mobile,
 			'billing_state'     => StateCore::getNameById( $address->id_state ),
 			'billing_country'   => CountryCore::getNameById(
 				(int) Configuration::get( 'PS_LANG_DEFAULT' ),
