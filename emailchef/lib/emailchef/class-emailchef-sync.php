@@ -212,6 +212,33 @@ class PS_Emailchef_Sync {
 	}
 
 	/**
+	 * Get higher product abandoned cart or empty
+	 * @param $customer_id
+	 * @return array
+	 */
+
+	public function getHigherProductAbandonedCartOrEmpty($customer_id){
+
+		/**
+		 * @var $abandoned_cart array
+		 */
+		$abandoned_cart = $this->getHigherProductAbandonedCart($customer_id);
+
+		if ($abandoned_cart === false) {
+			return array(
+				'abandoned_cart_product_name_price_higher' => '',
+				'abandoned_cart_product_description_price_higher' => '',
+				'abandoned_cart_product_price_price_higher' => '',
+				'abandoned_cart_purchase_date_price_higher' => '',
+				'abandoned_cart_product_id_price_higher' => '',
+				'abandoned_cart_product_url_price_higher' => '',
+				'abandoned_cart_product_url_image_price_higher' => ''
+			);
+		}
+		return $abandoned_cart;
+	}
+
+	/**
 	 * Get date helper
 	 * @param $date
 	 * @param string $format
