@@ -50,7 +50,7 @@ class Emailchef extends Module
     {
         $this->name = 'emailchef';
         $this->tab = 'administration';
-        $this->version = '1.0.0';
+        $this->version = '1.0.0.A';
         $this->author = 'dueclic';
         $this->need_instance = 0;
         $this->bootstrap = true;

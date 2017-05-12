@@ -358,7 +358,7 @@ class PS_Emailchef_Sync {
 			'billing_state'     => StateCore::getNameById( $address->id_state ),
 			'billing_country'   => $address->country,
 			'currency'          => CurrencyCore::getDefaultCurrency()->name,
-			'newsletter'        => 'no'
+			'newsletter'        => $customerob->newsletter ? 'yes' : 'no'
 
 		);
 
