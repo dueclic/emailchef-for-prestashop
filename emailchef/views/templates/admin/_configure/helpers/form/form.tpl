@@ -257,6 +257,61 @@
                 </div>
             </div>
         </div>
+        <!--
+            Sistemazione custom fields
+        -->
+
+        <div id="success_status_list_data_cf_change" class="status-list-cf-change response-list-cf-change">
+            <div class="row">
+                <div class="col-lg-offset-3 col-lg-9">
+                    <div class="alert alert-success alert-check">
+
+                        <h4>
+                            {$i18n['success_status_list_data_cf_change']}
+                        </h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="check_status_list_data_cf_change" class="check-list-cf-change">
+            <div class="row">
+                <div class="col-lg-offset-3 col-lg-9">
+                    <div class="alert alert-info alert-check">
+
+                        <h4>
+                            <span class="loading-spinner-emailchef"></span> {$i18n['check_status_list_data_cf_change']}
+                        </h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="error_status_list_data_cf_change" class="status-list-cf-change response-list-cf-change">
+            <div class="row">
+                <div class="col-lg-offset-3 col-lg-9">
+                    <div class="alert alert-danger alert-check">
+
+                        <h4>
+                            {$i18n['error_status_list_data_cf_change']}
+                        </h4>
+                        <p class="reason"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="server_error_status_list_data_cf_change" class="status-list-cf-change response-list-cf-change">
+            <div class="row">
+                <div class="col-lg-offset-3 col-lg-9">
+                    <div class="alert alert-danger alert-check">
+
+                        <h4>
+                            {$i18n['server_error_status_list_data']}
+                        </h4>
+                        <p class="reason"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     {/if}
 
     {if $input.type == "password" && $input.name == $password_field}

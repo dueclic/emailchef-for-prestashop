@@ -181,18 +181,18 @@ class PS_Emailchef extends PS_Emailchef_Api
         /**
          *
          * Check if there are fields in emailChef
-         * not present in @private $custom_fiels
+         * not present in @private $custom_fields
          *
          * If fields are present delete
          *
          */
 
         $ec_id_custom_fields = array_column($collection, "id");
-        $diff = array_diff($ec_id_custom_fields, $new_custom_fields);
+        //$diff = array_diff($ec_id_custom_fields, $new_custom_fields);
 
-        foreach ($diff as $custom_id) {
+        /*foreach ($diff as $custom_id) {
             $this->delete_custom_field($custom_id);
-        }
+        }*/
 
         return true;
 

@@ -38,6 +38,7 @@ var PS_Emailchef = function($) {
     var $policyList;
     var $listCreation;
     var $btnSave;
+    var isCreated = 0;
 
     return {
         go : go
@@ -75,6 +76,7 @@ var PS_Emailchef = function($) {
 
         $(document).on("click", "#" + prefixed_setting("save"), function (evt) {
             evt.preventDefault();
+            isCreated = 1;
             addList($apiUser.val(), $apiPass.val(), $("#" + prefixed_setting("new_name")).val(), $("#" + prefixed_setting("new_description")).val());
         });
 
@@ -95,6 +97,15 @@ var PS_Emailchef = function($) {
             else {
                 $landingList.closest(".form-group").fadeIn();
                 $fpageList.closest(".form-group").fadeIn();
+            }
+
+        });
+
+        $("form").on("submit", function(evt){
+
+            if (isCreated == 0) {
+                evt.preventDefault();
+                checkCustomFields($apiUser.val(), $apiPass.val(), $selList.val());
             }
 
         });
@@ -203,6 +214,7 @@ var PS_Emailchef = function($) {
         $listCreation.hide();
         $(".check-list, .response-list").hide();
         $(".check-list-cf, .response-list-cf").hide();
+        $(".check-list-cf-change, .response-list-cf-change").hide();
 
     }
 
@@ -254,6 +266,54 @@ var PS_Emailchef = function($) {
                 $(".check-list-cf").hide();
                 $btnSave.removeAttr("disabled");
                 $selList.removeAttr("disabled");
+            }
+        });
+
+    }
+
+    function checkCustomFields(apiUser, apiPass, listId) {
+
+        $btnSave.attr("disabled", "disabled");
+
+        var ajax_data = {
+            action: 'emailchefaddcustomfields',
+            api_user: apiUser,
+            api_pass: apiPass,
+            list_id: listId
+        };
+
+        var ajax_url = $listCreation.data("ajax-action");
+
+        $(".status-list-cf-change").hide();
+        $(".check-list-cf-change").show();
+
+        $.ajax({
+            type: 'POST',
+            url: ajax_url,
+            data: ajax_data,
+            dataType: 'json',
+            success: function(response) {
+
+                if (response.type == 'error') {
+                    $(".status-list-cf-change").hide();
+                    $("#error_status_list_data_cf_change").find(".reason").text(response.msg);
+                    $("#error_status_list_data_cf_change").show();
+                    return;
+                }
+
+                $("#success_status_list_data_cf_change").show().delay(3000).fadeOut();
+
+            },
+            error: function(jxqr, textStatus, thrown){
+                $("#error_status_list_data_cf_change").find(".reason").text(jxqr.error +" "+textStatus+" "+thrown);
+                $("#server_error_status_list_data_cf_change").show();
+            },
+            complete: function() {
+                $(".check-list-cf-change").hide();
+                $btnSave.removeAttr("disabled");
+                $selList.removeAttr("disabled");
+                isCreated = 1;
+                $("form").submit();
             }
         });
 

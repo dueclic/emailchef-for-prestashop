@@ -39,6 +39,10 @@ return array(
         'name' => Translate::getAdminTranslation('Email'),
         'type' => 'predefined'
     ),
+    'source'                                      => array(
+	    'name' => Translate::getAdminTranslation('Sorgente'),
+	    'type' => 'text'
+    ),
     'gender'                                      => array(
 	    'name' => Translate::getAdminTranslation('Sesso'),
 	    'type' => 'text'

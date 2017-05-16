@@ -50,7 +50,7 @@ class Emailchef extends Module
     {
         $this->name = 'emailchef';
         $this->tab = 'administration';
-        $this->version = '1.0.0.A';
+        $this->version = '1.0.0.B';
         $this->author = 'dueclic';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -311,11 +311,14 @@ EOF;
             'no_list_found'                 => $this->l('Nessuna lista trovata.'),
             'check_status_list_data'        => $this->l('Creazione della lista in corso...'),
             'check_status_list_data_cf'     => $this->l('Stiamo creando i custom fields per la lista appena creata...'),
+            'check_status_list_data_cf_change'     => $this->l('Stiamo sistemando i custom fields per la lista appena scelta...'),
             'error_status_list_data'        => $this->l('Errore nella creazione della lista indicata.'),
             'error_status_list_data_cf'     => $this->l('Errore nella creazione dei custom fields per la lista creata.'),
+            'error_status_list_data_cf_change'     => $this->l('Errore nella sistemazione dei custom fields per la lista scelta.'),
             'server_error_status_list_data' => $this->l('Errore interno del server, riprova.'),
             'success_status_list_data'      => $this->l('La lista è stata creata con successo, ora verranno creati i custom fields.'),
-            'success_status_list_data_cf'   => $this->l('Creazione dei custom fields per la lista avvenuta con successo.')
+            'success_status_list_data_cf'   => $this->l('Creazione dei custom fields per la lista avvenuta con successo.'),
+            'success_status_list_data_cf_change'   => $this->l('Sistemazione dei custom fields per la lista avvenuta con successo.')
 
         ));
 

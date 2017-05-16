@@ -124,7 +124,7 @@ class PS_Emailchef_Sync {
 	 */
 
 	private function getLastShippedCompletedOrder( $customer_id, $param = "id_order" ) {
-		$fetch = Db::getInstance()->executeS( 'SELECT `' . $param . '` FROM ' . _DB_PREFIX_ . 'orders WHERE `id_customer`=' . (int) $customer_id . ' AND `current_state` IN ('. (int) Configuration::get("PS_OS_SHIPPING") . ', ' . (int) Configuration::get("PS_OS_DELIVERED") . ') ORDER BY `id_order`  DESC limit 1' );
+		$fetch = Db::getInstance()->executeS( 'SELECT `' . $param . '` FROM ' . _DB_PREFIX_ . 'orders WHERE `id_customer`=' . (int) $customer_id . ' AND `current_state` IN (' . (int) Configuration::get( "PS_OS_SHIPPING" ) . ', ' . (int) Configuration::get( "PS_OS_DELIVERED" ) . ') ORDER BY `id_order`  DESC limit 1' );
 
 		if ( array_key_exists( 0, $fetch ) ) {
 
@@ -326,6 +326,10 @@ class PS_Emailchef_Sync {
 		return $this->get_date( $birthday );
 	}
 
+	private function get_platform(){
+		return Configuration::get('PS_SHOP_NAME').' - '."Prestashop "._PS_VERSION_;
+	}
+
 	/**
 	 * Get customer data
 	 *
@@ -358,6 +362,7 @@ class PS_Emailchef_Sync {
 			'billing_state'     => StateCore::getNameById( $address->id_state ),
 			'billing_country'   => $address->country,
 			'currency'          => CurrencyCore::getDefaultCurrency()->name,
+			'source'            => $this->get_platform(),
 			'newsletter'        => $customerob->newsletter ? 'yes' : 'no'
 
 		);
@@ -387,11 +392,11 @@ class PS_Emailchef_Sync {
 
 		$latest_shipped_completed_order_id = $this->getLastShippedCompletedOrder( $customer['id_customer'], 'id_order' );
 
-		if ($latest_shipped_completed_order_id !== null) {
+		if ( $latest_shipped_completed_order_id !== null ) {
 
-			$latest_order        = new OrderCore( $latest_shipped_completed_order_id );
-			$latest_order_date_upd   = $this->get_date( $latest_order->date_upd );
-			$latest_order_status = $latest_order->getCurrentStateFull( (int) Configuration::get( 'PS_LANG_DEFAULT' ) )['name'];
+			$latest_order          = new OrderCore( $latest_shipped_completed_order_id );
+			$latest_order_date_upd = $this->get_date( $latest_order->date_upd );
+			$latest_order_status   = $latest_order->getCurrentStateFull( (int) Configuration::get( 'PS_LANG_DEFAULT' ) )['name'];
 
 			$data = array_merge( $data, array(
 				'latest_shipped_order_id'     => $latest_shipped_completed_order_id,
@@ -443,6 +448,7 @@ class PS_Emailchef_Sync {
 			'latest_order_amount'      => CartCore::getCartByOrderId( $order_id )->getOrderTotal(),
 			'all_ordered_product_ids'  => $this->getAllOrderedProductIDS( $id_customer ),
 			'latest_order_product_ids' => $this->getLastOrderProductIDS( $order ),
+			'source' => $this->get_platform()
 		);
 
 		if ( $customer->isGuest() ) {
@@ -494,7 +500,8 @@ class PS_Emailchef_Sync {
 			'customer_id' => $customer->id,
 			'gender'      => $this->get_gender( $customer->id_gender ),
 			'birthday'    => $this->get_birthday( $customer->birthday ),
-			'language'    => $this->get_lang( $customer->id_lang )
+			'language'    => $this->get_lang( $customer->id_lang ),
+			'source'      => $this->get_platform()
 		);
 	}
 
@@ -526,7 +533,8 @@ class PS_Emailchef_Sync {
 			'billing_country'   => CountryCore::getNameById(
 				(int) Configuration::get( 'PS_LANG_DEFAULT' ),
 				$address->id_country
-			)
+			),
+			'source'            => $this->get_platform()
 		);
 
 	}

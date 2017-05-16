@@ -41,6 +41,6 @@ select#ps_emailchef_list.select_and_create {
     padding-right:20px;
 }
 
-.check-login, .response-login, .check-list, .response-list, .check-list-cf, .response-list-cf {
+.check-login, .response-login, .check-list, .response-list, .check-list-cf, .response-list-cf, .check-list-cf-change, .response-list-cf-change  {
     display: none;
 }
