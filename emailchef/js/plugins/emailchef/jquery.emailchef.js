@@ -102,6 +102,7 @@ var PS_Emailchef = function($) {
         });
 
         $("form").on("submit", function(evt){
+            var $btn = $(evt.target);
 
             if (isCreated == 0) {
                 evt.preventDefault();
@@ -313,7 +314,7 @@ var PS_Emailchef = function($) {
                 $btnSave.removeAttr("disabled");
                 $selList.removeAttr("disabled");
                 isCreated = 1;
-                $("form").submit();
+                $btnSave.trigger("click");
             }
         });
 
