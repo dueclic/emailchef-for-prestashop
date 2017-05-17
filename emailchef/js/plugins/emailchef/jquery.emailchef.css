@@ -1,5 +1,6 @@
 select#ps_emailchef_list.select_and_create {
     float:left;
+    width:400px !important;
 }
 
 .select_and_create_btn {

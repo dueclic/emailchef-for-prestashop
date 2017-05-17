@@ -50,7 +50,7 @@ class Emailchef extends Module
     {
         $this->name = 'emailchef';
         $this->tab = 'administration';
-        $this->version = '1.0.0.B';
+        $this->version = '1.0.0.C';
         $this->author = 'dueclic';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -271,7 +271,7 @@ EOF;
                 )
             ),
             'submit' => array(
-                'title' => $this->l('Salva'),
+                'title' => $this->l('Salva ed esporta i contatti'),
                 'class' => 'btn btn-default pull-right'
             )
         );

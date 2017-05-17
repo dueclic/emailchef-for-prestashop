@@ -224,6 +224,12 @@ var PS_Emailchef = function($) {
         $("#" + prefixed_setting("username") + ", " + "#" + prefixed_setting("password")).change(function () {
             accessIsValid($apiUser.val(), $apiPass.val());
         });
+
+        if ($apiUser.val() === '' || $apiPass.val() === '') {
+            formContent('hide');
+            return;
+        }
+
         accessIsValid("islogin", "islogin");
 
     }

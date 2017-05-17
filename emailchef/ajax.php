@@ -133,7 +133,7 @@ final class EmailchefAjaxRequest{
 
         if ($psec->isLogged()){
 
-            if ( ! $args['list_name'] || empty( $args['list_name'] ) || ! $args['list_desc'] || empty( $args['list_desc'] ) ) {
+            if ( ! $args['list_name'] || empty( $args['list_name'] ) ) {
                 $response['msg'] = $this->module->l('Inserisci un nome e una descrizione per la nuova lista');
                 return $response;
             }

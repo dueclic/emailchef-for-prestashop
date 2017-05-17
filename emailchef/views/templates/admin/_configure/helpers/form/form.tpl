@@ -118,7 +118,7 @@
                         </div>
 
                         <div class="form-group">
-                            <label class="col-lg-3 control-label required"
+                            <label class="col-lg-3 control-label"
                                    for="{$new_desc_id}">{$i18n['desc_list']}</label>
                             <div class="col-lg-6">
                                 <input type="text" class="form-control" id="{$new_desc_id}" name="{$new_desc_id}"

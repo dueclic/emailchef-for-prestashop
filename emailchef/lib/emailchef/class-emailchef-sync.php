@@ -327,7 +327,7 @@ class PS_Emailchef_Sync {
 	}
 
 	private function get_platform(){
-		return Configuration::get('PS_SHOP_NAME').' - '."Prestashop "._PS_VERSION_;
+		return 'eMailChef for PrestaShop';
 	}
 
 	/**
