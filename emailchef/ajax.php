@@ -119,6 +119,8 @@ final class EmailchefAjaxRequest{
 
 	public function ajax_emailchefaddlist($args) {
 
+		error_reporting(0);
+
 	    if (isset($args['api_user']) && isset($args['api_pass'])) {
             $psec = $this->module->emailchef( $args['api_user'], $args['api_pass'] );
         }
@@ -138,7 +140,13 @@ final class EmailchefAjaxRequest{
                 return $response;
             }
 
+	        if ( ! $args['list_desc'] || empty( $args['list_desc'] ) ) {
+            	$args['list_desc'] = "";
+	        }
+
             $list_id = $psec->create_list($args['list_name'], $args['list_desc']);
+
+            $response['full_response'] = $psec->lastResponse;
 
             if ( $list_id !== false ) {
 
