@@ -45,3 +45,21 @@ select#ps_emailchef_list.select_and_create {
 .check-login, .response-login, .check-list, .response-list, .check-list-cf, .response-list-cf, .check-list-cf-change, .response-list-cf-change  {
     display: none;
 }
+
+.label-tooltip {
+    background-color: transparent !important;
+}
+
+.tooltip-inner {
+    max-width: 400px !important;
+    width: 400px !important;
+}
+
+.emailchef-image {
+    margin-bottom:15px;
+}
+
+.emailchef-image img {
+    display:block;
+    margin: 0 auto;
+}

@@ -1,4 +1,12 @@
 {extends file="helpers/form/form.tpl"}
+
+{block name="legend"}
+    {$smarty.block.parent}
+    <div class="emailchef-image">
+        <img src="{$logo_url}" alt="eMailChef Logo">
+    </div>
+{/block}
+
 {block name="input"}
 
     {if $input.type == "select_and_create"}
@@ -97,6 +105,28 @@
 
 {/block}
 
+{block name="label"}
+    {if isset($input.label)}
+        <label class="control-label col-lg-3{if isset($input.required) && $input.required && $input.type != 'radio'} required{/if}">
+            {$input.label}
+            {if isset($input.hint)}
+            <span class="label-tooltip" data-toggle="tooltip" data-html="true" title="{if is_array($input.hint)}
+                            {foreach $input.hint as $hint}
+                                {if is_array($hint)}
+                                    {$hint.text|escape:'quotes'}
+                                {else}
+                                    {$hint|escape:'quotes'}
+                                {/if}
+                            {/foreach}
+                        {else}
+                            {$input.hint|escape:'quotes'}
+                        {/if}"><i class="icon-info-sign"></i></span>
+                {/if}
+
+        </label>
+    {/if}
+{/block}
+
 {block name="input_row"}
 
     {$smarty.block.parent}
@@ -128,7 +158,7 @@
 
                         <div class="form-group">
                             <div class="col-lg-12">
-                                * {$i18n['accept_privacy']}
+                                {$i18n['accept_privacy']}
                             </div>
                         </div>
 
@@ -260,7 +290,6 @@
         <!--
             Sistemazione custom fields
         -->
-
         <div id="success_status_list_data_cf_change" class="status-list-cf-change response-list-cf-change">
             <div class="row">
                 <div class="col-lg-offset-3 col-lg-9">
@@ -311,7 +340,6 @@
                 </div>
             </div>
         </div>
-
     {/if}
 
     {if $input.type == "password" && $input.name == $password_field}
