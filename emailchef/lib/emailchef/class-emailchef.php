@@ -224,7 +224,6 @@ class PS_Emailchef extends PS_Emailchef_Api {
 			$args["instance_in"]["list_description"] = $description;
 		}
 
-
 		$response = $this->get( "/lists", $args, "POST" );
 
 		if ( $response['status'] != "OK" ) {
