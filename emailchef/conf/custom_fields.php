@@ -104,7 +104,7 @@ return array(
         'type' => 'number'
     ),
     'total_ordered_12m'                               => array(
-        'name' => Translate::getAdminTranslation('Totale ordinato nell’ultimo anno'),
+        'name' => Translate::getAdminTranslation('Totale ordinato negli ultimi 12 mesi'),
         'type' => 'number'
     ),
     'total_orders'                                    => array(

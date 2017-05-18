@@ -88,7 +88,8 @@ class Emailchef extends Module
             $this->registerHook('actionCustomerAccountAdd') &&
             $this->registerHook('actionOrderStatusUpdate') &&
             $this->registerHook('actionObjectAddressAddAfter') &&
-            $this->registerHook('actionObjectAddressUpdateAfter')
+            $this->registerHook('actionObjectAddressUpdateAfter') &&
+            $this->registerHook('actionCartSave')
         );
     }
 
@@ -106,7 +107,8 @@ class Emailchef extends Module
             $this->unregisterHook('actionCustomerAccountAdd') &&
             $this->unregisterHook('actionOrderStatusUpdate') &&
             $this->unregisterHook('actionObjectAddressAddAfter') &&
-            $this->unregisterHook('actionObjectAddressUpdateAfter')
+            $this->unregisterHook('actionObjectAddressUpdateAfter') &&
+            $this->unregisterHook('actionCartSave')
         );
     }
 
@@ -618,6 +620,64 @@ EOF;
 
     }
 
+    public function hookActionCartSave(){
+
+    	$customer = $this->context->customer;
+
+	    if ($this->emailchef()->isLogged() && $customer->isLogged() && $this->context->cart !== null) {
+
+		    $list_id = $this->_getConf("list");
+
+		    require_once( dirname( __FILE__ ) . "/lib/emailchef/class-emailchef-sync.php" );
+		    $sync = new PS_Emailchef_Sync();
+
+
+		    $higher_product = $sync->getHigherProductCart(
+			    $this->context->cart
+		    );
+
+		    $syncCartSave = array(
+			    'first_name'  => $customer->firstname,
+			    'last_name'   => $customer->lastname,
+			    'user_email'  => $customer->email
+		    );
+
+		    $syncCartSave = array_merge($syncCartSave, $higher_product);
+
+		    $upsert = $this->emailchef()->upsert_customer(
+			    $list_id,
+			    $syncCartSave
+		    );
+
+		    if ($upsert) {
+			    $this->log(
+				    sprintf(
+					    $this->l("Inserito nella lista %d il prodotto con prezzo più alto nel carrello di %d (Nome: %s Cognome: %s Email: %s)"),
+					    $list_id,
+					    $customer->id,
+					    $customer->firstname,
+					    $customer->lastname,
+					    $customer->email
+				    )
+			    );
+		    } else {
+			    $this->log(
+				    sprintf(
+					    $this->l("Inserimento non riuscito del prodotto con prezzo più alto nel carrello nella lista %d da parte di %d (Nome: %s Cognome: %s Email: %s)"),
+					    $list_id,
+					    $customer->id,
+					    $customer->firstname,
+					    $customer->lastname,
+					    $customer->email
+				    ),
+				    3
+			    );
+		    }
+
+	    }
+
+    }
+
     public function hookActionCustomerAccountAdd($params)
     {
         if ($this->emailchef()->isLogged()) {
@@ -745,7 +805,9 @@ EOF;
 
 	    $list_id = $this->_getConf("list");
 
-	    if ($this->emailchef()->isLogged()) {
+	    $ecps = $this->emailchef();
+
+	    if ($ecps->isLogged()) {
 
 		    $sync = new PS_Emailchef_Sync();
 			$syncOrderData = $sync->getSyncOrderData(
@@ -758,7 +820,7 @@ EOF;
 			    $sync->getHigherProductAbandonedCartOrEmpty($syncOrderData['customer_id'] )
 		    );
 
-		    $upsert = $this->emailchef()->upsert_customer(
+		    $upsert = $ecps->upsert_customer(
 			    $list_id,
 			    $syncOrderData
 		    );
@@ -777,12 +839,13 @@ EOF;
 		    } else {
 			    $this->log(
 				    sprintf(
-					    $this->l("Inserimento nella lista %d dei dati aggiornati del cliente %d (Nome: %s Cognome: %s e altri %d campi) non avvenuto"),
+					    $this->l("Inserimento nella lista %d dei dati aggiornati del cliente %d (Nome: %s Cognome: %s e altri %d campi) non avvenuto (Errore: %s)"),
 					    $list_id,
 					    $syncOrderData['customer_id'],
 					    $syncOrderData['first_name'],
 					    $syncOrderData['last_name'],
-					    intval(count($syncOrderData) - 2)
+					    intval(count($syncOrderData) - 2),
+					    $ecps->lastError
 				    ),
 				    3
 			    );

@@ -355,7 +355,7 @@ class PS_Emailchef extends PS_Emailchef_Api
 	 * @return bool
 	 */
 
-	private function update_customer( $list_id, $customer, $ec_id, $abandoned_cart = false ) {
+	private function update_customer( $list_id, $customer, $ec_id) {
 
 		$path  = "/contacts";
 		$route = sprintf( "%s/%d", $path, $ec_id );
@@ -371,14 +371,6 @@ class PS_Emailchef extends PS_Emailchef_Api
 				continue;
 
 			$my_custom['value'] = $customer[ $my_custom['place_holder'] ];
-
-			if ( ! $abandoned_cart && $my_custom['value'] == null ) {
-				continue;
-			}
-
-			if ( $abandoned_cart && strpos( $my_custom['place_holder'], 'abandoned_cart' ) === false ) {
-				continue;
-			}
 
 			$custom_fields[] = $my_custom;
 

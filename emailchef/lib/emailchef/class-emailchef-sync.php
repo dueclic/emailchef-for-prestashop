@@ -174,6 +174,12 @@ class PS_Emailchef_Sync {
 		return "";
 	}
 
+	/**
+	 * Get last ordered product IDS
+	 * @param OrderCore $latest_order
+	 * @return string
+	 */
+
 	private function getLastOrderProductIDS( OrderCore $latest_order ) {
 		$products    = $latest_order->getProducts();
 		$all_ordered = array();
@@ -203,21 +209,15 @@ class PS_Emailchef_Sync {
 	}
 
 	/**
-	 * Get higher product abandoned cart for Customer ID
+	 * Get higher product in Cart
 	 *
-	 * @param $customer_id
+	 * @param Cart $cart
 	 *
-	 * @return array|bool
+	 * @return array
 	 */
 
-	private function getHigherProductAbandonedCart( $customer_id ) {
-		$cart_id = $this->getLastAbandonedCart( $customer_id );
+	public function getHigherProductCart( $cart ) {
 
-		if ( $cart_id === null ) {
-			return false;
-		}
-
-		$cart     = new CartCore( $cart_id );
 		$products = $cart->getProducts();
 
 		usort( $products, function ( $p1, $p2 ) {
@@ -242,6 +242,27 @@ class PS_Emailchef_Sync {
 			'abandoned_cart_product_url_price_higher'         => $product->getLink(),
 			'abandoned_cart_product_url_image_price_higher'   => $image_path
 		);
+
+	}
+
+	/**
+	 * Get higher product abandoned cart for Customer ID
+	 *
+	 * @param $customer_id
+	 *
+	 * @return array|bool
+	 */
+
+	private function getHigherProductAbandonedCart( $customer_id ) {
+		$cart_id = $this->getLastAbandonedCart( $customer_id );
+
+		if ( $cart_id === null ) {
+			return false;
+		}
+
+		$cart = new CartCore( $cart_id );
+
+		return $this->getHigherProductCart( $cart );
 
 	}
 
@@ -326,7 +347,7 @@ class PS_Emailchef_Sync {
 		return $this->get_date( $birthday );
 	}
 
-	private function get_platform(){
+	private function get_platform() {
 		return 'eMailChef for PrestaShop';
 	}
 
@@ -358,7 +379,7 @@ class PS_Emailchef_Sync {
 			'billing_postcode'  => $address->postcode,
 			'billing_city'      => $address->city,
 			'billing_phone'     => $address->phone,
-			'billing_phone2'    => $address->phone_mobile,
+			'billing_phone_2'    => $address->phone_mobile,
 			'billing_state'     => StateCore::getNameById( $address->id_state ),
 			'billing_country'   => $address->country,
 			'currency'          => CurrencyCore::getDefaultCurrency()->name,
@@ -448,7 +469,8 @@ class PS_Emailchef_Sync {
 			'latest_order_amount'      => CartCore::getCartByOrderId( $order_id )->getOrderTotal(),
 			'all_ordered_product_ids'  => $this->getAllOrderedProductIDS( $id_customer ),
 			'latest_order_product_ids' => $this->getLastOrderProductIDS( $order ),
-			'source' => $this->get_platform()
+			'source'                   => $this->get_platform(),
+			'currency'                 => CurrencyCore::getDefaultCurrency()->name
 		);
 
 		if ( $customer->isGuest() ) {
@@ -463,6 +485,7 @@ class PS_Emailchef_Sync {
 				'billing_postcode'  => $address->postcode,
 				'billing_city'      => $address->city,
 				'billing_phone'     => $address->phone,
+				'billing_phone_2'   => $address->phone_mobile,
 				'billing_state'     => StateCore::getNameById( $address->id_state ),
 				'billing_country'   => $address->country,
 				'currency'          => CurrencyCore::getDefaultCurrency()->name,
