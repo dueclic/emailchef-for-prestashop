@@ -2,8 +2,10 @@
 
 {block name="legend"}
     {$smarty.block.parent}
-    <div class="emailchef-image">
-        <img src="{$logo_url}" alt="eMailChef Logo">
+    <div class="emailchef-image row">
+        <div class="col-lg-9 col-lg-offset-3">
+            <img src="{$logo_url}" alt="eMailChef Logo">
+        </div>
     </div>
 {/block}
 
@@ -110,7 +112,7 @@
         <label class="control-label col-lg-3{if isset($input.required) && $input.required && $input.type != 'radio'} required{/if}">
             {$input.label}
             {if isset($input.hint)}
-            <span class="label-tooltip" data-toggle="tooltip" data-html="true" title="{if is_array($input.hint)}
+                <span class="label-tooltip" data-toggle="tooltip" data-html="true" title="{if is_array($input.hint)}
                             {foreach $input.hint as $hint}
                                 {if is_array($hint)}
                                     {$hint.text|escape:'quotes'}
@@ -121,7 +123,7 @@
                         {else}
                             {$input.hint|escape:'quotes'}
                         {/if}"><i class="icon-info-sign"></i></span>
-                {/if}
+            {/if}
 
         </label>
     {/if}
@@ -136,44 +138,55 @@
             <div class="row">
                 <div class="col-lg-offset-3 col-lg-9">
 
-                    <div class="list_creation_form alert alert-onboarding">
+                    <div class="list_creation_form panel panel-emailchef">
 
-                        <div class="form-group">
-                            <label class="col-lg-3 control-label required"
-                                   for="{$new_name_id}">{$i18n['name_list']}</label>
-                            <div class="col-lg-6">
-                                <input type="text" class="form-control" id="{$new_name_id}" name="{$new_name_id}"
-                                       placeholder="{$i18n['name_list_placeholder']}">
-                            </div>
+                        <div class="panel-heading">
+                            <h1 class="panel-title">{$i18n['create_destination_list']}</h1>
                         </div>
 
-                        <div class="form-group">
-                            <label class="col-lg-3 control-label"
-                                   for="{$new_desc_id}">{$i18n['desc_list']}</label>
-                            <div class="col-lg-6">
-                                <input type="text" class="form-control" id="{$new_desc_id}" name="{$new_desc_id}"
-                                       placeholder="{$i18n['desc_list_placeholder']}">
+                        <div class="panel-body">
+
+                            <div class="form-group">
+                                <label class="col-lg-3 control-label required"
+                                       for="{$new_name_id}">{$i18n['name_list']}</label>
+                                <div class="col-lg-6">
+                                    <input type="text" class="form-control" id="{$new_name_id}" name="{$new_name_id}"
+                                           placeholder="{$i18n['name_list_placeholder']}">
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="form-group">
-                            <div class="col-lg-12">
-                                {$i18n['accept_privacy']}
+                            <div class="form-group">
+                                <label class="col-lg-3 control-label"
+                                       for="{$new_desc_id}">{$i18n['desc_list']}</label>
+                                <div class="col-lg-6">
+                                    <input type="text" class="form-control" id="{$new_desc_id}" name="{$new_desc_id}"
+                                           placeholder="{$i18n['desc_list_placeholder']}">
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="form-group">
+                            <div class="form-group">
+                                <div class="col-lg-9 col-lg-offset-3">
+                                    {$i18n['accept_privacy']}
+                                </div>
+                            </div>
 
-                            <button type="submit" value="1" id="{$undo_id}" name="{$undo_id}"
-                                    class="btn btn-default pull-right">
-                                <i class="icon-undo"></i> {$i18n['undo_btn']}
-                            </button>
-                            &nbsp;
-                            <button type="submit" value="1" id="{$save_id}" name="{$save_id}"
-                                    class="btn btn-default pull-right">
-                                <i class="icon-plus"></i> {$i18n['create_list']}
-                            </button>
+                            <div class="form-group">
 
+                                <div class="col-lg-9 col-lg-offset-3">
+                                    &nbsp;
+                                    <button type="submit" value="1" id="{$save_id}" name="{$save_id}"
+                                            class="btn btn-default">
+                                        <i class="icon-plus"></i> {$i18n['create_list']}
+                                    </button>
+
+                                    <button type="submit" value="1" id="{$undo_id}" name="{$undo_id}"
+                                            class="btn btn-default">
+                                        <i class="icon-undo"></i> {$i18n['undo_btn']}
+                                    </button>
+
+                                </div>
+
+                            </div>
                         </div>
 
                     </div>

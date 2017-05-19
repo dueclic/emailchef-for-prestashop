@@ -320,7 +320,14 @@ class PS_Emailchef_Sync {
 	 */
 
 	private function get_gender( $id_gender ) {
-		return $id_gender == 1 ? "m" : "f";
+
+		if ($id_gender == 1)
+			return "m";
+		else if ($id_gender == 2)
+			return "f";
+		else
+			return "na";
+
 	}
 
 	/**
@@ -459,6 +466,7 @@ class PS_Emailchef_Sync {
 			'last_name'                => $customer->lastname,
 			'user_email'               => $customer->email,
 			'customer_id'              => $id_customer,
+			'gender'                   => $this->get_gender($customer->id_gender),
 			'total_ordered'            => $this->getTotalOrdered( $id_customer ),
 			'total_ordered_30d'        => $this->getTotalOrdered30d( $id_customer ),
 			'total_ordered_12m'        => $this->getTotalOrdered12m( $id_customer ),
@@ -515,7 +523,8 @@ class PS_Emailchef_Sync {
 	 */
 
 	public function getSyncCustomerAccountAdd( CustomerCore $customer, $newsletter ) {
-		return array(
+
+		$data = array(
 			'first_name'  => $customer->firstname,
 			'last_name'   => $customer->lastname,
 			'user_email'  => $customer->email,
@@ -526,6 +535,9 @@ class PS_Emailchef_Sync {
 			'language'    => $this->get_lang( $customer->id_lang ),
 			'source'      => $this->get_platform()
 		);
+
+		return $data;
+
 	}
 
 	/**
@@ -541,11 +553,14 @@ class PS_Emailchef_Sync {
 		$customer       = new Customer( $address->id_customer );
 		$customer_email = $customer->email;
 
-		return array(
+		$data = array(
 			'customer_id'       => $address->id_customer,
 			'first_name'        => $address->firstname,
 			'last_name'         => $address->lastname,
 			'user_email'        => $customer_email,
+			'gender'            => $this->get_gender( $customer->id_gender ),
+			'birthday'          => $this->get_birthday( $customer->birthday ),
+			'language'          => $this->get_lang( $customer->id_lang ),
 			'billing_company'   => $address->company,
 			'billing_address_1' => $address->address1,
 			'billing_postcode'  => $address->postcode,
@@ -559,6 +574,8 @@ class PS_Emailchef_Sync {
 			),
 			'source'            => $this->get_platform()
 		);
+
+		return $data;
 
 	}
 

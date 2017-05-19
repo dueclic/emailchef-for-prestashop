@@ -48,7 +48,7 @@ class Emailchef extends Module {
 	public function __construct() {
 		$this->name          = 'emailchef';
 		$this->tab           = 'administration';
-		$this->version       = '1.0.0.D';
+		$this->version       = '1.0.0.E';
 		$this->author        = 'dueclic';
 		$this->need_instance = 0;
 		$this->bootstrap     = true;
@@ -83,10 +83,9 @@ class Emailchef extends Module {
 			parent::install() &&
 			$this->registerHook( 'backOfficeHeader' ) &&
 			$this->registerHook( 'actionCustomerAccountAdd' ) &&
-			$this->registerHook( 'actionOrderStatusUpdate' ) &&
+			$this->registerHook( 'actionOrderStatusPostUpdate' ) &&
 			$this->registerHook( 'actionObjectAddressAddAfter' ) &&
-			$this->registerHook( 'actionObjectAddressUpdateAfter' ) &&
-			$this->registerHook( 'actionCartSave' )
+			$this->registerHook( 'actionObjectAddressUpdateAfter' )
 		);
 	}
 
@@ -101,10 +100,9 @@ class Emailchef extends Module {
 			parent::uninstall() &&
 			$this->unregisterHook( 'backOfficeHeader' ) &&
 			$this->unregisterHook( 'actionCustomerAccountAdd' ) &&
-			$this->unregisterHook( 'actionOrderStatusUpdate' ) &&
+			$this->unregisterHook( 'actionOrderStatusPostUpdate' ) &&
 			$this->unregisterHook( 'actionObjectAddressAddAfter' ) &&
-			$this->unregisterHook( 'actionObjectAddressUpdateAfter' ) &&
-			$this->unregisterHook( 'actionCartSave' )
+			$this->unregisterHook( 'actionObjectAddressUpdateAfter' )
 		);
 	}
 
@@ -290,6 +288,7 @@ EOF;
 		);
 
 		$this->context->smarty->assign( 'i18n', array(
+			'create_destination_list'            => $this->l( 'Crea una nuova lista di destinazione' ),
 			'create_list'                        => $this->l( 'Crea lista' ),
 			'name_list'                          => $this->l( 'Nome lista' ),
 			'name_list_placeholder'              => $this->l( 'Inserisci il nome della nuova lista' ),
@@ -606,6 +605,9 @@ EOF;
 
 	}
 
+	/*
+	 * Deprecated since 1.0.0.E
+
 	public function hookActionCartSave() {
 
 		$customer = $this->context->customer;
@@ -663,6 +665,8 @@ EOF;
 		}
 
 	}
+
+	*/
 
 	public function hookActionCustomerAccountAdd( $params ) {
 		if ( $this->emailchef()->isLogged() ) {
@@ -750,6 +754,20 @@ EOF;
 
 			$syncAddressData = $sync->getSyncUpdateCustomerAddress( $address );
 
+			/**
+			 * Dinamica carrello abbandonato
+			 */
+
+			$higher_product_data = $sync->getHigherProductCart(
+				$this->context->cart
+			);
+
+			$syncAddressData = array_merge( $syncAddressData, $higher_product_data );
+
+			/**
+			 * Fine dinamica carrello abbandonato
+			 */
+
 			$upsert = $this->emailchef()->upsert_customer(
 				$list_id,
 				$syncAddressData
@@ -784,7 +802,7 @@ EOF;
 
 	}
 
-	public function hookActionOrderStatusUpdate( $params ) {
+	public function hookActionOrderStatusPostUpdate( $params ) {
 		require_once( dirname( __FILE__ ) . "/lib/emailchef/class-emailchef-sync.php" );
 
 		$list_id = $this->_getConf( "list" );
