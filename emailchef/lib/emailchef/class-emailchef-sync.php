@@ -354,6 +354,22 @@ class PS_Emailchef_Sync {
 		return $this->get_date( $birthday );
 	}
 
+	/**
+	 * Group name by Customer Group ID
+	 * @param $group_id
+	 * @return string
+	 */
+
+	private function get_group($group_id){
+		$group = new GroupCore($group_id);
+		return $group->name[(int)Configuration::get("PS_LANG_DEFAULT")];
+	}
+
+	/**
+	 * Get platform used
+	 * @return string
+	 */
+
 	private function get_platform() {
 		return 'eMailChef for PrestaShop';
 	}
@@ -378,6 +394,7 @@ class PS_Emailchef_Sync {
 			'last_name'         => $customerob->lastname,
 			'user_email'        => $customerob->email,
 			'customer_id'       => $customer['id_customer'],
+			'customer_type'     => $this->get_group( CustomerCore::getDefaultGroupId($customer['id_customer']) ),
 			'gender'            => $this->get_gender( $customerob->id_gender ),
 			'birthday'          => $this->get_birthday( $customerob->birthday ),
 			'language'          => $this->get_lang( $customerob->id_lang ),
@@ -466,6 +483,7 @@ class PS_Emailchef_Sync {
 			'last_name'                => $customer->lastname,
 			'user_email'               => $customer->email,
 			'customer_id'              => $id_customer,
+			'customer_type'     => $this->get_group( CustomerCore::getDefaultGroupId($id_customer) ),
 			'gender'                   => $this->get_gender($customer->id_gender),
 			'total_ordered'            => $this->getTotalOrdered( $id_customer ),
 			'total_ordered_30d'        => $this->getTotalOrdered30d( $id_customer ),
@@ -528,6 +546,7 @@ class PS_Emailchef_Sync {
 			'first_name'  => $customer->firstname,
 			'last_name'   => $customer->lastname,
 			'user_email'  => $customer->email,
+			'customer_type'     => $this->get_group( CustomerCore::getDefaultGroupId($customer->id) ),
 			'newsletter'  => $newsletter,
 			'customer_id' => $customer->id,
 			'gender'      => $this->get_gender( $customer->id_gender ),
@@ -561,6 +580,7 @@ class PS_Emailchef_Sync {
 			'gender'            => $this->get_gender( $customer->id_gender ),
 			'birthday'          => $this->get_birthday( $customer->birthday ),
 			'language'          => $this->get_lang( $customer->id_lang ),
+			'customer_type'     => $this->get_group( CustomerCore::getDefaultGroupId($address->id_customer) ),
 			'billing_company'   => $address->company,
 			'billing_address_1' => $address->address1,
 			'billing_postcode'  => $address->postcode,

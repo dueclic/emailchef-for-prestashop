@@ -1,6 +1,34 @@
-select#ps_emailchef_list.select_and_create {
-    float:left;
-    width:400px !important;
+@media screen and (max-width:400px){
+
+    select#ps_emailchef_list.select_and_create {
+        width: 100% !important;
+    }
+
+    input#ps_emailchef_username {
+        width: 100% !important;
+    }
+
+    input#ps_emailchef_password {
+        width: 100% !important;
+    }
+
+}
+
+@media screen and (min-width:400px) {
+
+    select#ps_emailchef_list.select_and_create {
+        float: left;
+        width: 400px !important;
+    }
+
+    input#ps_emailchef_username {
+        width: 400px !important;
+    }
+
+    input#ps_emailchef_password {
+        width: 369px !important;
+    }
+
 }
 
 .select_and_create_btn {

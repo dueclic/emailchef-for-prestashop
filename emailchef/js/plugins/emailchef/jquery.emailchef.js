@@ -24,7 +24,7 @@
  * /
  */
 
-var PS_Emailchef = function($) {
+var PS_Emailchef = function ($) {
 
     var namespace = 'ps_emailchef';
 
@@ -41,7 +41,7 @@ var PS_Emailchef = function($) {
     var isCreated = 0;
 
     return {
-        go : go
+        go: go
     };
 
     function getElements() {
@@ -55,15 +55,23 @@ var PS_Emailchef = function($) {
         $policyList = $("#" + prefixed_setting("policy_type"));
         $btnSave = $("button[name='submitemailchef']");
         $listCreation = $(".list_creation");
+
+        if ($.browser.webkit) {
+            $apiPass.attr({
+                'autocomplete': 'new-password',
+                'role': 'presentation'
+            });
+        }
+
     }
 
     function triggerElements() {
 
         $createList.on("click", function (evt) {
             evt.preventDefault();
-            $listCreation.slideToggle('slow', function(){
+            $listCreation.slideToggle('slow', function () {
 
-                if ($(this).is(":hidden")){
+                if ($(this).is(":hidden")) {
                     $createList.text(i18n.create_list);
                 }
                 else {
@@ -86,11 +94,11 @@ var PS_Emailchef = function($) {
             $listCreation.slideUp();
         });
 
-        $policyList.on("change", function(evt){
+        $policyList.on("change", function (evt) {
 
             evt.preventDefault();
 
-            if ($(this).val() === 'sopt'){
+            if ($(this).val() === 'sopt') {
                 $landingList.closest(".form-group").fadeOut();
                 $fpageList.closest(".form-group").fadeOut();
             }
@@ -101,7 +109,7 @@ var PS_Emailchef = function($) {
 
         });
 
-        $("form").on("submit", function(evt){
+        $("form").on("submit", function (evt) {
             var $btn = $(evt.target);
 
             if (isCreated == 0) {
@@ -151,7 +159,7 @@ var PS_Emailchef = function($) {
             url: ajax_url,
             data: ajax_data,
             dataType: 'json',
-            success: function(response) {
+            success: function (response) {
 
                 if (response.type == 'error') {
                     $(".status-login").hide();
@@ -176,7 +184,7 @@ var PS_Emailchef = function($) {
 
                 formContent('show');
 
-                console.log("Policy = "+response.policy);
+                console.log("Policy = " + response.policy);
 
                 if (response.policy !== 'premium')
                     policyContent('hide');
@@ -191,10 +199,10 @@ var PS_Emailchef = function($) {
                 $btnSave.removeAttr("disabled");
 
             },
-            error: function(jxqr, textStatus, thrown){
+            error: function (jxqr, textStatus, thrown) {
                 $("#server_failure_login_data").show();
             },
-            complete: function() {
+            complete: function () {
                 $(".check-login").hide();
             }
         });
@@ -202,7 +210,7 @@ var PS_Emailchef = function($) {
 
     function formContent(status) {
 
-        $(".form-wrapper > div").each(function(key, div) {
+        $(".form-wrapper > div").each(function (key, div) {
             if (key > 5) {
                 if (status == 'hide')
                     $(div).hide();
@@ -253,7 +261,7 @@ var PS_Emailchef = function($) {
             url: ajax_url,
             data: ajax_data,
             dataType: 'json',
-            success: function(response) {
+            success: function (response) {
 
                 if (response.type == 'error') {
                     $(".status-list-cf").hide();
@@ -265,11 +273,11 @@ var PS_Emailchef = function($) {
                 $("#success_status_list_data_cf").show().delay(3000).fadeOut();
 
             },
-            error: function(jxqr, textStatus, thrown){
-                $("#error_status_list_data_cf").find(".reason").text(jxqr.error +" "+textStatus+" "+thrown);
+            error: function (jxqr, textStatus, thrown) {
+                $("#error_status_list_data_cf").find(".reason").text(jxqr.error + " " + textStatus + " " + thrown);
                 $("#server_error_status_list_data_cf").show();
             },
-            complete: function() {
+            complete: function () {
                 $(".check-list-cf").hide();
                 $btnSave.removeAttr("disabled");
                 $selList.removeAttr("disabled");
@@ -299,7 +307,7 @@ var PS_Emailchef = function($) {
             url: ajax_url,
             data: ajax_data,
             dataType: 'json',
-            success: function(response) {
+            success: function (response) {
 
                 if (response.type == 'error') {
                     $(".status-list-cf-change").hide();
@@ -311,11 +319,11 @@ var PS_Emailchef = function($) {
                 $("#success_status_list_data_cf_change").show().delay(3000).fadeOut();
 
             },
-            error: function(jxqr, textStatus, thrown){
-                $("#error_status_list_data_cf_change").find(".reason").text(jxqr.error +" "+textStatus+" "+thrown);
+            error: function (jxqr, textStatus, thrown) {
+                $("#error_status_list_data_cf_change").find(".reason").text(jxqr.error + " " + textStatus + " " + thrown);
                 $("#server_error_status_list_data_cf_change").show();
             },
-            complete: function() {
+            complete: function () {
                 $(".check-list-cf-change").hide();
                 $btnSave.removeAttr("disabled");
                 $selList.removeAttr("disabled");
@@ -349,7 +357,7 @@ var PS_Emailchef = function($) {
             url: ajax_url,
             data: ajax_data,
             dataType: 'json',
-            success: function(response) {
+            success: function (response) {
 
                 if (response.type == 'error') {
                     $(".status-list").hide();
@@ -371,11 +379,11 @@ var PS_Emailchef = function($) {
                 createCustomFields(apiUser, apiPass, response.list_id);
 
             },
-            error: function(jxqr, textStatus, thrown){
-                $("#error_status_list_data").find(".reason").text(jxqr.error +" "+textStatus+" "+thrown);
+            error: function (jxqr, textStatus, thrown) {
+                $("#error_status_list_data").find(".reason").text(jxqr.error + " " + textStatus + " " + thrown);
                 $("#server_error_status_list_data").show();
             },
-            complete: function() {
+            complete: function () {
                 $(".check-list").hide();
             }
         });
@@ -394,9 +402,9 @@ var PS_Emailchef = function($) {
 
 }(jQuery);
 
-(function($){
+(function ($) {
 
-    $(document).ready(function() {
+    $(document).ready(function () {
         PS_Emailchef.go();
     });
 

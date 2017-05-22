@@ -17,7 +17,7 @@ services:
       - PS_INSTALL_AUTO=1
       - DB_SERVER=db
       - DB_PASSWD=hacker20
-      - ADMIN_MAIL=test-dev@dueclic.com
+      - ADMIN_MAIL=andrea.debernardi@dueclic.com
       - ADMIN_PASSWD=hacker20
     networks:
       - internal
