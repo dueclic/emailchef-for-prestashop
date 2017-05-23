@@ -176,7 +176,9 @@ class PS_Emailchef_Sync {
 
 	/**
 	 * Get last ordered product IDS
+	 *
 	 * @param OrderCore $latest_order
+	 *
 	 * @return string
 	 */
 
@@ -240,7 +242,8 @@ class PS_Emailchef_Sync {
 			'abandoned_cart_purchase_date_price_higher'       => $this->get_date( $cart->date_upd ),
 			'abandoned_cart_product_id_price_higher'          => $product->id,
 			'abandoned_cart_product_url_price_higher'         => $product->getLink(),
-			'abandoned_cart_product_url_image_price_higher'   => $image_path
+			'abandoned_cart_product_url_image_price_higher'   => $image_path,
+			'is_abandoned_cart'                               => true
 		);
 
 	}
@@ -289,7 +292,8 @@ class PS_Emailchef_Sync {
 				'abandoned_cart_purchase_date_price_higher'       => '',
 				'abandoned_cart_product_id_price_higher'          => '',
 				'abandoned_cart_product_url_price_higher'         => '',
-				'abandoned_cart_product_url_image_price_higher'   => ''
+				'abandoned_cart_product_url_image_price_higher'   => '',
+				'is_abandoned_cart'                               => false
 			);
 		}
 
@@ -321,12 +325,13 @@ class PS_Emailchef_Sync {
 
 	private function get_gender( $id_gender ) {
 
-		if ($id_gender == 1)
+		if ( $id_gender == 1 ) {
 			return "m";
-		else if ($id_gender == 2)
+		} else if ( $id_gender == 2 ) {
 			return "f";
-		else
+		} else {
 			return "na";
+		}
 
 	}
 
@@ -356,13 +361,16 @@ class PS_Emailchef_Sync {
 
 	/**
 	 * Group name by Customer Group ID
+	 *
 	 * @param $group_id
+	 *
 	 * @return string
 	 */
 
-	private function get_group($group_id){
-		$group = new GroupCore($group_id);
-		return $group->name[(int)Configuration::get("PS_LANG_DEFAULT")];
+	private function get_group( $group_id ) {
+		$group = new GroupCore( $group_id );
+
+		return $group->name[ (int) Configuration::get( "PS_LANG_DEFAULT" ) ];
 	}
 
 	/**
@@ -394,7 +402,7 @@ class PS_Emailchef_Sync {
 			'last_name'         => $customerob->lastname,
 			'user_email'        => $customerob->email,
 			'customer_id'       => $customer['id_customer'],
-			'customer_type'     => $this->get_group( CustomerCore::getDefaultGroupId($customer['id_customer']) ),
+			'customer_type'     => $this->get_group( CustomerCore::getDefaultGroupId( $customer['id_customer'] ) ),
 			'gender'            => $this->get_gender( $customerob->id_gender ),
 			'birthday'          => $this->get_birthday( $customerob->birthday ),
 			'language'          => $this->get_lang( $customerob->id_lang ),
@@ -403,7 +411,7 @@ class PS_Emailchef_Sync {
 			'billing_postcode'  => $address->postcode,
 			'billing_city'      => $address->city,
 			'billing_phone'     => $address->phone,
-			'billing_phone_2'    => $address->phone_mobile,
+			'billing_phone_2'   => $address->phone_mobile,
 			'billing_state'     => StateCore::getNameById( $address->id_state ),
 			'billing_country'   => $address->country,
 			'currency'          => CurrencyCore::getDefaultCurrency()->name,
@@ -411,6 +419,9 @@ class PS_Emailchef_Sync {
 			'newsletter'        => $customerob->newsletter ? 'yes' : 'no'
 
 		);
+
+		if (empty($customerob->birthday))
+			unset($data['birthday']);
 
 		$latest_order_id = $this->getLastOrder( $customer['id_customer'], 'id_order' );
 
@@ -483,8 +494,8 @@ class PS_Emailchef_Sync {
 			'last_name'                => $customer->lastname,
 			'user_email'               => $customer->email,
 			'customer_id'              => $id_customer,
-			'customer_type'     => $this->get_group( CustomerCore::getDefaultGroupId($id_customer) ),
-			'gender'                   => $this->get_gender($customer->id_gender),
+			'customer_type'            => $this->get_group( CustomerCore::getDefaultGroupId( $id_customer ) ),
+			'gender'                   => $this->get_gender( $customer->id_gender ),
 			'total_ordered'            => $this->getTotalOrdered( $id_customer ),
 			'total_ordered_30d'        => $this->getTotalOrdered30d( $id_customer ),
 			'total_ordered_12m'        => $this->getTotalOrdered12m( $id_customer ),
@@ -543,17 +554,20 @@ class PS_Emailchef_Sync {
 	public function getSyncCustomerAccountAdd( CustomerCore $customer, $newsletter ) {
 
 		$data = array(
-			'first_name'  => $customer->firstname,
-			'last_name'   => $customer->lastname,
-			'user_email'  => $customer->email,
-			'customer_type'     => $this->get_group( CustomerCore::getDefaultGroupId($customer->id) ),
-			'newsletter'  => $newsletter,
-			'customer_id' => $customer->id,
-			'gender'      => $this->get_gender( $customer->id_gender ),
-			'birthday'    => $this->get_birthday( $customer->birthday ),
-			'language'    => $this->get_lang( $customer->id_lang ),
-			'source'      => $this->get_platform()
+			'first_name'    => $customer->firstname,
+			'last_name'     => $customer->lastname,
+			'user_email'    => $customer->email,
+			'customer_type' => $this->get_group( CustomerCore::getDefaultGroupId( $customer->id ) ),
+			'newsletter'    => $newsletter,
+			'customer_id'   => $customer->id,
+			'gender'        => $this->get_gender( $customer->id_gender ),
+			'birthday'      => $this->get_birthday( $customer->birthday ),
+			'language'      => $this->get_lang( $customer->id_lang ),
+			'source'        => $this->get_platform()
 		);
+
+		if (empty($customer->birthday))
+			unset($data['birthday']);
 
 		return $data;
 
@@ -580,7 +594,8 @@ class PS_Emailchef_Sync {
 			'gender'            => $this->get_gender( $customer->id_gender ),
 			'birthday'          => $this->get_birthday( $customer->birthday ),
 			'language'          => $this->get_lang( $customer->id_lang ),
-			'customer_type'     => $this->get_group( CustomerCore::getDefaultGroupId($address->id_customer) ),
+			'currency'          => CurrencyCore::getDefaultCurrency()->name,
+			'customer_type'     => $this->get_group( CustomerCore::getDefaultGroupId( $address->id_customer ) ),
 			'billing_company'   => $address->company,
 			'billing_address_1' => $address->address1,
 			'billing_postcode'  => $address->postcode,
@@ -594,6 +609,10 @@ class PS_Emailchef_Sync {
 			),
 			'source'            => $this->get_platform()
 		);
+
+		if (empty($customer->birthday))
+			unset($data['birthday']);
+
 
 		return $data;
 

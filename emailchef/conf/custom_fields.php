@@ -155,6 +155,10 @@ return array(
 		'name' => Translate::getAdminTranslation( 'Consenso newsletter' ),
 		'type' => 'text'
 	),
+	'is_abandoned_cart' => array(
+		'name' => Translate::getAdminTranslation( 'Carrello abbandonato' ),
+		'type' => 'boolean'
+	),
 	'abandoned_cart_product_name_price_higher'        => array(
 		'name' => Translate::getAdminTranslation( 'Nome prodotto con prezzo più alto in carrello abbandonato' ),
 		'type' => 'text'
