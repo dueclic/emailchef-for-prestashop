@@ -62,6 +62,13 @@ class Emailchef extends Module {
 		$this->emailchef();
 	}
 
+	/**
+	 * Get emailchef connection object
+	 * @param string|null $api_user
+	 * @param string|null $api_pass
+	 * @return PS_Emailchef
+	 */
+
 	public function emailchef( $api_user = null, $api_pass = null ) {
 
 		if ( empty( $this->emailchef ) || ! is_null( $api_user ) || ! is_null( $api_pass ) ) {
