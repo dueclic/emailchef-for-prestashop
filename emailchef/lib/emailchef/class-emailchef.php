@@ -190,7 +190,7 @@ class PS_Emailchef extends PS_Emailchef_Api {
 		 *
 		 */
 
-		$ec_id_custom_fields = array_column( $collection, "id" );
+		//$ec_id_custom_fields = array_column( $collection, "id" );
 		//$diff = array_diff($ec_id_custom_fields, $new_custom_fields);
 
 		/*foreach ($diff as $custom_id) {

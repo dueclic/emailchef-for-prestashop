@@ -1,1 +1,1 @@
-FROM prestashop/prestashop:1.6.1.13
+FROM prestashop/prestashop:1.6.1.12
