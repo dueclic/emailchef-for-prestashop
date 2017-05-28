@@ -134,8 +134,10 @@ class PS_Emailchef extends PS_Emailchef_Api {
 
 		foreach ( $this->get_custom_fields() as $place_holder => $custom_field ) {
 
-			$type = $custom_field['type'];
+			$type = $custom_field['data_type'];
 			$name = $custom_field['name'];
+			$options = (isset($custom_field['options']) ? $custom_field['options'] : array());
+			$default_value =  (isset($custom_field['default_value']) ? $custom_field['default_value'] : "");
 
 			/**
 			 *
@@ -176,7 +178,7 @@ class PS_Emailchef extends PS_Emailchef_Api {
 
 			}
 
-			$this->create_custom_field( $list_id, $type, $name, $place_holder );
+			$this->create_custom_field( $list_id, $type, $name, $place_holder, $options, $default_value );
 			$new_custom_fields[] = $this->new_custom_id;
 
 		}
@@ -266,11 +268,12 @@ class PS_Emailchef extends PS_Emailchef_Api {
 	 * @param $type
 	 * @param string $name
 	 * @param $placeholder
+	 * @param array $options
 	 * @param string $default_value
 	 *
 	 * @return bool
 	 */
-	public function create_custom_field( $list_id, $type, $name = "", $placeholder, $default_value = "" ) {
+	public function create_custom_field( $list_id, $type, $name = "", $placeholder, $options = array(), $default_value = "" ) {
 
 		$route = sprintf( "/lists/%d/customfields", $list_id );
 
@@ -284,6 +287,9 @@ class PS_Emailchef extends PS_Emailchef_Api {
 			)
 
 		);
+
+		if ($type == "select")
+			$args["instance_in"]["options"] = $options;
 
 		$response = $this->get( $route, $args, "POST", true );
 

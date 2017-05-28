@@ -311,7 +311,6 @@ class PS_Emailchef_Sync {
 
 	private function get_date( $date, $format = "Y-m-d" ) {
 		$dt = new DateTime( $date );
-
 		return $dt->format( $format );
 	}
 
@@ -420,7 +419,7 @@ class PS_Emailchef_Sync {
 
 		);
 
-		if (empty($customerob->birthday))
+		if (isset($customerob->birthday) && $customerob->birthday != '0000-00-00')
 			unset($data['birthday']);
 
 		$latest_order_id = $this->getLastOrder( $customer['id_customer'], 'id_order' );
@@ -566,7 +565,7 @@ class PS_Emailchef_Sync {
 			'source'        => $this->get_platform()
 		);
 
-		if (empty($customer->birthday))
+		if (isset($customer->birthday) && $customer->birthday != '0000-00-00')
 			unset($data['birthday']);
 
 		return $data;
@@ -610,9 +609,8 @@ class PS_Emailchef_Sync {
 			'source'            => $this->get_platform()
 		);
 
-		if (empty($customer->birthday))
+		if (isset($customer->birthday) && $customer->birthday != '0000-00-00')
 			unset($data['birthday']);
-
 
 		return $data;
 
