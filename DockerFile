@@ -1,1 +1,2 @@
 FROM prestashop/prestashop:1.6.1.13
+RUN echo "max_input_vars = 10000;" >> /usr/local/etc/php/php.ini
