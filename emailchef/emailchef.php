@@ -83,6 +83,17 @@ class Emailchef extends Module {
 
 	}
 
+	private function install_emailchef_tables(){
+		$create_table_sql = 'CREATE TABLE IF NOT EXISTS `' . $this->category_table . '` (
+        `id` int unsigned NOT null AUTO_INCREMENT,
+        `reparto` varchar(255) NOT null,
+        `macro` varchar(255) NOT null,
+        `categoria` varchar(255) NOT null,
+        `id_cat` int unsigned,
+        PRIMARY KEY (`id`)
+        ) ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci ;';
+	}
+
 	public function install() {
 		Configuration::updateValue( 'EC_SALT', Tools::passwdGen( 16 ) );
 
@@ -93,8 +104,9 @@ class Emailchef extends Module {
 			$this->registerHook( 'actionOrderStatusPostUpdate' ) &&
 			$this->registerHook( 'actionObjectAddressAddAfter' ) &&
 			$this->registerHook( 'actionObjectAddressUpdateAfter' ) &&
-			$this->registerHook('footer')
-	);
+			$this->registerHook('footer') &&
+		    $this->install_emailchef_tables()
+		);
 	}
 
 	public function uninstall() {
