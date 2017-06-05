@@ -166,7 +166,7 @@ EOF;
 
 		$sql = "SELECT * FROM (
 		SELECT
-		CONCAT(LEFT(c.`firstname`, 1), '. ', c.`lastname`) `customer`, a.id_cart total, ca.name carrier, c.id_customer, a.id_cart, a.date_upd,a.date_add,
+		CONCAT(LEFT(c.`firstname`, 1), '. ', c.`lastname`) `customer`, a.id_cart total, ca.name carrier, c.id_customer, c.email, a.id_cart, a.date_upd,a.date_add,
 				IF (IFNULL(o.id_order, 'Non ordered') = 'Non ordered', IF(TIME_TO_SEC(TIMEDIFF('".date('Y-m-d H:i:s')."', a.`date_add`)) > 86000, 'Abandoned cart', 'Non ordered'), o.id_order) id_order, IF(o.id_order, 1, 0) badge_success, IF(o.id_order, 0, 1) badge_danger, IF(co.id_guest, 1, 0) id_guest
 		FROM `"._DB_PREFIX_."cart` a  
 				JOIN `"._DB_PREFIX_."customer` c ON (c.id_customer = a.id_customer)
@@ -180,7 +180,9 @@ EOF;
 		$abandoned_carts = Db::getInstance()->ExecuteS($sql);
 
 		if ( count($abandoned_carts) > 0 ){
-
+			die(
+				var_dump($abandoned_carts)
+			);
 		}
 
 		return '<script type="text/javascript" src="'.$this->_path.'js/plugins/emailchef/jquery.emailchef.abandoned.js"></script>';
