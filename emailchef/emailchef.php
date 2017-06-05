@@ -180,7 +180,7 @@ EOF;
 		$abandoned_carts = Db::getInstance()->ExecuteS($sql);
 
 		if ( count($abandoned_carts) > 0 ){
-			
+
 		}
 
 		return '<script type="text/javascript" src="'.$this->_path.'js/plugins/emailchef/jquery.emailchef.abandoned.js"></script>';
