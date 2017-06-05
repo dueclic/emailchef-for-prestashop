@@ -92,8 +92,9 @@ class Emailchef extends Module {
 			$this->registerHook( 'actionCustomerAccountAdd' ) &&
 			$this->registerHook( 'actionOrderStatusPostUpdate' ) &&
 			$this->registerHook( 'actionObjectAddressAddAfter' ) &&
-			$this->registerHook( 'actionObjectAddressUpdateAfter' )
-		);
+			$this->registerHook( 'actionObjectAddressUpdateAfter' ) &&
+			$this->registerHook('footer')
+	);
 	}
 
 	public function uninstall() {
@@ -109,7 +110,8 @@ class Emailchef extends Module {
 			$this->unregisterHook( 'actionCustomerAccountAdd' ) &&
 			$this->unregisterHook( 'actionOrderStatusPostUpdate' ) &&
 			$this->unregisterHook( 'actionObjectAddressAddAfter' ) &&
-			$this->unregisterHook( 'actionObjectAddressUpdateAfter' )
+			$this->unregisterHook( 'actionObjectAddressUpdateAfter' ) &&
+		    $this->unregisterHook('footer')
 		);
 	}
 
@@ -158,6 +160,30 @@ EOF;
 		}
 
 		return $output . $this->displayForm();
+	}
+
+	public function hookFooter(){
+
+		$sql = "SELECT * FROM (
+		SELECT
+		CONCAT(LEFT(c.`firstname`, 1), '. ', c.`lastname`) `customer`, a.id_cart total, ca.name carrier, c.id_customer, a.id_cart, a.date_upd,a.date_add,
+				IF (IFNULL(o.id_order, 'Non ordered') = 'Non ordered', IF(TIME_TO_SEC(TIMEDIFF('".date('Y-m-d H:i:s')."', a.`date_add`)) > 86000, 'Abandoned cart', 'Non ordered'), o.id_order) id_order, IF(o.id_order, 1, 0) badge_success, IF(o.id_order, 0, 1) badge_danger, IF(co.id_guest, 1, 0) id_guest
+		FROM `"._DB_PREFIX_."cart` a  
+				JOIN `"._DB_PREFIX_."customer` c ON (c.id_customer = a.id_customer)
+				LEFT JOIN `"._DB_PREFIX_."currency` cu ON (cu.id_currency = a.id_currency)
+				LEFT JOIN `"._DB_PREFIX_."carrier` ca ON (ca.id_carrier = a.id_carrier)
+				LEFT JOIN `"._DB_PREFIX_."orders` o ON (o.id_cart = a.id_cart)
+				LEFT JOIN `"._DB_PREFIX_."connections` co ON (a.id_guest = co.id_guest AND TIME_TO_SEC(TIMEDIFF('".date('Y-m-d H:i:s')."', co.`date_add`)) < 1800)
+				WHERE a.date_add > (NOW() - INTERVAL 60 DAY) ORDER BY a.id_cart DESC 
+		) AS toto WHERE id_order='Abandoned cart'";
+
+		$abandoned_carts = Db::getInstance()->ExecuteS($sql);
+
+		if ( count($abandoned_carts) > 0 ){
+			
+		}
+
+		return '<script type="text/javascript" src="'.$this->_path.'js/plugins/emailchef/jquery.emailchef.abandoned.js"></script>';
 	}
 
 	/**
