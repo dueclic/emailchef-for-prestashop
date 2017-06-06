@@ -31,7 +31,14 @@ var PS_Emailchef_Abandoned = function($) {
     };
 
     function sync(){
-        alert("OK");
+        $.ajax({
+            type: 'POST',
+            url: emailchef_abandoned_url,
+            data: {
+                'action' : 'emailchefabandonedcart'
+            },
+            dataType: 'json'
+        });
     }
 
 }(jQuery);

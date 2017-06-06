@@ -1,0 +1,1 @@
+UPDATE ps_cart SET date_add='2017-06-04' WHERE id_cart=6;

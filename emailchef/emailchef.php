@@ -44,6 +44,7 @@ class Emailchef extends Module {
 	protected $_html = '';
 	private $namespace = "ps_emailchef";
 	private $emailchef;
+	private $category_table;
 
 	public function __construct() {
 		$this->name          = 'emailchef';
@@ -56,6 +57,7 @@ class Emailchef extends Module {
 
 		parent::__construct();
 
+		$this->category_table   = _DB_PREFIX_ . "emailchef_abcart_synced";
 		$this->displayName      = $this->l( 'eMailChef' );
 		$this->description      = $this->l( 'Integrazione di eMailChef' );
 		$this->confirmUninstall = $this->l( 'Sei sicuro di voler disinstallare questo modulo?' );
@@ -64,8 +66,10 @@ class Emailchef extends Module {
 
 	/**
 	 * Get emailchef connection object
+	 *
 	 * @param string|null $api_user
 	 * @param string|null $api_pass
+	 *
 	 * @return PS_Emailchef
 	 */
 
@@ -83,15 +87,20 @@ class Emailchef extends Module {
 
 	}
 
-	private function install_emailchef_tables(){
+	private function create_emailchef_tables() {
 		$create_table_sql = 'CREATE TABLE IF NOT EXISTS `' . $this->category_table . '` (
-        `id` int unsigned NOT null AUTO_INCREMENT,
-        `reparto` varchar(255) NOT null,
-        `macro` varchar(255) NOT null,
-        `categoria` varchar(255) NOT null,
-        `id_cat` int unsigned,
-        PRIMARY KEY (`id`)
+        `id_cart` INT UNSIGNED NOT NULL,
+        `date_synced` DATE NOT NULL,
+        PRIMARY KEY (`id_cart`)
         ) ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci ;';
+
+		return Db::getInstance()->execute( $create_table_sql );
+	}
+
+	private function drop_emailchef_tables() {
+		$drop_table_sql = 'DROP TABLE IF EXISTS `' . $this->category_table . '`';
+
+		return Db::getInstance()->execute( $drop_table_sql );
 	}
 
 	public function install() {
@@ -104,8 +113,8 @@ class Emailchef extends Module {
 			$this->registerHook( 'actionOrderStatusPostUpdate' ) &&
 			$this->registerHook( 'actionObjectAddressAddAfter' ) &&
 			$this->registerHook( 'actionObjectAddressUpdateAfter' ) &&
-			$this->registerHook('footer') &&
-		    $this->install_emailchef_tables()
+			$this->registerHook( 'footer' ) &&
+			$this->create_emailchef_tables()
 		);
 	}
 
@@ -123,7 +132,8 @@ class Emailchef extends Module {
 			$this->unregisterHook( 'actionOrderStatusPostUpdate' ) &&
 			$this->unregisterHook( 'actionObjectAddressAddAfter' ) &&
 			$this->unregisterHook( 'actionObjectAddressUpdateAfter' ) &&
-		    $this->unregisterHook('footer')
+			$this->unregisterHook( 'footer' ) &&
+			$this->drop_emailchef_tables()
 		);
 	}
 
@@ -174,30 +184,34 @@ EOF;
 		return $output . $this->displayForm();
 	}
 
-	public function hookFooter(){
+	public function hookFooter() {
 
-		$sql = "SELECT * FROM (
-		SELECT
-		CONCAT(LEFT(c.`firstname`, 1), '. ', c.`lastname`) `customer`, a.id_cart total, ca.name carrier, c.id_customer, c.email, a.id_cart, a.date_upd,a.date_add,
-				IF (IFNULL(o.id_order, 'Non ordered') = 'Non ordered', IF(TIME_TO_SEC(TIMEDIFF('".date('Y-m-d H:i:s')."', a.`date_add`)) > 86000, 'Abandoned cart', 'Non ordered'), o.id_order) id_order, IF(o.id_order, 1, 0) badge_success, IF(o.id_order, 0, 1) badge_danger, IF(co.id_guest, 1, 0) id_guest
-		FROM `"._DB_PREFIX_."cart` a  
-				JOIN `"._DB_PREFIX_."customer` c ON (c.id_customer = a.id_customer)
-				LEFT JOIN `"._DB_PREFIX_."currency` cu ON (cu.id_currency = a.id_currency)
-				LEFT JOIN `"._DB_PREFIX_."carrier` ca ON (ca.id_carrier = a.id_carrier)
-				LEFT JOIN `"._DB_PREFIX_."orders` o ON (o.id_cart = a.id_cart)
-				LEFT JOIN `"._DB_PREFIX_."connections` co ON (a.id_guest = co.id_guest AND TIME_TO_SEC(TIMEDIFF('".date('Y-m-d H:i:s')."', co.`date_add`)) < 1800)
-				WHERE a.date_add > (NOW() - INTERVAL 60 DAY) ORDER BY a.id_cart DESC 
-		) AS toto WHERE id_order='Abandoned cart'";
+		if ( $this->emailchef()->isLogged() ) {
 
-		$abandoned_carts = Db::getInstance()->ExecuteS($sql);
+			$output = null;
 
-		if ( count($abandoned_carts) > 0 ){
-			die(
-				var_dump($abandoned_carts)
-			);
+			require_once( dirname( __FILE__ ) . "/lib/emailchef/class-emailchef-sync.php" );
+			$sync = new PS_Emailchef_Sync();
+
+			$abandoned_carts = $sync->getAbandonedCarts();
+
+			if ( count( $abandoned_carts ) > 0 ) {
+
+				$emailchef_abandoned_url = $this->_path . "ajax.php";
+				$output             .= <<<EOF
+				<script>
+				    var emailchef_abandoned_url = '$emailchef_abandoned_url';
+				</script>
+EOF;
+			}
+
+
 		}
 
-		return '<script type="text/javascript" src="'.$this->_path.'js/plugins/emailchef/jquery.emailchef.abandoned.js"></script>';
+		$output .= '<script type="text/javascript" src="' . $this->_path . 'js/plugins/emailchef/jquery.emailchef.abandoned.js"></script>';
+
+		return $output;
+
 	}
 
 	/**
@@ -650,69 +664,6 @@ EOF;
 		}
 
 	}
-
-	/*
-	 * Deprecated since 1.0.0.E
-
-	public function hookActionCartSave() {
-
-		$customer = $this->context->customer;
-
-		if ( $this->emailchef()->isLogged() && $customer->isLogged() && $this->context->cart !== null ) {
-
-			$list_id = $this->_getConf( "list" );
-
-			require_once( dirname( __FILE__ ) . "/lib/emailchef/class-emailchef-sync.php" );
-			$sync = new PS_Emailchef_Sync();
-
-
-			$higher_product = $sync->getHigherProductCart(
-				$this->context->cart
-			);
-
-			$syncCartSave = array(
-				'first_name' => $customer->firstname,
-				'last_name'  => $customer->lastname,
-				'user_email' => $customer->email
-			);
-
-			$syncCartSave = array_merge( $syncCartSave, $higher_product );
-
-			$upsert = $this->emailchef()->upsert_customer(
-				$list_id,
-				$syncCartSave
-			);
-
-			if ( $upsert ) {
-				$this->log(
-					sprintf(
-						$this->l( "Inserito nella lista %d il prodotto con prezzo più alto nel carrello di %d (Nome: %s Cognome: %s Email: %s)" ),
-						$list_id,
-						$customer->id,
-						$customer->firstname,
-						$customer->lastname,
-						$customer->email
-					)
-				);
-			} else {
-				$this->log(
-					sprintf(
-						$this->l( "Inserimento non riuscito del prodotto con prezzo più alto nel carrello nella lista %d da parte di %d (Nome: %s Cognome: %s Email: %s)" ),
-						$list_id,
-						$customer->id,
-						$customer->firstname,
-						$customer->lastname,
-						$customer->email
-					),
-					3
-				);
-			}
-
-		}
-
-	}
-
-	*/
 
 	public function hookActionCustomerAccountAdd( $params ) {
 		if ( $this->emailchef()->isLogged() ) {

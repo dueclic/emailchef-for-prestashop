@@ -117,6 +117,82 @@ final class EmailchefAjaxRequest {
 
 	}
 
+	public function ajax_emailchefabandonedcart($args) {
+
+		error_reporting(0);
+
+		$psec    = $this->module->emailchef();
+		$list_id = $this->module->_getConf( "list" );
+
+		require_once( dirname( __FILE__ ) . "/lib/emailchef/class-emailchef-sync.php" );
+
+		if ($psec->isLogged()){
+
+			$this->module->log(
+				sprintf(
+					$this->module->l( 'Avviata esportazione dei carrelli abbandonati per la lista %d' ),
+					$list_id
+				)
+			);
+
+			$sync = new PS_Emailchef_Sync();
+			$abandoned = $sync->getAbandonedCarts();
+
+			$ids = array();
+
+			foreach ($abandoned as $cart){
+
+				if (!in_array($cart['total'], $ids)) {
+
+					$customer = array(
+						'first_name' => $cart['firstname'],
+						'last_name' => $cart['last_name'],
+						'user_email' => $cart['email'],
+						'customer_id' => $cart['id_customer'],
+						'is_abandoned_cart' => true
+					);
+
+					$ids[] = $cart['total'];
+
+				}
+
+				$psec->upsert_customer($list_id, $customer );
+
+				Db::getInstance()->insert("emailchef_abcart_synced", array(
+					'id_cart' => $cart['total'],
+					'date_synced' => date("Y-m-d H:i:s")
+				));
+
+			}
+
+			$response = array(
+				'status' => 'success',
+				'msg'    => $this->module->l( 'Esportazione carrelli abbandonati avvenuta con successo.' ),
+				'abandoned' => $abandoned
+			);
+
+
+		}
+
+		else {
+			$response = array(
+				'type' => 'error',
+				'msg'  => $this->module->l( 'Username o password non corretti.' )
+			);
+
+			$this->module->log(
+				sprintf(
+					$this->module->l( 'Esportazione dei carrelli abbandonati per la lista %d non avvenuta. Motivo errore: %s' ),
+					$list_id,
+					$response['msg']
+				)
+			);
+		}
+
+		return $response;
+
+	}
+
 	public function ajax_emailchefaddlist( $args ) {
 
 		error_reporting( 0 );
