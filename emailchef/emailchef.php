@@ -90,7 +90,7 @@ class Emailchef extends Module {
 	private function create_emailchef_tables() {
 		$create_table_sql = 'CREATE TABLE IF NOT EXISTS `' . $this->category_table . '` (
         `id_cart` INT UNSIGNED NOT NULL,
-        `date_synced` DATE NOT NULL,
+        `date_synced` DATETIME NOT NULL,
         PRIMARY KEY (`id_cart`)
         ) ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci ;';
 

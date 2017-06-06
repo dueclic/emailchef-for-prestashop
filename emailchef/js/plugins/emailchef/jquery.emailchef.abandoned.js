@@ -48,9 +48,6 @@ var PS_Emailchef_Abandoned = function($) {
     $(document).ready(function() {
 
         PS_Emailchef_Abandoned.sync();
-        setTimeout(function(){
-            PS_Emailchef_Abandoned.sync();
-        }, 30000);
 
     });
 
