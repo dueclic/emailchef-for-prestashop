@@ -356,7 +356,12 @@ class PS_Emailchef extends PS_Emailchef_Api {
 
 		$args = array(
 
-			"instance_in" => $collection[$cID]
+			"instance_in" => array(
+				"data_type"     => $type,
+				"name"          => ( $name == "" ? $placeholder : $name ),
+				"place_holder"  => $placeholder,
+				"default_value" => $default_value
+			)
 
 		);
 

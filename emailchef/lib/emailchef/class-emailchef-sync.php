@@ -434,7 +434,7 @@ class PS_Emailchef_Sync {
 			'billing_phone_2'   => $address->phone_mobile,
 			'billing_state'     => StateCore::getNameById( $address->id_state ),
 			'billing_country'   => $address->country,
-			'currency'          => CurrencyCore::getDefaultCurrency()->iso_code,
+			'currency'          => CurrencyCore::getDefaultCurrency()->name,
 			'source'            => $this->get_platform(),
 			'newsletter'        => $customerob->newsletter ? 'yes' : 'no'
 
@@ -524,7 +524,7 @@ class PS_Emailchef_Sync {
 			'all_ordered_product_ids'  => $this->getAllOrderedProductIDS( $id_customer ),
 			'latest_order_product_ids' => $this->getLastOrderProductIDS( $order ),
 			'source'                   => $this->get_platform(),
-			'currency'                 => CurrencyCore::getDefaultCurrency()->iso_code
+			'currency'                 => CurrencyCore::getDefaultCurrency()->name
 		);
 
 		if ( $customer->isGuest() ) {
@@ -542,7 +542,7 @@ class PS_Emailchef_Sync {
 				'billing_phone_2'   => $address->phone_mobile,
 				'billing_state'     => StateCore::getNameById( $address->id_state ),
 				'billing_country'   => $address->country,
-				'currency'          => CurrencyCore::getDefaultCurrency()->iso_code,
+				'currency'          => CurrencyCore::getDefaultCurrency()->name,
 				'status_id'         => $status_id
 			) );
 		}
@@ -607,8 +607,8 @@ class PS_Emailchef_Sync {
 			'user_email'        => $customer_email,
 			'gender'            => $this->get_gender( $customer->id_gender ),
 			'birthday'          => $this->get_birthday( $customer->birthday ),
-			'lang'          => $this->get_lang( $customer->id_lang ),
-			'currency'          => CurrencyCore::getDefaultCurrency()->iso_code,
+			'language'          => $this->get_lang( $customer->id_lang ),
+			'currency'          => CurrencyCore::getDefaultCurrency()->name,
 			'customer_type'     => $this->get_group( CustomerCore::getDefaultGroupId( $address->id_customer ) ),
 			'billing_company'   => $address->company,
 			'billing_address_1' => $address->address1,
