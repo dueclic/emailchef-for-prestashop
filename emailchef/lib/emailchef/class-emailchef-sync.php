@@ -378,6 +378,10 @@ class PS_Emailchef_Sync {
 	 */
 
 	private function get_birthday( $birthday ) {
+		if ( empty( $birthday ) ) {
+			return "";
+		}
+
 		return $this->get_date( $birthday );
 	}
 

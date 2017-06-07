@@ -49,7 +49,7 @@ class Emailchef extends Module {
 	public function __construct() {
 		$this->name          = 'emailchef';
 		$this->tab           = 'administration';
-		$this->version       = '1.0.0.I';
+		$this->version       = '1.0.0.L';
 		$this->author        = 'dueclic';
 		$this->need_instance = 0;
 		$this->bootstrap     = true;
@@ -116,6 +116,7 @@ class Emailchef extends Module {
 			$this->registerHook( 'actionObjectLanguageAddAfter' ) &&
 			$this->registerHook( 'actionObjectLanguageUpdateAfter' ) &&
 			$this->registerHook( 'actionObjectLanguageDeleteAfter' ) &&
+			$this->registerHook( "backOfficeFooter" ) &&
 			$this->registerHook( 'footer' ) &&
 			$this->create_emailchef_tables()
 		);
@@ -138,7 +139,8 @@ class Emailchef extends Module {
 			$this->unregisterHook( 'actionObjectLanguageAddAfter' ) &&
 			$this->unregisterHook( 'actionObjectLanguageUpdateAfter' ) &&
 			$this->unregisterHook( 'actionObjectLanguageDeleteAfter' ) &&
-			$this->unregisterHook( 'footer' ) &&
+			$this->unregisterHook( "backOfficeFooter" ) &&
+		    $this->unregisterHook( 'footer' ) &&
 			$this->drop_emailchef_tables()
 		);
 	}
@@ -191,8 +193,7 @@ EOF;
 		return $output . $this->displayForm();
 	}
 
-	public function hookFooter() {
-
+	private function sync_abandoned_cart(){
 		if ( $this->emailchef()->isLogged() ) {
 
 			$output = null;
@@ -212,13 +213,19 @@ EOF;
 EOF;
 			}
 
-
 		}
 
 		$output .= '<script type="text/javascript" src="' . $this->_path . 'js/plugins/emailchef/jquery.emailchef.abandoned.js"></script>';
 
 		return $output;
+	}
 
+	public function hookBackOfficeFooter() {
+		return $this->sync_abandoned_cart();
+	}
+
+	public function hookFooter() {
+		return $this->sync_abandoned_cart();
 	}
 
 	/**

@@ -451,8 +451,7 @@ class PS_Emailchef extends PS_Emailchef_Api {
 	 * @param $list_id
 	 * @param $customer
 	 * @param $ec_id
-	 * @param bool $abandoned_cart
-	 *
+'	 *
 	 * @return bool
 	 */
 
