@@ -257,14 +257,14 @@ class PS_Emailchef_Sync {
 		$image_path = _PS_BASE_URL_ . _THEME_PROD_DIR_ . $image->getExistingImgPath() . ".jpg";
 
 		return array(
-			'abandoned_cart_product_name_price_higher'        => $product->name,
-			'abandoned_cart_product_description_price_higher' => strip_tags( $product->description_short ),
-			'abandoned_cart_product_price_price_higher'       => $product->getPrice( true, null, 2 ),
-			'abandoned_cart_purchase_date_price_higher'       => $this->get_date( $cart->date_upd ),
-			'abandoned_cart_product_id_price_higher'          => $product->id,
-			'abandoned_cart_product_url_price_higher'         => $product->getLink(),
-			'abandoned_cart_product_url_image_price_higher'   => $image_path,
-			'is_abandoned_cart'                               => false
+			'ab_cart_prod_name_pr_hr'        => $product->name,
+			'ab_cart_prod_desc_pr_hr' => strip_tags( $product->description_short ),
+			'ab_cart_prod_pr_pr_hr'       => $product->getPrice( true, null, 2 ),
+			'ab_cart_date'       => $this->get_date( $cart->date_upd ),
+			'ab_cart_prod_id_pr_hr'          => $product->id,
+			'ab_cart_prod_url_pr_hr'         => $product->getLink(),
+			'ab_cart_prod_url_img_pr_hr'   => $image_path,
+			'ab_cart_is_abandoned_cart'                               => false
 		);
 
 	}
@@ -307,14 +307,14 @@ class PS_Emailchef_Sync {
 
 		if ( $abandoned_cart === false ) {
 			return array(
-				'abandoned_cart_product_name_price_higher'        => '',
-				'abandoned_cart_product_description_price_higher' => '',
-				'abandoned_cart_product_price_price_higher'       => '',
-				'abandoned_cart_purchase_date_price_higher'       => '',
-				'abandoned_cart_product_id_price_higher'          => '',
-				'abandoned_cart_product_url_price_higher'         => '',
-				'abandoned_cart_product_url_image_price_higher'   => '',
-				'is_abandoned_cart'                               => false
+				'ab_cart_prod_name_pr_hr'        => '',
+				'ab_cart_prod_desc_pr_hr' => '',
+				'ab_cart_prod_pr_pr_hr'       => '',
+				'ab_cart_date'       => '',
+				'ab_cart_prod_id_pr_hr'          => '',
+				'ab_cart_prod_url_pr_hr'         => '',
+				'ab_cart_prod_url_img_pr_hr'   => '',
+				'ab_cart_is_abandoned_cart'                               => false
 			);
 		}
 
@@ -425,7 +425,7 @@ class PS_Emailchef_Sync {
 			'customer_type'     => $this->get_group( CustomerCore::getDefaultGroupId( $customer['id_customer'] ) ),
 			'gender'            => $this->get_gender( $customerob->id_gender ),
 			'birthday'          => $this->get_birthday( $customerob->birthday ),
-			'language'          => $this->get_lang( $customerob->id_lang ),
+			'lang'          => $this->get_lang( $customerob->id_lang ),
 			'billing_company'   => $address->company,
 			'billing_address_1' => $address->address1,
 			'billing_postcode'  => $address->postcode,
@@ -434,7 +434,7 @@ class PS_Emailchef_Sync {
 			'billing_phone_2'   => $address->phone_mobile,
 			'billing_state'     => StateCore::getNameById( $address->id_state ),
 			'billing_country'   => $address->country,
-			'currency'          => CurrencyCore::getDefaultCurrency()->name,
+			'currency'          => CurrencyCore::getDefaultCurrency()->iso_code,
 			'source'            => $this->get_platform(),
 			'newsletter'        => $customerob->newsletter ? 'yes' : 'no'
 
@@ -524,7 +524,7 @@ class PS_Emailchef_Sync {
 			'all_ordered_product_ids'  => $this->getAllOrderedProductIDS( $id_customer ),
 			'latest_order_product_ids' => $this->getLastOrderProductIDS( $order ),
 			'source'                   => $this->get_platform(),
-			'currency'                 => CurrencyCore::getDefaultCurrency()->name
+			'currency'                 => CurrencyCore::getDefaultCurrency()->iso_code
 		);
 
 		if ( $customer->isGuest() ) {
@@ -542,7 +542,7 @@ class PS_Emailchef_Sync {
 				'billing_phone_2'   => $address->phone_mobile,
 				'billing_state'     => StateCore::getNameById( $address->id_state ),
 				'billing_country'   => $address->country,
-				'currency'          => CurrencyCore::getDefaultCurrency()->name,
+				'currency'          => CurrencyCore::getDefaultCurrency()->iso_code,
 				'status_id'         => $status_id
 			) );
 		}
@@ -579,7 +579,7 @@ class PS_Emailchef_Sync {
 			'customer_id'   => $customer->id,
 			'gender'        => $this->get_gender( $customer->id_gender ),
 			'birthday'      => $this->get_birthday( $customer->birthday ),
-			'language'      => $this->get_lang( $customer->id_lang ),
+			'lang'      => $this->get_lang( $customer->id_lang ),
 			'source'        => $this->get_platform()
 		);
 
@@ -607,8 +607,8 @@ class PS_Emailchef_Sync {
 			'user_email'        => $customer_email,
 			'gender'            => $this->get_gender( $customer->id_gender ),
 			'birthday'          => $this->get_birthday( $customer->birthday ),
-			'language'          => $this->get_lang( $customer->id_lang ),
-			'currency'          => CurrencyCore::getDefaultCurrency()->name,
+			'lang'          => $this->get_lang( $customer->id_lang ),
+			'currency'          => CurrencyCore::getDefaultCurrency()->iso_code,
 			'customer_type'     => $this->get_group( CustomerCore::getDefaultGroupId( $address->id_customer ) ),
 			'billing_company'   => $address->company,
 			'billing_address_1' => $address->address1,

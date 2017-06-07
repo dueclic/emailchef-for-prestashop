@@ -25,6 +25,30 @@
  * /
  */
 
+/**
+ * Helper function for get all languages
+ */
+
+function get_all_languages(){
+	$langs = array();
+	foreach (LanguageCore::getLanguages() as $lang){
+		$langs[] = array(
+			"text" => LanguageCore::getIsoById($lang['id_lang'])
+		);
+	}
+	return $langs;
+}
+
+function get_currencies(){
+	$currencies = array();
+	foreach (CurrencyCore::getCurrencies() as $currency){
+		$currencies[] = array(
+			"text" => $currency['iso_code']
+		);
+	}
+	return $currencies;
+}
+
 return array(
 
 	'first_name'                                      => array(
@@ -59,9 +83,11 @@ return array(
 		),
 		'default_value' => 'na'
 	),
-	'language'                                        => array(
+	'lang'                                        => array(
 		'name' => Translate::getAdminTranslation( 'Lingua' ),
-		'data_type' => 'text'
+		'data_type' => 'select',
+		'options' => get_all_languages(),
+		'default_value' => LanguageCore::getIsoById(Configuration::get("PS_LANG_DEFAULT"))
 	),
 	'birthday'                                        => array(
 		'name' => Translate::getAdminTranslation( 'Data di nascita' ),
@@ -101,13 +127,15 @@ return array(
 	),
 	'currency'                                        => array(
 		'name' => Translate::getAdminTranslation( 'Valuta' ),
-		'data_type' => 'text'
+		'data_type' => 'select',
+		'options' => get_currencies(),
+		'default_value' => CurrencyCore::getDefaultCurrency()->iso_code
 	),
 	'customer_id'                                     => array(
 		'name' => Translate::getAdminTranslation( 'ID Cliente' ),
 		'data_type' => 'number'
 	),
-	'customer_data_type'                                   => array(
+	'customer_type'                                   => array(
 		'name' => Translate::getAdminTranslation( 'Tipo cliente' ),
 		'data_type' => 'text'
 	),
@@ -128,19 +156,19 @@ return array(
 		'data_type' => 'number'
 	),
 	'latest_order_id'                                 => array(
-		'name' => Translate::getAdminTranslation( 'ID ultimo ordine' ),
+		'name' => Translate::getAdminTranslation( 'Ultimo ordine - ID' ),
 		'data_type' => 'number'
 	),
 	'latest_order_date'                               => array(
-		'name' => Translate::getAdminTranslation( 'Data ultimo ordine' ),
+		'name' => Translate::getAdminTranslation( 'Ultimo ordine - Data' ),
 		'data_type' => 'date'
 	),
 	'latest_order_amount'                             => array(
-		'name' => Translate::getAdminTranslation( 'Totale ultimo ordine' ),
+		'name' => Translate::getAdminTranslation( 'Ultimo ordine - Totale' ),
 		'data_type' => 'number'
 	),
 	'latest_order_status'                             => array(
-		'name' => Translate::getAdminTranslation( 'Stato lavorazione ultimo ordine' ),
+		'name' => Translate::getAdminTranslation( 'Ultimo ordine - Stato lavorazione' ),
 		'data_type' => 'text'
 	),
 	'all_ordered_product_ids'                         => array(
@@ -148,19 +176,19 @@ return array(
 		'data_type' => 'text'
 	),
 	'latest_order_product_ids'                        => array(
-		'name' => Translate::getAdminTranslation( 'ID prodotti ultimo ordine' ),
+		'name' => Translate::getAdminTranslation( 'Ultimo ordine - ID prodotti' ),
 		'data_type' => 'text'
 	),
 	'latest_shipped_order_id'                         => array(
-		'name' => Translate::getAdminTranslation( 'ID ultimo ordine inviato' ),
+		'name' => Translate::getAdminTranslation( 'Ultimo ordine inviato - ID' ),
 		'data_type' => 'number'
 	),
 	'latest_shipped_order_date'                       => array(
-		'name' => Translate::getAdminTranslation( 'Data ultimo ordine inviato' ),
+		'name' => Translate::getAdminTranslation( 'Ultimo ordine inviato - Data' ),
 		'data_type' => 'date'
 	),
 	'latest_shipped_order_status'                     => array(
-		'name' => Translate::getAdminTranslation( 'Stato lavorazione ultimo ordine inviato' ),
+		'name' => Translate::getAdminTranslation( 'Ultimo ordine inviato - Stato lavorazione' ),
 		'data_type' => 'text'
 	),
 	'newsletter'                                      => array(
@@ -179,36 +207,36 @@ return array(
 		),
 		'default_value' => 'no'
 	),
-	'is_abandoned_cart' => array(
-		'name' => Translate::getAdminTranslation( 'Carrello abbandonato' ),
+	'ab_cart_is_abandoned_cart' => array(
+		'name' => Translate::getAdminTranslation( 'Carrello abbandonato - Sì/No' ),
 		'data_type' => 'boolean'
 	),
-	'abandoned_cart_product_name_price_higher'        => array(
-		'name' => Translate::getAdminTranslation( 'Nome prodotto con prezzo più alto in carrello abbandonato' ),
+	'ab_cart_prod_name_pr_hr'        => array(
+		'name' => Translate::getAdminTranslation( 'Carrello abbandonato - Nome prodotto più caro' ),
 		'data_type' => 'text'
 	),
-	'abandoned_cart_product_description_price_higher' => array(
-		'name' => Translate::getAdminTranslation( 'Descrizione prodotto con prezzo più alto in carrello abbandonato' ),
+	'ab_cart_prod_desc_pr_hr' => array(
+		'name' => Translate::getAdminTranslation( 'Carrello abbandonato - Desc. prodotto più caro' ),
 		'data_type' => 'text'
 	),
-	'abandoned_cart_product_price_price_higher'       => array(
-		'name' => Translate::getAdminTranslation( 'Prezzo prodotto con prezzo più alto in carrello abbandonato' ),
+	'ab_cart_prod_pr_pr_hr'       => array(
+		'name' => Translate::getAdminTranslation( 'Carrello abbandonato - Prezzo prodotto più caro' ),
 		'data_type' => 'number'
 	),
-	'abandoned_cart_product_url_price_higher'         => array(
-		'name' => Translate::getAdminTranslation( 'URL prodotto con prezzo più alto in carrello abbandonato' ),
+	'ab_cart_prod_url_pr_hr'         => array(
+		'name' => Translate::getAdminTranslation( 'Carrello abbandonato - URL prodotto più caro' ),
 		'data_type' => 'text'
 	),
-	'abandoned_cart_product_url_image_price_higher'   => array(
-		'name' => Translate::getAdminTranslation( 'URL immagine prodotto con prezzo più alto in carrello abbandonato' ),
+	'ab_cart_prod_url_img_pr_hr'   => array(
+		'name' => Translate::getAdminTranslation( 'Carrello abbandonato - URL immagine prodotto più caro' ),
 		'data_type' => 'text'
 	),
-	'abandoned_cart_product_id_price_higher'          => array(
-		'name' => Translate::getAdminTranslation( 'ID prodotto con prezzo più alto in carrello abbandonato' ),
+	'ab_cart_prod_id_pr_hr'          => array(
+		'name' => Translate::getAdminTranslation( 'Carrello abbandonato - ID prodotto più caro' ),
 		'data_type' => 'number'
 	),
-	'abandoned_cart_purchase_date_price_higher'       => array(
-		'name' => Translate::getAdminTranslation( 'Data acquisto prodotto con prezzo più alto in carrello abbandonato' ),
+	'ab_cart_date'       => array(
+		'name' => Translate::getAdminTranslation( 'Carrello abbandonato - Data' ),
 		'data_type' => 'date'
 	)
 

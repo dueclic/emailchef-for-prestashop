@@ -109,13 +109,35 @@ class PS_Emailchef extends PS_Emailchef_Api {
 	}
 
 	/**
+	 * Get ID of custom field in eMailChef collection
+	 *
+	 * @param $list_id
+	 * @param string $placeholder
+	 *
+	 * @return mixed
+	 */
+
+	public function get_custom_field_id( $list_id, $placeholder ) {
+		$collection = $this->get_collection($list_id);
+
+		foreach ($collection as $custom_field){
+
+			if ($custom_field['place_holder'] == $placeholder) {
+				return $custom_field['id'];
+			}
+
+		}
+
+		return FALSE;
+	}
+
+	/**
 	 * Get custom fields from Config
 	 * @return mixed
 	 */
 
 	protected function get_custom_fields() {
 		$custom_fields = require( PS_EMAILCHEF_DIR . "/conf/custom_fields.php" );
-
 		return $custom_fields;
 	}
 
@@ -304,6 +326,60 @@ class PS_Emailchef extends PS_Emailchef_Api {
 
 		return false;
 
+
+	}
+
+	/**
+	 * Update a Custom Field in List ID
+	 *
+	 * @param $list_id
+	 * @param $type
+	 * @param string $name
+	 * @param $placeholder
+	 * @param array $options
+	 * @param string $default_value
+	 *
+	 * @return bool
+	 */
+	public function update_custom_field( $list_id, $type, $name = "", $placeholder, $options = array(), $default_value = "" ) {
+
+		$collection = $this->get_collection($list_id);
+
+		$cID = array_search( $placeholder, array_column( $collection, "place_holder" ) );
+
+		if ($cID === false) {
+			$this->lastError = "Placeholder non valido.";
+			return false;
+		}
+
+		$route = sprintf( "/customfields/%d", $collection[$cID]['id'] );
+
+		$args = array(
+
+			"instance_in" => $collection[$cID]
+
+		);
+
+		$args["instance_in"]["data_type"] = $type;
+		$args["instance_in"]["name"] = $name;
+		$args["instance_in"]["place_holder"] = $placeholder;
+		$args["instance_in"]["default_value"] = $default_value;
+
+		if ($type == "select")
+			$args["instance_in"]["options"] = $options;
+
+		$response = $this->get( $route, $args, "PUT", true );
+
+		if ( isset( $response['status'] ) && $response['status'] == "OK" ) {
+
+			$this->new_custom_id = $response['custom_field_id'];
+
+			return true;
+		}
+
+		$this->lastError = $response['message'];
+
+		return false;
 
 	}
 

@@ -113,6 +113,9 @@ class Emailchef extends Module {
 			$this->registerHook( 'actionOrderStatusPostUpdate' ) &&
 			$this->registerHook( 'actionObjectAddressAddAfter' ) &&
 			$this->registerHook( 'actionObjectAddressUpdateAfter' ) &&
+			$this->registerHook( 'actionObjectLanguageAddAfter' ) &&
+			$this->registerHook( 'actionObjectLanguageUpdateAfter' ) &&
+			$this->registerHook( 'actionObjectLanguageDeleteAfter' ) &&
 			$this->registerHook( 'footer' ) &&
 			$this->create_emailchef_tables()
 		);
@@ -132,6 +135,9 @@ class Emailchef extends Module {
 			$this->unregisterHook( 'actionOrderStatusPostUpdate' ) &&
 			$this->unregisterHook( 'actionObjectAddressAddAfter' ) &&
 			$this->unregisterHook( 'actionObjectAddressUpdateAfter' ) &&
+			$this->unregisterHook( 'actionObjectLanguageAddAfter' ) &&
+			$this->unregisterHook( 'actionObjectLanguageUpdateAfter' ) &&
+			$this->unregisterHook( 'actionObjectLanguageDeleteAfter' ) &&
 			$this->unregisterHook( 'footer' ) &&
 			$this->drop_emailchef_tables()
 		);
@@ -140,6 +146,7 @@ class Emailchef extends Module {
 	public function getContent() {
 
 		$output = null;
+
 		if ( Tools::isSubmit( 'submit' . $this->name ) ) {
 			$ec_username    = strval( Tools::getValue( $this->prefix_setting( 'username' ) ) );
 			$ec_password    = strval( Tools::getValue( $this->prefix_setting( 'password' ) ) );
@@ -198,7 +205,7 @@ EOF;
 			if ( count( $abandoned_carts ) > 0 ) {
 
 				$emailchef_abandoned_url = $this->_path . "ajax.php";
-				$output             .= <<<EOF
+				$output                  .= <<<EOF
 				<script>
 				    var emailchef_abandoned_url = '$emailchef_abandoned_url';
 				</script>
@@ -732,6 +739,95 @@ EOF;
 
 	public function hookActionObjectAddressUpdateAfter( $params ) {
 		return $this->update_customer( $params['object'], "edit" );
+	}
+
+	public function hookActionObjectLanguageAddAfter( $params ) {
+		$this->update_language_field( $params['object'], "add" );
+	}
+
+	public function hookActionObjectLanguageUpdateAfter( $params ) {
+		$this->update_language_field( $params['object'], "update" );
+	}
+
+	public function hookActionObjectLanguageDeleteAfter( $params ) {
+		$this->update_language_field( $params['object'], "delete" );
+	}
+
+	/**
+	 * Update Language Field
+	 *
+	 * @param \LanguageCore $language
+	 * @param $action
+	 */
+
+	private function update_language_field( $language, $action = "update" ) {
+
+		$psec = $this->emailchef();
+
+		if ( $psec->isLogged() ) {
+
+			$list_id = $this->_getConf( "list" );
+
+			$custom_fields = require( PS_EMAILCHEF_DIR . "/conf/custom_fields.php" );
+			$custom_field  = $custom_fields['lang'];
+
+			$type          = $custom_field['data_type'];
+			$name          = $custom_field['name'];
+			$options       = ( isset( $custom_field['options'] ) ? $custom_field['options'] : array() );
+			$default_value = ( isset( $custom_field['default_value'] ) ? $custom_field['default_value'] : "" );
+			$iso_code      = $language->iso_code;
+
+			$new_options = array();
+
+			if ( $action == "delete" ) {
+				foreach ( $options as $option ) {
+					if ( $option['text'] == $iso_code ) {
+						continue;
+					}
+					$new_options[] = $option;
+				}
+			} else if ( $action == "update" ) {
+				$not_found = true;
+				foreach ( $options as $option ) {
+					if ( $option['text'] == $iso_code ) {
+						$not_found = false;
+					}
+					$new_options[] = $option;
+				}
+
+				if ( $not_found ) {
+					$new_options[] = array(
+						'text' => $iso_code
+					);
+				}
+			} else {
+				$new_options = $options;
+				$new_options[]   = array(
+					'text' => $iso_code
+				);
+			}
+
+			$init = $psec->update_custom_field( $list_id, $type, $name, 'lang', $new_options, $default_value );
+
+			if ( $init ) {
+				$this->log(
+					sprintf(
+						$this->l( "Aggiornati nella lista %d i custom fields relativi alla lingua" ),
+						$list_id
+					)
+				);
+			} else {
+				$this->log(
+					sprintf(
+						$this->l( "I campi della lista %d relativi alla lingua non sono stati modificati (Errore: %s)" ),
+						$list_id,
+						$psec->lastError
+					),
+					3
+				);
+			}
+
+		}
 	}
 
 	private function update_customer( $object, $action = 'add' ) {

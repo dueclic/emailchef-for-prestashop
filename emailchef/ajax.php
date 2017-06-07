@@ -149,7 +149,7 @@ final class EmailchefAjaxRequest {
 						'last_name' => $cart['last_name'],
 						'user_email' => $cart['email'],
 						'customer_id' => $cart['id_customer'],
-						'is_abandoned_cart' => true
+						'ab_cart_is_abandoned_cart' => true
 					);
 
 					$ids[] = $cart['total'];
