@@ -215,20 +215,21 @@ class PS_Emailchef_Sync {
 	 * @return array|false|mysqli_result|null|PDOStatement|resource
 	 */
 
-	public function getAbandonedCarts(){
+	public function getAbandonedCarts() {
 		$sql = "SELECT * FROM (
 		SELECT
 		c.firstname, c.lastname, a.id_cart total, ca.name carrier, c.id_customer, c.email, a.date_upd,a.date_add,
-				IF (IFNULL(o.id_order, 'Non ordered') = 'Non ordered', IF(TIME_TO_SEC(TIMEDIFF('".date('Y-m-d H:i:s')."', a.`date_add`)) > 86000, 'Abandoned cart', 'Non ordered'), o.id_order) id_order, IF(o.id_order, 1, 0) badge_success, IF(o.id_order, 0, 1) badge_danger, IF(co.id_guest, 1, 0) id_guest
-		FROM `"._DB_PREFIX_."cart` a  
-				JOIN `"._DB_PREFIX_."customer` c ON (c.id_customer = a.id_customer)
-				LEFT JOIN `"._DB_PREFIX_."currency` cu ON (cu.id_currency = a.id_currency)
-				LEFT JOIN `"._DB_PREFIX_."carrier` ca ON (ca.id_carrier = a.id_carrier)
-				LEFT JOIN `"._DB_PREFIX_."orders` o ON (o.id_cart = a.id_cart)
-				LEFT JOIN `"._DB_PREFIX_."connections` co ON (a.id_guest = co.id_guest AND TIME_TO_SEC(TIMEDIFF('".date('Y-m-d H:i:s')."', co.`date_add`)) < 1800)
+				IF (IFNULL(o.id_order, 'Non ordered') = 'Non ordered', IF(TIME_TO_SEC(TIMEDIFF('" . date( 'Y-m-d H:i:s' ) . "', a.`date_add`)) > 86000, 'Abandoned cart', 'Non ordered'), o.id_order) id_order, IF(o.id_order, 1, 0) badge_success, IF(o.id_order, 0, 1) badge_danger, IF(co.id_guest, 1, 0) id_guest
+		FROM `" . _DB_PREFIX_ . "cart` a  
+				JOIN `" . _DB_PREFIX_ . "customer` c ON (c.id_customer = a.id_customer)
+				LEFT JOIN `" . _DB_PREFIX_ . "currency` cu ON (cu.id_currency = a.id_currency)
+				LEFT JOIN `" . _DB_PREFIX_ . "carrier` ca ON (ca.id_carrier = a.id_carrier)
+				LEFT JOIN `" . _DB_PREFIX_ . "orders` o ON (o.id_cart = a.id_cart)
+				LEFT JOIN `" . _DB_PREFIX_ . "connections` co ON (a.id_guest = co.id_guest AND TIME_TO_SEC(TIMEDIFF('" . date( 'Y-m-d H:i:s' ) . "', co.`date_add`)) < 1800)
 				WHERE a.date_add > (NOW() - INTERVAL 60 DAY) ORDER BY a.id_cart DESC 
-		) AS toto LEFT JOIN `"._DB_PREFIX_."emailchef_abcart_synced` ec ON (toto.total = ec.id_cart) WHERE id_order='Abandoned cart' AND ec.id_cart IS NULL ORDER BY date_add ASC";
-		return Db::getInstance()->ExecuteS($sql);
+		) AS toto LEFT JOIN `" . _DB_PREFIX_ . "emailchef_abcart_synced` ec ON (toto.total = ec.id_cart) WHERE id_order='Abandoned cart' AND ec.id_cart IS NULL ORDER BY date_add ASC";
+
+		return Db::getInstance()->ExecuteS( $sql );
 	}
 
 	/**
@@ -257,14 +258,14 @@ class PS_Emailchef_Sync {
 		$image_path = _PS_BASE_URL_ . _THEME_PROD_DIR_ . $image->getExistingImgPath() . ".jpg";
 
 		return array(
-			'ab_cart_prod_name_pr_hr'        => $product->name,
-			'ab_cart_prod_desc_pr_hr' => strip_tags( $product->description_short ),
-			'ab_cart_prod_pr_pr_hr'       => $product->getPrice( true, null, 2 ),
-			'ab_cart_date'       => $this->get_date( $cart->date_upd ),
-			'ab_cart_prod_id_pr_hr'          => $product->id,
-			'ab_cart_prod_url_pr_hr'         => $product->getLink(),
-			'ab_cart_prod_url_img_pr_hr'   => $image_path,
-			'ab_cart_is_abandoned_cart'                               => false
+			'ab_cart_prod_name_pr_hr'    => $product->name,
+			'ab_cart_prod_desc_pr_hr'    => strip_tags( $product->description_short ),
+			'ab_cart_prod_pr_pr_hr'      => $product->getPrice( true, null, 2 ),
+			'ab_cart_date'               => $this->get_date( $cart->date_upd ),
+			'ab_cart_prod_id_pr_hr'      => $product->id,
+			'ab_cart_prod_url_pr_hr'     => $product->getLink(),
+			'ab_cart_prod_url_img_pr_hr' => $image_path,
+			'ab_cart_is_abandoned_cart'  => false
 		);
 
 	}
@@ -307,14 +308,14 @@ class PS_Emailchef_Sync {
 
 		if ( $abandoned_cart === false ) {
 			return array(
-				'ab_cart_prod_name_pr_hr'        => '',
-				'ab_cart_prod_desc_pr_hr' => '',
-				'ab_cart_prod_pr_pr_hr'       => '',
-				'ab_cart_date'       => '',
-				'ab_cart_prod_id_pr_hr'          => '',
-				'ab_cart_prod_url_pr_hr'         => '',
-				'ab_cart_prod_url_img_pr_hr'   => '',
-				'ab_cart_is_abandoned_cart'                               => false
+				'ab_cart_prod_name_pr_hr'    => '',
+				'ab_cart_prod_desc_pr_hr'    => '',
+				'ab_cart_prod_pr_pr_hr'      => '',
+				'ab_cart_date'               => '',
+				'ab_cart_prod_id_pr_hr'      => '',
+				'ab_cart_prod_url_pr_hr'     => '',
+				'ab_cart_prod_url_img_pr_hr' => '',
+				'ab_cart_is_abandoned_cart'  => false
 			);
 		}
 
@@ -332,6 +333,7 @@ class PS_Emailchef_Sync {
 
 	private function get_date( $date, $format = "Y-m-d" ) {
 		$dt = new DateTime( $date );
+
 		return $dt->format( $format );
 	}
 
@@ -425,7 +427,7 @@ class PS_Emailchef_Sync {
 			'customer_type'     => $this->get_group( CustomerCore::getDefaultGroupId( $customer['id_customer'] ) ),
 			'gender'            => $this->get_gender( $customerob->id_gender ),
 			'birthday'          => $this->get_birthday( $customerob->birthday ),
-			'lang'          => $this->get_lang( $customerob->id_lang ),
+			'lang'              => $this->get_lang( $customerob->id_lang ),
 			'billing_company'   => $address->company,
 			'billing_address_1' => $address->address1,
 			'billing_postcode'  => $address->postcode,
@@ -434,7 +436,7 @@ class PS_Emailchef_Sync {
 			'billing_phone_2'   => $address->phone_mobile,
 			'billing_state'     => StateCore::getNameById( $address->id_state ),
 			'billing_country'   => $address->country,
-			'currency'          => CurrencyCore::getDefaultCurrency()->name,
+			'currency'          => CurrencyCore::getDefaultCurrency()->iso_code,
 			'source'            => $this->get_platform(),
 			'newsletter'        => $customerob->newsletter ? 'yes' : 'no'
 
@@ -524,7 +526,7 @@ class PS_Emailchef_Sync {
 			'all_ordered_product_ids'  => $this->getAllOrderedProductIDS( $id_customer ),
 			'latest_order_product_ids' => $this->getLastOrderProductIDS( $order ),
 			'source'                   => $this->get_platform(),
-			'currency'                 => CurrencyCore::getDefaultCurrency()->name
+			'currency'                 => CurrencyCore::getDefaultCurrency()->iso_code
 		);
 
 		if ( $customer->isGuest() ) {
@@ -542,7 +544,7 @@ class PS_Emailchef_Sync {
 				'billing_phone_2'   => $address->phone_mobile,
 				'billing_state'     => StateCore::getNameById( $address->id_state ),
 				'billing_country'   => $address->country,
-				'currency'          => CurrencyCore::getDefaultCurrency()->name,
+				'currency'          => CurrencyCore::getDefaultCurrency()->iso_code,
 				'status_id'         => $status_id
 			) );
 		}
@@ -579,7 +581,7 @@ class PS_Emailchef_Sync {
 			'customer_id'   => $customer->id,
 			'gender'        => $this->get_gender( $customer->id_gender ),
 			'birthday'      => $this->get_birthday( $customer->birthday ),
-			'lang'      => $this->get_lang( $customer->id_lang ),
+			'lang'          => $this->get_lang( $customer->id_lang ),
 			'source'        => $this->get_platform()
 		);
 
@@ -608,7 +610,7 @@ class PS_Emailchef_Sync {
 			'gender'            => $this->get_gender( $customer->id_gender ),
 			'birthday'          => $this->get_birthday( $customer->birthday ),
 			'language'          => $this->get_lang( $customer->id_lang ),
-			'currency'          => CurrencyCore::getDefaultCurrency()->name,
+			'currency'          => CurrencyCore::getDefaultCurrency()->iso_code,
 			'customer_type'     => $this->get_group( CustomerCore::getDefaultGroupId( $address->id_customer ) ),
 			'billing_company'   => $address->company,
 			'billing_address_1' => $address->address1,

@@ -801,8 +801,8 @@ EOF;
 					);
 				}
 			} else {
-				$new_options = $options;
-				$new_options[]   = array(
+				$new_options   = $options;
+				$new_options[] = array(
 					'text' => $iso_code
 				);
 			}

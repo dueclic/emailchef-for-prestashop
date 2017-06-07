@@ -118,17 +118,17 @@ class PS_Emailchef extends PS_Emailchef_Api {
 	 */
 
 	public function get_custom_field_id( $list_id, $placeholder ) {
-		$collection = $this->get_collection($list_id);
+		$collection = $this->get_collection( $list_id );
 
-		foreach ($collection as $custom_field){
+		foreach ( $collection as $custom_field ) {
 
-			if ($custom_field['place_holder'] == $placeholder) {
+			if ( $custom_field['place_holder'] == $placeholder ) {
 				return $custom_field['id'];
 			}
 
 		}
 
-		return FALSE;
+		return false;
 	}
 
 	/**
@@ -138,6 +138,7 @@ class PS_Emailchef extends PS_Emailchef_Api {
 
 	protected function get_custom_fields() {
 		$custom_fields = require( PS_EMAILCHEF_DIR . "/conf/custom_fields.php" );
+
 		return $custom_fields;
 	}
 
@@ -156,10 +157,10 @@ class PS_Emailchef extends PS_Emailchef_Api {
 
 		foreach ( $this->get_custom_fields() as $place_holder => $custom_field ) {
 
-			$type = $custom_field['data_type'];
-			$name = $custom_field['name'];
-			$options = (isset($custom_field['options']) ? $custom_field['options'] : array());
-			$default_value =  (isset($custom_field['default_value']) ? $custom_field['default_value'] : "");
+			$type          = $custom_field['data_type'];
+			$name          = $custom_field['name'];
+			$options       = ( isset( $custom_field['options'] ) ? $custom_field['options'] : array() );
+			$default_value = ( isset( $custom_field['default_value'] ) ? $custom_field['default_value'] : "" );
 
 			/**
 			 *
@@ -310,8 +311,9 @@ class PS_Emailchef extends PS_Emailchef_Api {
 
 		);
 
-		if ($type == "select")
+		if ( $type == "select" ) {
 			$args["instance_in"]["options"] = $options;
+		}
 
 		$response = $this->get( $route, $args, "POST", true );
 
@@ -343,16 +345,17 @@ class PS_Emailchef extends PS_Emailchef_Api {
 	 */
 	public function update_custom_field( $list_id, $type, $name = "", $placeholder, $options = array(), $default_value = "" ) {
 
-		$collection = $this->get_collection($list_id);
+		$collection = $this->get_collection( $list_id );
 
 		$cID = array_search( $placeholder, array_column( $collection, "place_holder" ) );
 
-		if ($cID === false) {
+		if ( $cID === false ) {
 			$this->lastError = "Placeholder non valido.";
+
 			return false;
 		}
 
-		$route = sprintf( "/customfields/%d", $collection[$cID]['id'] );
+		$route = sprintf( "/customfields/%d", $collection[ $cID ]['id'] );
 
 		$args = array(
 
@@ -365,13 +368,14 @@ class PS_Emailchef extends PS_Emailchef_Api {
 
 		);
 
-		$args["instance_in"]["data_type"] = $type;
-		$args["instance_in"]["name"] = $name;
-		$args["instance_in"]["place_holder"] = $placeholder;
+		$args["instance_in"]["data_type"]     = $type;
+		$args["instance_in"]["name"]          = $name;
+		$args["instance_in"]["place_holder"]  = $placeholder;
 		$args["instance_in"]["default_value"] = $default_value;
 
-		if ($type == "select")
+		if ( $type == "select" ) {
 			$args["instance_in"]["options"] = $options;
+		}
 
 		$response = $this->get( $route, $args, "PUT", true );
 
