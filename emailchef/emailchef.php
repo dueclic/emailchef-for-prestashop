@@ -45,11 +45,12 @@ class Emailchef extends Module {
 	private $namespace = "ps_emailchef";
 	private $emailchef;
 	private $category_table;
+	private $newsletter_before = 0;
 
 	public function __construct() {
 		$this->name          = 'emailchef';
 		$this->tab           = 'administration';
-		$this->version       = '1.0.0.L';
+		$this->version       = '1.0.0.M';
 		$this->author        = 'dueclic';
 		$this->need_instance = 0;
 		$this->bootstrap     = true;
@@ -110,6 +111,8 @@ class Emailchef extends Module {
 			parent::install() &&
 			$this->registerHook( 'backOfficeHeader' ) &&
 			$this->registerHook( 'actionCustomerAccountAdd' ) &&
+			$this->registerHook('actionObjectCustomerUpdateBefore') &&
+			$this->registerHook('actionObjectCustomerUpdateAfter') &&
 			$this->registerHook( 'actionOrderStatusPostUpdate' ) &&
 			$this->registerHook( 'actionObjectAddressAddAfter' ) &&
 			$this->registerHook( 'actionObjectAddressUpdateAfter' ) &&
@@ -133,6 +136,8 @@ class Emailchef extends Module {
 			parent::uninstall() &&
 			$this->unregisterHook( 'backOfficeHeader' ) &&
 			$this->unregisterHook( 'actionCustomerAccountAdd' ) &&
+			$this->unregisterHook('actionObjectCustomerUpdateBefore') &&
+			$this->unregisterHook('actionObjectCustomerUpdateAfter') &&
 			$this->unregisterHook( 'actionOrderStatusPostUpdate' ) &&
 			$this->unregisterHook( 'actionObjectAddressAddAfter' ) &&
 			$this->unregisterHook( 'actionObjectAddressUpdateAfter' ) &&
@@ -211,11 +216,10 @@ EOF;
 				    var emailchef_abandoned_url = '$emailchef_abandoned_url';
 				</script>
 EOF;
+				$output .= '<script type="text/javascript" src="' . $this->_path . 'js/plugins/emailchef/jquery.emailchef.abandoned.js"></script>';
 			}
 
 		}
-
-		$output .= '<script type="text/javascript" src="' . $this->_path . 'js/plugins/emailchef/jquery.emailchef.abandoned.js"></script>';
 
 		return $output;
 	}
@@ -740,6 +744,24 @@ EOF;
 		}
 	}
 
+	public function HookActionObjectCustomerUpdateBefore($params){
+		if ($this->emailchef()->isLogged()){
+
+			/**
+			 * @var $customerob $customer
+			 */
+
+			$customerob = $params['object'];
+			$customer = new Customer($customerob->id);
+
+			$this->newsletter_before = (int)$customer->newsletter;
+		}
+	}
+
+	public function HookActionObjectCustomerUpdateAfter($params){
+		return $this->update_info_customer ( $params['object'] );
+	}
+
 	public function hookActionObjectAddressAddAfter( $params ) {
 		return $this->update_customer( $params['object'] );
 	}
@@ -837,7 +859,7 @@ EOF;
 		}
 	}
 
-	private function update_customer( $object, $action = 'add' ) {
+	private function update_customer( $object ) {
 
 		if ( $this->emailchef()->isLogged() ) {
 
@@ -892,6 +914,71 @@ EOF;
 						$address->firstname,
 						$address->lastname,
 						intval( count( $syncAddressData ) - 2 ),
+						$list_id
+					),
+					3
+				);
+			}
+
+		}
+
+	}
+
+	private function update_info_customer( $object ) {
+
+		if ( $this->emailchef()->isLogged() ) {
+
+			/**
+			 * @var Customer $customer
+			 */
+
+			$customer = $object;
+			$list_id = $this->_getConf( "list" );
+
+			require_once( dirname( __FILE__ ) . "/lib/emailchef/class-emailchef-sync.php" );
+
+			$sync = new PS_Emailchef_Sync();
+
+			$syncCustomerInfo = $sync->getSyncUpdateCustomerInfo( $customer );
+
+			if ( $customer->newsletter == 1 && $this->_getConf( "policy_type" ) == "dopt" && $this->newsletter_before == 0 ) {
+				$this->sendDoubleOptIn(
+					$customer->firstname,
+					$customer->email,
+					$this->context->language->id,
+					$this->context->shop->id
+				);
+				$syncCustomerInfo['newsletter'] = 'pending';
+			}
+
+			if ( $customer->newsletter == 1 && $this->_getConf( "policy_type" ) == "sopt" ) {
+				$syncCustomerInfo['newsletter'] = 'yes';
+			}
+
+			$upsert = $this->emailchef()->upsert_customer(
+				$list_id,
+				$syncCustomerInfo
+			);
+
+			if ( $upsert ) {
+				$this->log(
+					sprintf(
+						$this->l( "Aggiornati nella lista %d i campi del cliente %d (Nome: %s Cognome %s e altri %d campi)" ),
+						$list_id,
+						$customer->id,
+						$customer->firstname,
+						$customer->lastname,
+						intval( count( $syncCustomerInfo ) - 2 )
+					)
+				);
+			} else {
+				$this->log(
+					sprintf(
+						$this->l( "I campi del cliente %d (Nome: %s Cognome %s e altri %d campi) nella lista %d non sono stati aggiornati" ),
+						$customer->id,
+						$customer->firstname,
+						$customer->lastname,
+						intval( count( $syncCustomerInfo ) - 2 ),
 						$list_id
 					),
 					3

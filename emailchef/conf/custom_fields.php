@@ -40,6 +40,19 @@ function get_all_languages() {
 	return $langs;
 }
 
+function get_group_names() {
+
+	$groups = array();
+	foreach ( GroupCore::getGroups( Configuration::get( "PS_LANG_DEFAULT" ) ) as $group ) {
+		$groups[] = array(
+			"text" => $group['name']
+		);
+	}
+
+	return $groups;
+
+}
+
 function get_currencies() {
 	$currencies = array();
 	foreach ( CurrencyCore::getCurrencies() as $currency ) {
@@ -173,7 +186,8 @@ return array(
 	),
 	'customer_type'               => array(
 		'name'      => Translate::getAdminTranslation( 'Tipo cliente' ),
-		'data_type' => 'text',
+		'data_type' => 'select',
+		'options'   => get_group_names(),
 		'ord'       => 18
 	),
 	'total_ordered'               => array(

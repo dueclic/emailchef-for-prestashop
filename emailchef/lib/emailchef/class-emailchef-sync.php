@@ -634,6 +634,32 @@ class PS_Emailchef_Sync {
 
 	}
 
+	/**
+	 * Get Sync Update Customer Info
+	 *
+	 * @param Customer $customer
+	 *
+	 * @return array
+	 */
+
+	public function getSyncUpdateCustomerInfo( Customer $customer ) {
+
+		$data = array(
+			'customer_id'       => $customer->id,
+			'first_name'        => $customer->firstname,
+			'last_name'         => $customer->lastname,
+			'user_email'        => $customer->email,
+			'birthday'          => $this->get_birthday( $customer->birthday ),
+			'language'          => $this->get_lang( $customer->id_lang ),
+			'currency'          => CurrencyCore::getDefaultCurrency()->iso_code,
+			'customer_type'     => $this->get_group( CustomerCore::getDefaultGroupId( $customer->id ) ),
+			'source'            => $this->get_platform(),
+		);
+
+		return $data;
+
+	}
+
 	public function getCustomersData() {
 
 		$data = array();
