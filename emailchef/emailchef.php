@@ -50,7 +50,7 @@ class Emailchef extends Module {
 	public function __construct() {
 		$this->name          = 'emailchef';
 		$this->tab           = 'administration';
-		$this->version       = '1.0.0.M';
+		$this->version       = '1.0.0.N';
 		$this->author        = 'dueclic';
 		$this->need_instance = 0;
 		$this->bootstrap     = true;
@@ -219,9 +219,12 @@ EOF;
 				$output .= '<script type="text/javascript" src="' . $this->_path . 'js/plugins/emailchef/jquery.emailchef.abandoned.js"></script>';
 			}
 
+			return $output;
+
 		}
 
-		return $output;
+		return "";
+
 	}
 
 	public function hookBackOfficeFooter() {
@@ -880,11 +883,11 @@ EOF;
 			 * Dinamica carrello abbandonato
 			 */
 
-			$higher_product_data = $sync->getHigherProductCart(
+			/*$higher_product_data = $sync->getHigherProductCart(
 				$this->context->cart
 			);
 
-			$syncAddressData = array_merge( $syncAddressData, $higher_product_data );
+			$syncAddressData = array_merge( $syncAddressData, $higher_product_data );*/
 
 			/**
 			 * Fine dinamica carrello abbandonato

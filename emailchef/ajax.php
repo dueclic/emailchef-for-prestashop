@@ -144,13 +144,18 @@ final class EmailchefAjaxRequest {
 
 				if (!in_array($cart['total'], $ids)) {
 
+					$higher_product_data = $sync->getHigherProductCart(
+						new Cart($cart['total'])
+					);
+
 					$customer = array(
 						'first_name' => $cart['firstname'],
 						'last_name' => $cart['last_name'],
 						'user_email' => $cart['email'],
 						'customer_id' => $cart['id_customer'],
-						'ab_cart_is_abandoned_cart' => true
 					);
+
+					$customer = array_merge( $customer, $higher_product_data );
 
 					$ids[] = $cart['total'];
 

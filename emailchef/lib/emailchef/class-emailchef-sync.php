@@ -265,7 +265,7 @@ class PS_Emailchef_Sync {
 			'ab_cart_prod_id_pr_hr'      => $product->id,
 			'ab_cart_prod_url_pr_hr'     => $product->getLink(),
 			'ab_cart_prod_url_img_pr_hr' => $image_path,
-			'ab_cart_is_abandoned_cart'  => false
+			'ab_cart_is_abandoned_cart'  => true
 		);
 
 	}
