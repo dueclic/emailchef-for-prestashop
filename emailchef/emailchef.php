@@ -111,8 +111,8 @@ class Emailchef extends Module {
 			parent::install() &&
 			$this->registerHook( 'backOfficeHeader' ) &&
 			$this->registerHook( 'actionCustomerAccountAdd' ) &&
-			$this->registerHook('actionObjectCustomerUpdateBefore') &&
-			$this->registerHook('actionObjectCustomerUpdateAfter') &&
+			$this->registerHook( 'actionObjectCustomerUpdateBefore' ) &&
+			$this->registerHook( 'actionObjectCustomerUpdateAfter' ) &&
 			$this->registerHook( 'actionOrderStatusPostUpdate' ) &&
 			$this->registerHook( 'actionObjectAddressAddAfter' ) &&
 			$this->registerHook( 'actionObjectAddressUpdateAfter' ) &&
@@ -136,8 +136,8 @@ class Emailchef extends Module {
 			parent::uninstall() &&
 			$this->unregisterHook( 'backOfficeHeader' ) &&
 			$this->unregisterHook( 'actionCustomerAccountAdd' ) &&
-			$this->unregisterHook('actionObjectCustomerUpdateBefore') &&
-			$this->unregisterHook('actionObjectCustomerUpdateAfter') &&
+			$this->unregisterHook( 'actionObjectCustomerUpdateBefore' ) &&
+			$this->unregisterHook( 'actionObjectCustomerUpdateAfter' ) &&
 			$this->unregisterHook( 'actionOrderStatusPostUpdate' ) &&
 			$this->unregisterHook( 'actionObjectAddressAddAfter' ) &&
 			$this->unregisterHook( 'actionObjectAddressUpdateAfter' ) &&
@@ -145,7 +145,7 @@ class Emailchef extends Module {
 			$this->unregisterHook( 'actionObjectLanguageUpdateAfter' ) &&
 			$this->unregisterHook( 'actionObjectLanguageDeleteAfter' ) &&
 			$this->unregisterHook( "backOfficeFooter" ) &&
-		    $this->unregisterHook( 'footer' ) &&
+			$this->unregisterHook( 'footer' ) &&
 			$this->drop_emailchef_tables()
 		);
 	}
@@ -198,7 +198,7 @@ EOF;
 		return $output . $this->displayForm();
 	}
 
-	private function sync_abandoned_cart(){
+	private function sync_abandoned_cart() {
 		if ( $this->emailchef()->isLogged() ) {
 
 			$output = null;
@@ -216,7 +216,7 @@ EOF;
 				    var emailchef_abandoned_url = '$emailchef_abandoned_url';
 				</script>
 EOF;
-				$output .= '<script type="text/javascript" src="' . $this->_path . 'js/plugins/emailchef/jquery.emailchef.abandoned.js"></script>';
+				$output                  .= '<script type="text/javascript" src="' . $this->_path . 'js/plugins/emailchef/jquery.emailchef.abandoned.js"></script>';
 			}
 
 			return $output;
@@ -747,22 +747,22 @@ EOF;
 		}
 	}
 
-	public function HookActionObjectCustomerUpdateBefore($params){
-		if ($this->emailchef()->isLogged()){
+	public function HookActionObjectCustomerUpdateBefore( $params ) {
+		if ( $this->emailchef()->isLogged() ) {
 
 			/**
 			 * @var $customerob $customer
 			 */
 
 			$customerob = $params['object'];
-			$customer = new Customer($customerob->id);
+			$customer   = new Customer( $customerob->id );
 
-			$this->newsletter_before = (int)$customer->newsletter;
+			$this->newsletter_before = (int) $customer->newsletter;
 		}
 	}
 
-	public function HookActionObjectCustomerUpdateAfter($params){
-		return $this->update_info_customer ( $params['object'] );
+	public function HookActionObjectCustomerUpdateAfter( $params ) {
+		return $this->update_info_customer( $params['object'] );
 	}
 
 	public function hookActionObjectAddressAddAfter( $params ) {
@@ -936,7 +936,7 @@ EOF;
 			 */
 
 			$customer = $object;
-			$list_id = $this->_getConf( "list" );
+			$list_id  = $this->_getConf( "list" );
 
 			require_once( dirname( __FILE__ ) . "/lib/emailchef/class-emailchef-sync.php" );
 
