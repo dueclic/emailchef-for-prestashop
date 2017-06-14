@@ -50,7 +50,7 @@ class Emailchef extends Module {
 	public function __construct() {
 		$this->name          = 'emailchef';
 		$this->tab           = 'administration';
-		$this->version       = '1.0.0.N';
+		$this->version       = '1.0.0.O';
 		$this->author        = 'dueclic';
 		$this->need_instance = 0;
 		$this->bootstrap     = true;
@@ -264,22 +264,6 @@ EOF;
 				)
 			);
 		}
-	}
-
-	private function get_pages() {
-
-		$pages = CMSCore::getCMSPages();
-
-		return array_map( function ( $page ) {
-
-			return array(
-				'id'   => $page['id_cms'],
-				'name' => Meta::getCmsMetas( $page['id_cms'], (int) Configuration::get( 'PS_LANG_DEFAULT' ),
-					true )['meta_title']
-			);
-
-		}, $pages );
-
 	}
 
 	private function prefix_setting( $setting ) {
@@ -751,7 +735,7 @@ EOF;
 		if ( $this->emailchef()->isLogged() ) {
 
 			/**
-			 * @var $customerob $customer
+			 * @var Customer $customer
 			 */
 
 			$customerob = $params['object'];
@@ -879,20 +863,6 @@ EOF;
 
 			$syncAddressData = $sync->getSyncUpdateCustomerAddress( $address );
 
-			/**
-			 * Dinamica carrello abbandonato
-			 */
-
-			/*$higher_product_data = $sync->getHigherProductCart(
-				$this->context->cart
-			);
-
-			$syncAddressData = array_merge( $syncAddressData, $higher_product_data );*/
-
-			/**
-			 * Fine dinamica carrello abbandonato
-			 */
-
 			$upsert = $this->emailchef()->upsert_customer(
 				$list_id,
 				$syncAddressData
@@ -1009,7 +979,7 @@ EOF;
 
 			$syncOrderData = array_merge(
 				$syncOrderData,
-				$sync->getHigherProductAbandonedCartOrEmpty( $syncOrderData['customer_id'] )
+				$sync->flushAbandonedCarts( $syncOrderData['customer_id'] )
 			);
 
 			$upsert = $ecps->upsert_customer(

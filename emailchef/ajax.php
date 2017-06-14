@@ -142,11 +142,14 @@ final class EmailchefAjaxRequest {
 
 			foreach ($abandoned as $cart){
 
-				if (!in_array($cart['total'], $ids)) {
+				$cartob = new Cart($cart['total']);
 
-					$higher_product_data = $sync->getHigherProductCart(
-						new Cart($cart['total'])
-					);
+				if (!in_array($cart['total'], $ids) &&
+				    $cartob->getOrderTotal() !== 0.00 &&
+					$cartob->date_add
+				) {
+
+					$higher_product_data = $sync->getHigherProductCart($cartob);
 
 					$customer = array(
 						'first_name' => $cart['firstname'],
@@ -329,6 +332,23 @@ final class EmailchefAjaxRequest {
 					$customer
 				);
 			}
+
+			$abandoned_carts = $sync->getAbandonedCarts();
+
+			foreach ($abandoned_carts as $cart) {
+				Db::getInstance()->insert("emailchef_abcart_synced", array(
+					'id_cart' => $cart['total'],
+					'date_synced' => date("Y-m-d H:i:s")
+				));
+			}
+
+			$this->module->log(
+				sprintf(
+					$this->module->l( 'Per la lista %d tutti i carrelli abbandonati vecchi sono stati scartati.' ),
+					$list_id
+				)
+			);
+
 
 			$response = array(
 				'status' => 'success',

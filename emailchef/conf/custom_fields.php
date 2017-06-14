@@ -42,12 +42,17 @@ function get_all_languages() {
 
 function get_group_names() {
 
-	$groups = array();
-	foreach ( GroupCore::getGroups( Configuration::get( "PS_LANG_DEFAULT" ) ) as $group ) {
-		$groups[] = array(
-			"text" => $group['name']
-		);
-	}
+	$groups = array(
+		array(
+			'text' => 'Visitor'
+		),
+		array(
+			'text' => 'Group'
+		),
+		array(
+			'text' => 'Customer'
+		)
+	);
 
 	return $groups;
 

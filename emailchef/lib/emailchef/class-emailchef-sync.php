@@ -200,10 +200,12 @@ class PS_Emailchef_Sync {
 	 * @return int|null
 	 */
 
-	private function getLastAbandonedCart( $customer_id ) {
+	public function getLastAbandonedCart( $customer_id ) {
 
-		$fetch = Db::getInstance()->executeS( 'SELECT c.`id_cart` FROM ' . _DB_PREFIX_ . 'cart c LEFT JOIN ps_orders o ON ( c.`id_cart` = o.`id_cart` ) WHERE o.`id_order` IS NULL AND c.`id_customer` = ' . (int) $customer_id . ' ORDER BY c.id_cart DESC LIMIT 1' );
-		if ( array_key_exists( 0, $fetch ) ) {
+		$sql = "SELECT c.`id_cart`, IF (IFNULL(o.id_order, 'Non ordered') = 'Non ordered', IF(TIME_TO_SEC(TIMEDIFF('" . date( 'Y-m-d H:i:s' ) . "', c.`date_add`)) > 86000, 'Abandoned cart', 'Non ordered'), o.id_order) id_order FROM " . _DB_PREFIX_ . "cart c LEFT JOIN ps_orders o ON ( c.`id_cart` = o.`id_cart` ) WHERE o.`id_order` IS NULL AND c.`id_customer` = " . (int) $customer_id . " ORDER BY c.id_cart DESC LIMIT 1";
+
+		$fetch = Db::getInstance()->executeS( $sql );
+		if ( array_key_exists( 0, $fetch ) && $fetch[0]['id_order'] == "Abandoned cart" ) {
 			return $fetch[0]['id_cart'];
 		}
 
@@ -226,7 +228,7 @@ class PS_Emailchef_Sync {
 				LEFT JOIN `" . _DB_PREFIX_ . "carrier` ca ON (ca.id_carrier = a.id_carrier)
 				LEFT JOIN `" . _DB_PREFIX_ . "orders` o ON (o.id_cart = a.id_cart)
 				LEFT JOIN `" . _DB_PREFIX_ . "connections` co ON (a.id_guest = co.id_guest AND TIME_TO_SEC(TIMEDIFF('" . date( 'Y-m-d H:i:s' ) . "', co.`date_add`)) < 1800)
-				WHERE a.date_add > (NOW() - INTERVAL 60 DAY) ORDER BY a.id_cart DESC 
+				WHERE a.date_add > (NOW() - INTERVAL 7 DAY) ORDER BY a.id_cart DESC 
 		) AS toto LEFT JOIN `" . _DB_PREFIX_ . "emailchef_abcart_synced` ec ON (toto.total = ec.id_cart) WHERE id_order='Abandoned cart' AND ec.id_cart IS NULL ORDER BY date_add ASC";
 
 		return Db::getInstance()->ExecuteS( $sql );
@@ -289,6 +291,45 @@ class PS_Emailchef_Sync {
 
 		return $this->getHigherProductCart( $cart );
 
+	}
+
+	/**
+	 * Flush abandoned carts for customer ID
+	 *
+	 * @param $customer_id
+	 *
+	 * @return array
+	 */
+
+	public function flushAbandonedCarts( $customer_id ){
+
+		$abandoned_carts = $this->getAbandonedCarts();
+
+		foreach ( $abandoned_carts as $cart ) {
+
+			$id_customer = $cart['id_customer'];
+
+			if ( $id_customer == $customer_id ) {
+
+				Db::getInstance()->insert( "emailchef_abcart_synced", array(
+					'id_cart'     => $cart['total'],
+					'date_synced' => date( "Y-m-d H:i:s" )
+				) );
+
+			}
+
+		}
+
+		return array(
+			'ab_cart_prod_name_pr_hr'    => '',
+			'ab_cart_prod_desc_pr_hr'    => '',
+			'ab_cart_prod_pr_pr_hr'      => '',
+			'ab_cart_date'               => '',
+			'ab_cart_prod_id_pr_hr'      => '',
+			'ab_cart_prod_url_pr_hr'     => '',
+			'ab_cart_prod_url_img_pr_hr' => '',
+			'ab_cart_is_abandoned_cart'  => false
+		);
 	}
 
 	/**
@@ -394,9 +435,15 @@ class PS_Emailchef_Sync {
 	 */
 
 	private function get_group( $group_id ) {
-		$group = new GroupCore( $group_id );
 
-		return $group->name[ (int) Configuration::get( "PS_LANG_DEFAULT" ) ];
+		if ($group_id == 1)
+			return "Visitor";
+
+		if ($group_id == 2)
+			return "Guest";
+
+		return "Customer";
+
 	}
 
 	/**
@@ -483,12 +530,6 @@ class PS_Emailchef_Sync {
 				'latest_shipped_order_status' => $latest_order_status
 			) );
 
-		}
-
-		$abandoned_cart = $this->getHigherProductAbandonedCart( $customer['id_customer'] );
-
-		if ( $abandoned_cart !== false ) {
-			$data = array_merge( $data, $abandoned_cart );
 		}
 
 		return $data;
