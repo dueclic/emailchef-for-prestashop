@@ -50,11 +50,12 @@ class Emailchef extends Module {
 	public function __construct() {
 		$this->name          = 'emailchef';
 		$this->tab           = 'administration';
-		$this->version       = '1.0.0.O';
+		$this->version       = '1.0.0.P';
 		$this->author        = 'dueclic';
 		$this->need_instance = 0;
 		$this->bootstrap     = true;
-		$this->controllers   = array( 'verification', 'unsubscribe' );
+        $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
+        $this->controllers   = array( 'verification', 'unsubscribe' );
 
 		parent::__construct();
 
