@@ -47,7 +47,7 @@ function get_group_names() {
 			'text' => 'Visitor'
 		),
 		array(
-			'text' => 'Group'
+			'text' => 'Guest'
 		),
 		array(
 			'text' => 'Customer'
