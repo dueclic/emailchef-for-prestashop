@@ -90,6 +90,15 @@ function get_order_statuses()
 
 }
 
+function get_order_statuses_delivered()
+{
+    return array(
+        array("text" => "Delivered"),
+        array("text" => "Shipped"),
+    );
+
+}
+
 return array(
 
 	'first_name'                  => array(
@@ -280,7 +289,7 @@ return array(
 	'latest_shipped_order_status' => array(
 		'name'      => Translate::getAdminTranslation( 'Ultimo ordine inviato - Stato lavorazione' ),
         'data_type' => 'select',
-        'options'   => get_order_statuses(),
+        'options'   => get_order_statuses_delivered(),
 		'ord'       => 31
 	),
 	'ab_cart_is_abandoned_cart'   => array(
