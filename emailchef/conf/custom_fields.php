@@ -69,6 +69,27 @@ function get_currencies() {
 	return $currencies;
 }
 
+function get_order_statuses()
+{
+    return array(
+        array("text" => "Awaiting bank wire payment"),
+        array("text" => "Awaiting Cash On Delivery validation"),
+        array("text" => "Awaiting check payment"),
+        array("text" => "Awaiting PayPal payment"),
+        array("text" => "Canceled"),
+        array("text" => "Delivered"),
+        array("text" => "On backorder (not paid)"),
+        array("text" => "On backorder (paid)"),
+        array("text" => "Payment accepted"),
+        array("text" => "Payment error"),
+        array("text" => "Processing in progress"),
+        array("text" => "Refunded"),
+        array("text" => "Remote payment accepted"),
+        array("text" => "Shipped"),
+    );
+
+}
+
 return array(
 
 	'first_name'                  => array(
@@ -237,7 +258,8 @@ return array(
 	),
 	'latest_order_status'         => array(
 		'name'      => Translate::getAdminTranslation( 'Ultimo ordine - Stato lavorazione' ),
-		'data_type' => 'text',
+        'data_type' => 'select',
+        'options'   => get_order_statuses(),
 		'ord'       => 27
 	),
 	'latest_order_product_ids'    => array(
@@ -257,7 +279,8 @@ return array(
 	),
 	'latest_shipped_order_status' => array(
 		'name'      => Translate::getAdminTranslation( 'Ultimo ordine inviato - Stato lavorazione' ),
-		'data_type' => 'text',
+        'data_type' => 'select',
+        'options'   => get_order_statuses(),
 		'ord'       => 31
 	),
 	'ab_cart_is_abandoned_cart'   => array(
