@@ -49,7 +49,7 @@ class Emailchef extends Module {
 
 	public function __construct() {
 		$this->name          = 'emailchef';
-		$this->tab           = 'administration';
+		$this->tab           = 'Emailing & SMS';
 		$this->version       = '1.0.0.R';
 		$this->author        = 'dueclic';
 		$this->need_instance = 0;
@@ -60,8 +60,8 @@ class Emailchef extends Module {
 		parent::__construct();
 
 		$this->category_table   = _DB_PREFIX_ . "emailchef_abcart_synced";
-		$this->displayName      = $this->l( 'eMailChef' );
-		$this->description      = $this->l( 'Integrazione di eMailChef' );
+		$this->displayName      = $this->l( 'eMailChef for PrestaShop' );
+		$this->description      = $this->l( 'Grazie al plugin per Prestashop, eMailChef è capace di comunicare con il tuo shop online e ti consente di creare campagne mirate per i tuoi clienti, in maniera rapida, semplice e automatica.' );
 		$this->confirmUninstall = $this->l( 'Sei sicuro di voler disinstallare questo modulo?' );
 		$this->emailchef();
 	}
