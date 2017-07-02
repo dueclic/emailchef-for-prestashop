@@ -2,8 +2,8 @@
 
 global $_MODULE;
 $_MODULE = array();
-$_MODULE['<{emailchef}prestashop>emailchef_506d38d29fa394566382ebb84b71b9a8'] = "eMailChef";
-$_MODULE['<{emailchef}prestashop>emailchef_002416bcb9272b4b50beb6d4b9dc167c'] = "Integrazione di eMailChef";
+$_MODULE['<{emailchef}prestashop>emailchef_af3cbe1913d2a746662bbe130d8f57ed'] = "eMailChef for PrestaShop";
+$_MODULE['<{emailchef}prestashop>emailchef_95dcb12e6863229111532e984e5ca8d8'] = "Grazie al plugin per Prestashop, eMailChef è capace di comunicare con il tuo shop online e ti consente di creare campagne mirate per i tuoi clienti, in maniera rapida, semplice e automatica.";
 $_MODULE['<{emailchef}prestashop>emailchef_0148d4de61f94baf04e22b503c0df9aa'] = "Sei sicuro di voler disinstallare questo modulo?";
 $_MODULE['<{emailchef}prestashop>emailchef_317c30a4ab33d491edbac783f66fc7ef'] = "Inserisci uno username valido.";
 $_MODULE['<{emailchef}prestashop>emailchef_d27c67b09a9c41d1206fea9654ffb34c'] = "Inserisci una password valida.";

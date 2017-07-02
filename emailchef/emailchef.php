@@ -62,8 +62,8 @@ class Emailchef extends Module {
 		parent::__construct();
 
 		$this->category_table   = _DB_PREFIX_ . "emailchef_abcart_synced";
-		$this->displayName      = $this->l( 'eMailChef' );
-		$this->description      = $this->l( 'Integrazione di eMailChef' );
+		$this->displayName      = $this->l( 'eMailChef for PrestaShop' );
+		$this->description      = $this->l( 'Grazie al plugin per Prestashop, eMailChef è capace di comunicare con il tuo shop online e ti consente di creare campagne mirate per i tuoi clienti, in maniera rapida, semplice e automatica.' );
 		$this->confirmUninstall = $this->l( 'Sei sicuro di voler disinstallare questo modulo?' );
 		$this->emailchef();
 	}
@@ -301,19 +301,14 @@ EOF;
 				}
 
 			}
-
-			$pack               = require_once( $default_language );
-			$this->cached_trans = $pack;
-
-		} else {
-			$pack = $this->cached_trans;
+			$this->cached_trans = require_once( $default_language );
 		}
 
-		if ( ! isset( $pack[ $pack_key ] ) ) {
-			return $string;
+		if ( ! isset( $this->cached_trans[ $pack_key ] ) ) {
+			return parent::l( $string, $specific );
 		}
 
-		return $pack[ $pack_key ];
+		return $this->cached_trans[ $pack_key ];
 
 	}
 
