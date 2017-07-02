@@ -189,7 +189,7 @@ class PS_Emailchef_Sync
 
             }
 
-            return ",".implode(",", $all_ordered).",";
+            return implode(",", $all_ordered);
 
         }
 
@@ -212,7 +212,7 @@ class PS_Emailchef_Sync
             $all_ordered[] = $product['product_id'];
         }
 
-        return ",".implode(",", $all_ordered).",";
+        return implode(",", $all_ordered);
     }
 
     /**
