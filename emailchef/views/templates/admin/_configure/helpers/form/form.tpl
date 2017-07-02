@@ -412,7 +412,8 @@
     <script>
         var i18n = {
             'no_list_found': '{$i18n['no_list_found']}',
-            'create_list': '{$i18n['create_list']}'
+            'create_list': '{$i18n['create_list']}',
+            'language_set': '{$i18n['language_set']}'
         };
     </script>
 {/block}

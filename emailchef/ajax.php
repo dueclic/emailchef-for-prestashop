@@ -117,6 +117,20 @@ final class EmailchefAjaxRequest {
 
 	}
 
+	public function ajax_changelanguage($args) {
+
+		error_reporting(0);
+
+		$response = array(
+			'type' => 'success'
+		);
+
+		Configuration::updateValue( $this->module->prefix_setting( 'lang' ), $args['lang'] );
+
+		return $response;
+
+	}
+
 	public function ajax_emailchefabandonedcart($args) {
 
 		error_reporting(0);

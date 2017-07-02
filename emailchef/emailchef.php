@@ -46,22 +46,24 @@ class Emailchef extends Module {
 	private $emailchef;
 	private $category_table;
 	private $newsletter_before = 0;
+	private $cached_trans;
 
 	public function __construct() {
-		$this->name          = 'emailchef';
-		$this->tab           = 'Emailing & SMS';
-		$this->version       = '1.0.0.R';
-		$this->author        = 'dueclic';
-		$this->need_instance = 0;
-		$this->bootstrap     = true;
-        $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
-        $this->controllers   = array( 'verification', 'unsubscribe' );
+		$this->name                   = 'emailchef';
+		$this->tab                    = 'Emailing & SMS';
+		$this->version                = '1.0.0.R';
+		$this->author                 = 'dueclic';
+		$this->need_instance          = 0;
+		$this->bootstrap              = true;
+		$this->ps_versions_compliancy = array( 'min' => '1.6', 'max' => _PS_VERSION_ );
+		$this->controllers            = array( 'verification', 'unsubscribe' );
+		$this->cached_trans           = false;
 
 		parent::__construct();
 
 		$this->category_table   = _DB_PREFIX_ . "emailchef_abcart_synced";
-		$this->displayName      = $this->l( 'eMailChef for PrestaShop' );
-		$this->description      = $this->l( 'Grazie al plugin per Prestashop, eMailChef è capace di comunicare con il tuo shop online e ti consente di creare campagne mirate per i tuoi clienti, in maniera rapida, semplice e automatica.' );
+		$this->displayName      = $this->l( 'eMailChef' );
+		$this->description      = $this->l( 'Integrazione di eMailChef' );
 		$this->confirmUninstall = $this->l( 'Sei sicuro di voler disinstallare questo modulo?' );
 		$this->emailchef();
 	}
@@ -155,7 +157,9 @@ class Emailchef extends Module {
 
 		$output = null;
 
+
 		if ( Tools::isSubmit( 'submit' . $this->name ) ) {
+			$ec_lang        = strval( Tools::getValue( $this->prefix_setting( 'lang' ) ) );
 			$ec_username    = strval( Tools::getValue( $this->prefix_setting( 'username' ) ) );
 			$ec_password    = strval( Tools::getValue( $this->prefix_setting( 'password' ) ) );
 			$ec_list        = intval( Tools::getValue( $this->prefix_setting( 'list' ) ) );
@@ -172,6 +176,7 @@ class Emailchef extends Module {
 					if ( ! $ec_list || empty( $ec_list ) ) {
 						$output .= $this->displayError( $this->l( 'Devi scegliere una lista.' ) );
 					} else {
+						Configuration::updateValue( $this->prefix_setting( 'lang' ), $ec_lang );
 						Configuration::updateValue( $this->prefix_setting( 'username' ), $ec_username );
 						Configuration::updateValue( $this->prefix_setting( 'password' ), $ec_password );
 						Configuration::updateValue( $this->prefix_setting( 'list' ), $ec_list );
@@ -248,7 +253,8 @@ EOF;
 
 	public function log( $message, $severity = 1, $debug = false ) {
 		if ( $debug ) {
-			return PrestaShopLogger::addLog( "[eMailChef Plugin] [Debug]" . $message, $severity, null, null, null, true );
+			return PrestaShopLogger::addLog( "[eMailChef Plugin] [Debug]" . $message, $severity, null, null, null,
+				true );
 		}
 
 		return PrestaShopLogger::addLog( "[eMailChef Plugin] " . $message, $severity, null, null, null, true );
@@ -267,8 +273,48 @@ EOF;
 		}
 	}
 
-	private function prefix_setting( $setting ) {
+	public function prefix_setting( $setting ) {
 		return $this->namespace . "_" . $setting;
+	}
+
+
+	public function l( $string, $specific = false ) {
+
+		$string   = preg_replace( "/\\\*'/", "\'", $string );
+		$pack_key = '<{emailchef}prestashop>emailchef_' . md5( $string );
+
+		if ( $this->cached_trans == false ) {
+
+			$language_folder  = PS_EMAILCHEF_DIR . "/languages";
+			$default_language = $language_folder . "/en.php";
+
+			if ( ( $lang = self::_getConf( "lang" ) ) !== false ) {
+
+				$current_language = $language_folder . "/" . $lang . ".php";
+
+				if ( file_exists( $current_language ) && $current_language !== $default_language ) {
+					$pack               = require_once( $current_language );
+					$this->cached_trans = $pack;
+
+					return $pack[ $pack_key ];
+
+				}
+
+			}
+
+			$pack               = require_once( $default_language );
+			$this->cached_trans = $pack;
+
+		} else {
+			$pack = $this->cached_trans;
+		}
+
+		if ( ! isset( $pack[ $pack_key ] ) ) {
+			return $string;
+		}
+
+		return $pack[ $pack_key ];
+
 	}
 
 	public function displayForm() {
@@ -279,6 +325,26 @@ EOF;
 				'title' => $this->l( 'Impostazioni plugin' ),
 			),
 			'input'  => array(
+				array(
+					'type'     => 'select',
+					'label'    => $this->l( 'Lingua' ),
+					'name'     => $this->prefix_setting( 'lang' ),
+					'required' => true,
+					'options'  => array(
+						'query' => array(
+							array(
+								'id'   => 'en',
+								'name' => $this->l( 'Inglese' )
+							),
+							array(
+								'id'   => 'it',
+								'name' => $this->l( 'Italiano' )
+							),
+						),
+						'id'    => 'id',
+						'name'  => 'name'
+					)
+				),
 				array(
 					'type'     => 'text',
 					'label'    => $this->l( 'eMailChef username' ),
@@ -308,7 +374,7 @@ EOF;
 					'label'    => $this->l( 'Policy attiva' ),
 					'desc'     => $this->l( 'Scegli che tipo di policy vuoi adottare' ),
 					'name'     => $this->prefix_setting( 'policy_type' ),
-					'hint'     => 'Puoi scegliere tra Double Opt-in e Single Opt-in',
+					'hint'     => $this->l( 'Puoi scegliere tra Double Opt-in e Single Opt-in' ),
 					'required' => false,
 					'options'  => array(
 						'query' => array(
@@ -355,6 +421,7 @@ EOF;
 
 		$this->context->smarty->assign( 'i18n', array(
 			'create_destination_list'            => $this->l( 'Crea una nuova lista di destinazione' ),
+			'language_set'                       => $this->l( 'La lingua è stata caricata, vuoi aggiornare questa pagina nella lingua scelta?' ),
 			'create_list'                        => $this->l( 'Crea lista' ),
 			'name_list'                          => $this->l( 'Nome lista' ),
 			'name_list_placeholder'              => $this->l( 'Inserisci il nome della nuova lista' ),
@@ -402,6 +469,7 @@ EOF;
 		// Load current value
 		$helper->fields_value[ $this->prefix_setting( 'username' ) ]    = Configuration::get( $this->prefix_setting( 'username' ) );
 		$helper->fields_value[ $this->prefix_setting( 'password' ) ]    = Configuration::get( $this->prefix_setting( 'password' ) );
+		$helper->fields_value[ $this->prefix_setting( 'lang' ) ]        = Configuration::get( $this->prefix_setting( 'lang' ) );
 		$helper->fields_value[ $this->prefix_setting( 'list' ) ]        = Configuration::get( $this->prefix_setting( 'list' ) );
 		$helper->fields_value[ $this->prefix_setting( 'policy_type' ) ] = Configuration::get( $this->prefix_setting( 'policy_type' ) );
 

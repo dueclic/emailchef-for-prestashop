@@ -37,6 +37,7 @@ var PS_Emailchef = function ($) {
     var $newListDesc;
     var $policyList;
     var $listCreation;
+    var $langChange;
     var $btnSave;
     var isCreated = 0;
 
@@ -45,6 +46,7 @@ var PS_Emailchef = function ($) {
     };
 
     function getElements() {
+        $langChange = $("#" + prefixed_setting("lang"));
         $createList = $("#" + prefixed_setting("create_list"));
         $selList = $("#" + prefixed_setting("list"));
         $apiUser = $("#" + prefixed_setting("username"));
@@ -66,6 +68,34 @@ var PS_Emailchef = function ($) {
     }
 
     function triggerElements() {
+
+        $langChange.on("change", function(evt){
+
+            var ajax_url = $listCreation.data("ajax-action");
+            var ajax_data = {
+                action: 'changelanguage',
+                lang: $langChange.val()
+            };
+
+            $.ajax({
+                type: 'POST',
+                url: ajax_url,
+                data: ajax_data,
+                dataType: 'json',
+                success: function (response) {
+
+                    if (confirm(i18n.language_set)){
+                        location.reload();
+                    }
+
+                },
+                error: function (jxqr, textStatus, thrown) {
+                },
+                complete: function () {
+                }
+            });
+
+        });
 
         $createList.on("click", function (evt) {
             evt.preventDefault();
