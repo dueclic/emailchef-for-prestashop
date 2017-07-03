@@ -2,7 +2,7 @@
 
 global $_MODULE;
 $_MODULE = array();
-$_MODULE['<{emailchef}prestashop>emailchef_af3cbe1913d2a746662bbe130d8f57ed'] = "eMailChef for PrestaShop";
+$_MODULE['<{emailchef}prestashop>emailchef_506d38d29fa394566382ebb84b71b9a8'] = "eMailChef";
 $_MODULE['<{emailchef}prestashop>emailchef_95dcb12e6863229111532e984e5ca8d8'] = "Using this PrestaShop module, eMailChef can communicate with your online store and it creates easy, simply and automatic targeted campaigns.";
 $_MODULE['<{emailchef}prestashop>emailchef_0148d4de61f94baf04e22b503c0df9aa'] = "Do you really want to uninstall this module?";
 $_MODULE['<{emailchef}prestashop>emailchef_317c30a4ab33d491edbac783f66fc7ef'] = "Please, enter a valid username.";
