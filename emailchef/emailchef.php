@@ -50,7 +50,7 @@ class Emailchef extends Module {
 
 	public function __construct() {
 		$this->name                   = 'emailchef';
-		$this->tab                    = 'Emailing & SMS';
+		$this->tab                    = 'emailing';
 		$this->version                = '1.0.0.R';
 		$this->author                 = 'dueclic';
 		$this->need_instance          = 0;
