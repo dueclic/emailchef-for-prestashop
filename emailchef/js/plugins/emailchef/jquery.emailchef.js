@@ -142,6 +142,11 @@ var PS_Emailchef = function ($) {
         $("form").on("submit", function (evt) {
             var $btn = $(evt.target);
 
+            if ($apiUser.val() === "" || $apiUser.val() === "") {
+                evt.preventDefault();
+                return;
+            }
+
             if (isCreated == 0) {
                 evt.preventDefault();
                 checkCustomFields($apiUser.val(), $apiPass.val(), $selList.val());

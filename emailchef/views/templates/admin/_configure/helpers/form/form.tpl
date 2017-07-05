@@ -80,7 +80,7 @@
                     {/foreach}
                 {/if}
             </select>
-            <button class="select_and_create_btn btn btn-default" id="{$create_list_id}">{$i18n['create_list']}</button>
+            <a class="select_and_create_btn btn btn-default" id="{$create_list_id}">{$i18n['create_list']}</a>
             <div class="select_and_create_clear"></div>
         {/if}
 
@@ -174,15 +174,15 @@
 
                                 <div class="col-lg-9 col-lg-offset-3">
                                     &nbsp;
-                                    <button type="submit" value="1" id="{$save_id}" name="{$save_id}"
+                                    <a value="1" id="{$save_id}" name="{$save_id}"
                                             class="btn btn-default">
                                         <i class="icon-plus"></i> {$i18n['create_list']}
-                                    </button>
+                                    </a>
 
-                                    <button type="submit" value="1" id="{$undo_id}" name="{$undo_id}"
+                                    <a value="1" id="{$undo_id}" name="{$undo_id}"
                                             class="btn btn-default">
                                         <i class="icon-undo"></i> {$i18n['undo_btn']}
-                                    </button>
+                                    </a>
 
                                 </div>
 
