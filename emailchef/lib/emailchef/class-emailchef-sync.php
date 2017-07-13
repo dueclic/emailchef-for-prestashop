@@ -791,6 +791,7 @@ class PS_Emailchef_Sync
             'first_name'    => $customer->firstname,
             'last_name'     => $customer->lastname,
             'user_email'    => $customer->email,
+            'gender'        => $this->get_gender($customer->id_gender),
             'birthday'      => $this->get_birthday($customer->birthday),
             'language'      => $this->get_lang($customer->id_lang),
             'currency'      => CurrencyCore::getDefaultCurrency()->iso_code,
