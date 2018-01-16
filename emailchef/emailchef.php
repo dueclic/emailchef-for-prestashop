@@ -107,7 +107,25 @@ class Emailchef extends Module {
 		return Db::getInstance()->execute( $drop_table_sql );
 	}
 
-	public function install() {
+	public function runUpgradeModule()
+    {
+        if ( $this->emailchef()->isLogged() ) {
+            $list_id = $this->_getConf("list");
+            $this->emailchef()->upsert_integration($list_id);
+        }
+        return parent::runUpgradeModule();
+    }
+
+    public function enable($forceAll = false)
+    {
+        if ( $this->emailchef()->isLogged() ) {
+            $list_id = $this->_getConf("list");
+            $this->emailchef()->upsert_integration($list_id);
+        }
+        return parent::enable($forceAll);
+    }
+
+    public function install() {
 		Configuration::updateValue( 'EC_SALT', Tools::passwdGen( 16 ) );
 
 		return (
@@ -122,7 +140,7 @@ class Emailchef extends Module {
 			$this->registerHook( 'actionObjectLanguageAddAfter' ) &&
 			$this->registerHook( 'actionObjectLanguageUpdateAfter' ) &&
 			$this->registerHook( 'actionObjectLanguageDeleteAfter' ) &&
-			$this->registerHook( "backOfficeFooter" ) &&
+			$this->registerHook( 'backOfficeFooter' ) &&
 			$this->registerHook( 'footer' ) &&
 			$this->create_emailchef_tables()
 		);
@@ -147,8 +165,8 @@ class Emailchef extends Module {
 			$this->unregisterHook( 'actionObjectLanguageAddAfter' ) &&
 			$this->unregisterHook( 'actionObjectLanguageUpdateAfter' ) &&
 			$this->unregisterHook( 'actionObjectLanguageDeleteAfter' ) &&
-			$this->unregisterHook( "backOfficeFooter" ) &&
-			$this->unregisterHook( 'footer' ) &&
+			$this->unregisterHook( 'backOfficeFooter' ) &&
+            $this->unregisterHook( 'footer' ) &&
 			$this->drop_emailchef_tables()
 		);
 	}
@@ -156,7 +174,6 @@ class Emailchef extends Module {
 	public function getContent() {
 
 		$output = null;
-
 
 		if ( Tools::isSubmit( 'submit' . $this->name ) ) {
 			$ec_lang        = strval( Tools::getValue( $this->prefix_setting( 'lang' ) ) );

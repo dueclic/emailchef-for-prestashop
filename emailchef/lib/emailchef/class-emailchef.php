@@ -49,7 +49,118 @@ class PS_Emailchef extends PS_Emailchef_Api {
 		return $account['mode'];
 	}
 
-	/**
+    /**
+     * Get integrations
+     *
+     * @return string
+     */
+
+    public function get_meta_integrations()
+    {
+        $integrations = $this->get("/meta/integrations", array(), "GET");
+        return $integrations;
+    }
+
+
+    /**
+     * Get integrations from eMailChef List
+     *
+     * @param $list_id
+     *
+     * @return mixed
+     */
+
+    public function get_integrations($list_id)
+    {
+        $route = sprintf("/lists/%d/integrations", $list_id);
+        return $this->get($route, array(), "GET", false, "debug");
+    }
+
+    /**
+     * Upsert integrations yo eMailChef List
+     *
+     * @param $list_id
+     *
+     * @return mixed
+     */
+
+    public function upsert_integration($list_id) {
+        $integrations = $this->get_integrations($list_id);
+        foreach ($integrations as $integration) {
+            if ($integration["id"] == 2 && $integration["website"] == _PS_BASE_URL_)
+                return $this->update_integration($integration["row_id"], $list_id);
+        }
+        return $this->create_integration($list_id);
+    }
+
+    /**
+     * Upsert integrations yo eMailChef List
+     *
+     * @param $list_id
+     * @param $integration_id
+     *
+     * @return mixed
+     */
+
+    public function update_integration($integration_id, $list_id) {
+
+        $args = array(
+
+            "instance_in" => array(
+                "list_id" => $list_id,
+                "integration_id" => 2,
+                "website" => _PS_BASE_URL_,
+            )
+
+        );
+
+        $response = $this->get("/integrations/".$integration_id, $args, "PUT");
+
+        if ($response['status'] != "OK") {
+            $this->lastError    = $response['message'];
+            $this->lastResponse = $response;
+
+            return false;
+        }
+
+        return $response['integration_id'];
+
+    }
+
+    /**
+     * Get integrations from eMailChef List
+     *
+     * @param $list_id
+     *
+     * @return mixed
+     */
+
+    public function create_integration($list_id) {
+
+        $args = array(
+
+            "instance_in" => array(
+                "list_id" => $list_id,
+                "integration_id" => 2,
+                "website" => _PS_BASE_URL_,
+            )
+
+        );
+
+        $response = $this->get("/integrations", $args, "POST");
+
+        if ($response['status'] != "OK") {
+            $this->lastError    = $response['message'];
+            $this->lastResponse = $response;
+
+            return false;
+        }
+
+        return $response['id'];
+
+    }
+
+    /**
 	 * Get lists from eMailChef
 	 *
 	 * @param array $args
@@ -241,6 +352,12 @@ class PS_Emailchef extends PS_Emailchef_Api {
 
 			"instance_in" => array(
 				"list_name" => $name,
+                "integrations" => array(
+                    array(
+                        "integration_id" => 2,
+                        "website" => _PS_BASE_URL_
+                    )
+                )
 			)
 
 		);

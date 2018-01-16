@@ -82,7 +82,9 @@ final class EmailchefAjaxRequest {
 				return $response;
 			}
 
-			$init = $psec->initialize_custom_fields( $args['list_id'] );
+            $psec->upsert_integration($args['list_id']);
+
+            $init = $psec->initialize_custom_fields( $args['list_id'] );
 
 			if ( $init ) {
 
