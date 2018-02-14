@@ -135,8 +135,6 @@ final class EmailchefAjaxRequest {
 
 	public function ajax_emailchefabandonedcart($args) {
 
-		error_reporting(0);
-
 		$psec    = $this->module->emailchef();
 		$list_id = $this->module->_getConf( "list" );
 
@@ -322,8 +320,6 @@ final class EmailchefAjaxRequest {
 
 	public function ajax_emailchefsync( $args ) {
 
-		error_reporting( 0 );
-
 		require_once( dirname( __FILE__ ) . "/lib/emailchef/class-emailchef-sync.php" );
 
 		$psec    = $this->module->emailchef();
@@ -339,15 +335,19 @@ final class EmailchefAjaxRequest {
 		if ( $psec->isLogged() ) {
 
 			$sync = new PS_Emailchef_Sync();
-
 			$customers = $sync->getCustomersData();
 
-			foreach ( $customers as $customer ) {
+			$this->module->emailchef()->import(
+			    $list_id,
+                $customers
+            );
+
+			/*foreach ( $customers as $customer ) {
 				$this->module->emailchef()->upsert_customer(
 					$list_id,
 					$customer
 				);
-			}
+			}*/
 
 			$abandoned_carts = $sync->getAbandonedCarts();
 
@@ -402,4 +402,4 @@ final class EmailchefAjaxRequest {
 }
 
 $emailchef = EmailchefAjaxRequest::get_instance();
-$emailchef->route( Tools::getAllValues() );
+$emailchef->route( $_POST + $_GET );

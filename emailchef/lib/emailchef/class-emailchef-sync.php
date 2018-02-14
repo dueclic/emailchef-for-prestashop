@@ -287,9 +287,9 @@ class PS_Emailchef_Sync
             }
         );
 
-        $product = new ProductCore($products[0]['id_product'], false, (int)Configuration::get('PS_LANG_DEFAULT'));
+        $product = new Product($products[0]['id_product'], false, (int)Configuration::get('PS_LANG_DEFAULT'));
 
-        $image      = new ImageCore($product->getCoverWs());
+        $image      = new Image($product->getCoverWs());
         $image_path = _PS_BASE_URL_._THEME_PROD_DIR_.$image->getExistingImgPath().".jpg";
 
         return array(
@@ -542,11 +542,11 @@ class PS_Emailchef_Sync
     private function getCustomerData(array $customer)
     {
 
-        $address = new AddressCore(
+        $address = new Address(
             AddressCore::getFirstCustomerAddressId($customer['id_customer'])
         );
 
-        $customerob = new CustomerCore($customer['id_customer']);
+        $customerob = new Customer($customer['id_customer']);
 
         $data = array(
             'first_name'        => $customerob->firstname,
@@ -575,7 +575,7 @@ class PS_Emailchef_Sync
 
         if ($latest_order_id !== null) {
 
-            $latest_order        = new OrderCore($latest_order_id);
+            $latest_order        = new Order($latest_order_id);
             $latest_order_date   = $this->get_date($latest_order->date_add);
             $latest_order_status = $latest_order->getCurrentStateFull(
                 (int)Configuration::get('PS_LANG_DEFAULT')
@@ -603,7 +603,7 @@ class PS_Emailchef_Sync
 
         if ($latest_shipped_completed_order_id !== null) {
 
-            $latest_order          = new OrderCore($latest_shipped_completed_order_id);
+            $latest_order          = new Order($latest_shipped_completed_order_id);
             $latest_order_date_upd = $this->get_date($latest_order->date_upd);
             $latest_order_status   = $latest_order->getCurrentStateFull(
                 (int)Configuration::get('PS_LANG_DEFAULT')
@@ -809,7 +809,21 @@ class PS_Emailchef_Sync
         $data = array();
 
         foreach (CustomerCore::getCustomers() as $customer) {
-            $data[] = $this->getCustomerData($customer);
+
+            $curCustomer = array();
+
+            foreach ($this->getCustomerData($customer) as $placeholder => $value){
+
+                if ($placeholder == "user_email")
+                    $placeholder = "email";
+
+                $curCustomer[] = array(
+                    "placeholder" => $placeholder,
+                    "value" => $value
+                );
+            }
+
+            $data[] = $curCustomer;
         }
 
         return $data;
