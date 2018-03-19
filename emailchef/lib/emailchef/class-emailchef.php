@@ -555,6 +555,10 @@ class PS_Emailchef extends PS_Emailchef_Api {
 			return true;
 		}
 
+		if ( isset( $response['contact_added_to_list'] ) && !$response['contact_added_to_list'] && $response["updated"] ) {
+			return true;
+		}
+
 		$this->lastError = $response['message'];
 
 		return false;
@@ -653,19 +657,7 @@ class PS_Emailchef extends PS_Emailchef_Api {
 	 */
 
 	public function upsert_customer( $list_id, $customer ) {
-
-		$path = "/contacts";
-
-		$route = sprintf( "%s?query_string=%s&limit=10&offset=0&list_id=%d&orderby=e&ordertype=a", $path, $customer['user_email'], $list_id );
-
-		$ec_customer = $this->get( $route, array(), "GET" );
-
-		if ( empty( $ec_customer ) ) {
-			return $this->insert_customer( $list_id, $customer );
-		}
-
-		return $this->update_customer( $list_id, $customer, $ec_customer[0]['id'] );
-
+		return $this->insert_customer( $list_id, $customer );
 	}
 
 }

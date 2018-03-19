@@ -51,7 +51,7 @@ class Emailchef extends Module {
 	public function __construct() {
 		$this->name                   = 'emailchef';
 		$this->tab                    = 'emailing';
-		$this->version                = '1.0.2';
+		$this->version                = '1.0.3';
 		$this->author                 = 'dueclic';
 		$this->need_instance          = 0;
 		$this->bootstrap              = true;
@@ -222,9 +222,10 @@ EOF;
 	}
 
 	private function sync_abandoned_cart() {
-		if ( $this->emailchef()->isLogged() ) {
 
-			$output = null;
+		$output = '<script type="text/javascript" src="' . $this->_path . 'js/plugins/emailchef/jquery.emailchef.js"></script>';
+
+		if ( $this->emailchef()->isLogged() ) {
 
 			require_once( dirname( __FILE__ ) . "/lib/emailchef/class-emailchef-sync.php" );
 			$sync = new PS_Emailchef_Sync();
@@ -242,11 +243,10 @@ EOF;
 				$output                  .= '<script type="text/javascript" src="' . $this->_path . 'js/plugins/emailchef/jquery.emailchef.abandoned.js"></script>';
 			}
 
-			return $output;
 
 		}
 
-		return "";
+		return $output;
 
 	}
 
@@ -491,7 +491,6 @@ EOF;
 
 	public function hookBackOfficeHeader( $arr ) {
 		if ( strtolower( Tools::getValue( 'controller' ) ) == 'adminmodules' && Tools::getValue( 'configure' ) == "emailchef" ) {
-			$this->context->controller->addJS( $this->_path . 'js/plugins/emailchef/jquery.emailchef.js' );
 			$this->context->controller->addCSS( $this->_path . "js/plugins/emailchef/jquery.emailchef.css" );
 		}
 	}
