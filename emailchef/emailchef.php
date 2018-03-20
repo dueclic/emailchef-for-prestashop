@@ -834,7 +834,7 @@ EOF;
 	}
 
 	public function hookActionObjectAddressUpdateAfter( $params ) {
-		return $this->update_customer( $params['object'], "edit" );
+		return $this->update_customer( $params['object'] );
 	}
 
 	public function hookActionObjectLanguageAddAfter( $params ) {
