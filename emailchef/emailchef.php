@@ -51,7 +51,7 @@ class Emailchef extends Module {
 	public function __construct() {
 		$this->name                   = 'emailchef';
 		$this->tab                    = 'emailing';
-		$this->version                = '1.0.3';
+		$this->version                = '1.0.4';
 		$this->author                 = 'dueclic';
 		$this->need_instance          = 0;
 		$this->bootstrap              = true;
@@ -95,7 +95,7 @@ class Emailchef extends Module {
 		$create_table_sql = 'CREATE TABLE IF NOT EXISTS `' . $this->category_table . '` (
         `id_cart` INT UNSIGNED NOT NULL,
         `date_synced` DATETIME NOT NULL,
-        PRIMARY KEY (`id_cart`)
+        UNIQUE (`id_cart`)
         ) ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci ;';
 
 		return Db::getInstance()->execute( $create_table_sql );
@@ -218,12 +218,13 @@ EOF;
 			}
 		}
 
-		return $output . $this->displayForm();
+		return $output . $this->displayForm() . '<script type="text/javascript" src="' . $this->_path . 'js/plugins/emailchef/jquery.emailchef.js"></script>';
+		;
 	}
 
 	private function sync_abandoned_cart() {
 
-		$output = '<script type="text/javascript" src="' . $this->_path . 'js/plugins/emailchef/jquery.emailchef.js"></script>';
+		$output = "";
 
 		if ( $this->emailchef()->isLogged() ) {
 
