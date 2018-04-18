@@ -355,7 +355,7 @@ final class EmailchefAjaxRequest {
 					);
 				}
 
-				if (count($data) > 200) {
+				if (count($data) > 100) {
 					$this->module->emailchef()->import($list_id, $data);
 					$data = array();
 					$data[] = $curCustomer;
