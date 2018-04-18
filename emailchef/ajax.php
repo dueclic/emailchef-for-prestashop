@@ -320,6 +320,8 @@ final class EmailchefAjaxRequest {
 
 	public function ajax_emailchefsync( $args ) {
 
+		set_time_limit(0);
+
 		require_once( dirname( __FILE__ ) . "/lib/emailchef/class-emailchef-sync.php" );
 
 		$psec    = $this->module->emailchef();
@@ -335,36 +337,37 @@ final class EmailchefAjaxRequest {
 		if ( $psec->isLogged() ) {
 
 			$sync = new PS_Emailchef_Sync();
-			$customers = $sync->getCustomersData();
 
-			$this->module->emailchef()->import(
-			    $list_id,
-                $customers
-            );
+			$data = array();
 
-			/*foreach ( $customers as $customer ) {
-				$this->module->emailchef()->upsert_customer(
-					$list_id,
-					$customer
-				);
-			}*/
+			foreach (CustomerCore::getCustomers() as $customer) {
 
-			$abandoned_carts = $sync->getAbandonedCarts();
+				$curCustomer = array();
 
-			foreach ($abandoned_carts as $cart) {
-				Db::getInstance()->insert("emailchef_abcart_synced", array(
-					'id_cart' => $cart['total'],
-					'date_synced' => date("Y-m-d H:i:s")
-				));
+				foreach ($sync->getCustomerData($customer) as $placeholder => $value){
+
+					if ($placeholder == "user_email")
+						$placeholder = "email";
+
+					$curCustomer[] = array(
+						"placeholder" => $placeholder,
+						"value" => $value
+					);
+				}
+
+				if (count($data) > 200) {
+					$this->module->emailchef()->import($list_id, $data);
+					$data = array();
+					$data[] = $curCustomer;
+				}
+				else {
+					$data[] = $curCustomer;
+				}
+
 			}
 
-			$this->module->log(
-				sprintf(
-					$this->module->l( 'Per la lista %d tutti i carrelli abbandonati vecchi sono stati scartati.' ),
-					$list_id
-				)
-			);
-
+			if (count($data) > 0)
+				$this->module->emailchef()->import($list_id, $data);
 
 			$response = array(
 				'status' => 'success',

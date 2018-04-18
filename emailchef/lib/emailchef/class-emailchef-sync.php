@@ -539,7 +539,7 @@ class PS_Emailchef_Sync
      *
      * @return array
      */
-    private function getCustomerData(array $customer)
+    public function getCustomerData(array $customer)
     {
 
         $address = new Address(
@@ -803,7 +803,7 @@ class PS_Emailchef_Sync
 
     }
 
-    public function getCustomersData()
+    public function importCustomersData()
     {
 
         $data = array();
