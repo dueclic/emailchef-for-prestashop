@@ -45,6 +45,11 @@ class EmailchefVerificationModuleFrontController extends ModuleFrontController
 		parent::initContent();
 
 		$this->context->smarty->assign('message', $this->message);
-		$this->setTemplate('verification_emailchef.tpl');
+		if (version_compare(_PS_VERSION_, '1.7.0', '>=') === true) {
+			$this->setTemplate( "module:emailchef/views/templates/front/17/verification_emailchef.tpl" );
+		}
+		else {
+			$this->setTemplate( 'verification_emailchef.tpl' );
+		}
 	}
 }

@@ -1,7 +1,6 @@
 {extends file="helpers/form/form.tpl"}
 
-{block name="legend"}
-    {$smarty.block.parent}
+{block name="legend" append}
     <div class="emailchef-image row">
         <div class="col-lg-9 col-lg-offset-3">
             <img src="{$logo_url}" alt="eMailChef Logo">
@@ -84,8 +83,7 @@
             <div class="select_and_create_clear"></div>
         {/if}
 
-        {block name='label'}
-            {$smarty.block.parent}
+        {block name='label' append}
         {/block}
 
     {elseif $input.type == "password"}
@@ -129,9 +127,7 @@
     {/if}
 {/block}
 
-{block name="input_row"}
-
-    {$smarty.block.parent}
+{block name="input_row" append}
 
     {if $input.type == "select_and_create"}
         <div class="list_creation" data-ajax-action="{$ajax_url}">
@@ -407,8 +403,7 @@
     {/if}
 
 {/block}
-{block name="footer"}
-    {$smarty.block.parent}
+{block name="footer" append}
     <script>
         var i18n = {
             'no_list_found': '{$i18n['no_list_found']}',

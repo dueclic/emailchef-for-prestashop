@@ -44,6 +44,13 @@ class EmailchefUnsubscribeModuleFrontController extends ModuleFrontController
 	{
 		parent::initContent();
 		$this->context->smarty->assign('message', $this->message);
-		$this->setTemplate('unsubscribe_emailchef.tpl');
+
+		if (version_compare(_PS_VERSION_, '1.7.0', '>=') === true) {
+			$this->setTemplate( "module:emailchef/views/templates/front/17/unsubscribe_emailchef.tpl" );
+		}
+		else {
+			$this->setTemplate( 'unsubscribe_emailchef.tpl' );
+		}
+
 	}
 }

@@ -51,7 +51,7 @@ class Emailchef extends Module {
 	public function __construct() {
 		$this->name                   = 'emailchef';
 		$this->tab                    = 'emailing';
-		$this->version                = '1.0.5';
+		$this->version                = '1.0.6';
 		$this->author                 = 'dueclic';
 		$this->need_instance          = 0;
 		$this->bootstrap              = true;
@@ -296,7 +296,7 @@ EOF;
 	}
 
 
-	public function l( $string, $specific = false ) {
+	public function l( $string, $specific = false, $locale = null ) {
 
 		$string   = preg_replace( "/\\\*'/", "\'", $string );
 		$pack_key = '<{emailchef}prestashop>emailchef_' . md5( $string );
