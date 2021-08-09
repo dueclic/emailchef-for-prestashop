@@ -1,5 +1,7 @@
 <?php
 
+define("MAX_CONTACTS", 2000);
+
 require_once( dirname( __FILE__ ) . '../../../config/config.inc.php' );
 require_once( dirname( __FILE__ ) . '../../../init.php' );
 
@@ -340,7 +342,20 @@ final class EmailchefAjaxRequest {
 
 			$data = array();
 
-			foreach (CustomerCore::getCustomers() as $customer) {
+			$start = isset( $_POST['offset'] ) ? $_POST['offset'] : 0;
+            $limit = isset( $_POST['limit'] ) ? $_POST['limit'] : 0;
+
+            if ($limit == 0){
+                $customers = CustomerCore::getCustomers();
+            } else {
+                $customers = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS('
+            SELECT `id_customer`, `email`, `firstname`, `lastname`
+            FROM `'._DB_PREFIX_.'customer` ORDER BY `id_customer` ASC LIMIT '.$limit.' OFFSET '.$start
+                );
+            }
+
+
+			foreach ($customers as $customer) {
 
 				$curCustomer = array();
 
@@ -355,7 +370,7 @@ final class EmailchefAjaxRequest {
 					);
 				}
 
-				if (count($data) > 100) {
+				if (count($data) > MAX_CONTACTS) {
 					$this->module->emailchef()->import($list_id, $data);
 					$data = array();
 					$data[] = $curCustomer;

@@ -51,7 +51,7 @@ class Emailchef extends Module {
 	public function __construct() {
 		$this->name                   = 'emailchef';
 		$this->tab                    = 'emailing';
-		$this->version                = '1.0.6';
+		$this->version                = '1.0.7';
 		$this->author                 = 'dueclic';
 		$this->need_instance          = 0;
 		$this->bootstrap              = true;
@@ -219,7 +219,6 @@ EOF;
 		}
 
 		return $output . $this->displayForm() . '<script type="text/javascript" src="' . $this->_path . 'js/plugins/emailchef/jquery.emailchef.js"></script>';
-		;
 	}
 
 	private function sync_abandoned_cart() {
