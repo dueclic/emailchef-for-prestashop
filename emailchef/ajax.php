@@ -178,14 +178,16 @@ final class EmailchefAjaxRequest {
 
 					$ids[] = $cart['total'];
 
+                    $psec->upsert_customer($list_id, $customer );
+
+                    Db::getInstance()->insert("emailchef_abcart_synced", array(
+                        'id_cart' => $cart['total'],
+                        'date_synced' => date("Y-m-d H:i:s")
+                    ));
+
 				}
 
-				$psec->upsert_customer($list_id, $customer );
 
-				Db::getInstance()->insert("emailchef_abcart_synced", array(
-					'id_cart' => $cart['total'],
-					'date_synced' => date("Y-m-d H:i:s")
-				));
 
 			}
 
