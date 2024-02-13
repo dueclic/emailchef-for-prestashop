@@ -43,7 +43,7 @@ class EmailchefEmailchefModuleFrontController extends ModuleFrontController
     public function initContent()
     {
         parent::initContent();
-        die(Tools::jsonEncode(array(
+        die(json_encode(array(
             "is_active" => $this->module->_getConf("list") !== false,
             "list_id" => $this->module->_getConf("list")
         )));

@@ -46,12 +46,12 @@ final class EmailchefAjaxRequest {
 
 				$response['msg'] = $this->module->l( 'Errore: eccezione ' ) . $e->getMessage();
 
-				die( Tools::jsonEncode( $response ));
+				die( json_encode( $response ));
 			}
 		}
 
 		die(
-		Tools::jsonEncode( $response )
+        json_encode( $response )
 		);
 
 	}
