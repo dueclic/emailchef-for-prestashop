@@ -46,8 +46,6 @@ class Emailchef extends Module {
 	private $emailchef;
 	private $category_table;
 	private $newsletter_before = 0;
-	private $cached_trans;
-
 	public function __construct() {
 		$this->name                   = 'emailchef';
 		$this->tab                    = 'emailing';
@@ -57,7 +55,6 @@ class Emailchef extends Module {
 		$this->bootstrap              = true;
 		$this->ps_versions_compliancy = array( 'min' => '1.6', 'max' => _PS_VERSION_ );
 		$this->controllers            = array( 'verification', 'unsubscribe' );
-		$this->cached_trans           = false;
 
 		parent::__construct();
 
@@ -292,41 +289,6 @@ EOF;
 
 	public function prefix_setting( $setting ) {
 		return $this->namespace . "_" . $setting;
-	}
-
-
-	public function l( $string, $specific = false, $locale = null ) {
-
-		$string   = preg_replace( "/\\\*'/", "\'", $string );
-		$pack_key = '<{emailchef}prestashop>emailchef_' . md5( $string );
-
-		if ( $this->cached_trans == false ) {
-
-			$language_folder  = PS_EMAILCHEF_DIR . "/languages";
-			$default_language = $language_folder . "/en.php";
-
-			if ( ( $lang = self::_getConf( "lang" ) ) !== false ) {
-
-				$current_language = $language_folder . "/" . $lang . ".php";
-
-				if ( file_exists( $current_language ) && $current_language !== $default_language ) {
-					$pack               = require_once( $current_language );
-					$this->cached_trans = $pack;
-
-					return $pack[ $pack_key ];
-
-				}
-
-			}
-			$this->cached_trans = require_once( $default_language );
-		}
-
-		if ( ! isset( $this->cached_trans[ $pack_key ] ) ) {
-			return parent::l( $string, $specific );
-		}
-
-		return $this->cached_trans[ $pack_key ];
-
 	}
 
 	public function displayForm() {
