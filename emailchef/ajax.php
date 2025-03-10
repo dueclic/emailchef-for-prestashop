@@ -44,7 +44,7 @@ final class EmailchefAjaxRequest {
 				$response = call_user_func( array( $this, $method ), $args );
 			} catch ( \Exception $e ) {
 
-				$response['msg'] = $this->module->l( 'Errore: eccezione ' ) . $e->getMessage();
+				$response['msg'] = $this->module->l( 'Error exception: ' ) . $e->getMessage();
 
 				die( json_encode( $response ));
 			}
@@ -59,7 +59,7 @@ final class EmailchefAjaxRequest {
 	private function _errorRequest() {
 		return array(
 			'type' => 'error',
-			'msg'  => $this->module->l( 'Route non valida' )
+			'msg'  => $this->module->l( 'Route invalid' )
 		);
 	}
 
@@ -73,13 +73,13 @@ final class EmailchefAjaxRequest {
 
 		$response = array(
 			'type' => 'error',
-			'msg'  => $this->module->l( 'Username o password non corretti.' )
+			'msg'  => $this->module->l( 'Username or password are wrong.' )
 		);
 
 		if ( $psec->isLogged() ) {
 
 			if ( ! $args['list_id'] || empty( $args['list_id'] ) ) {
-				$response['msg'] = $this->module->l( 'Lista assegnata non valida.' );
+				$response['msg'] = $this->module->l( 'Lista provided is not valid.' );
 
 				return $response;
 			}
@@ -91,11 +91,11 @@ final class EmailchefAjaxRequest {
 			if ( $init ) {
 
 				$response['type'] = "success";
-				$response['msg']  = $this->module->l( "Custom fields creati con successo." );
+				$response['msg']  = $this->module->l( "Custom fields created successfully." );
 
 				$this->module->log(
 					sprintf(
-						$this->module->l( 'Creati custom fields per la lista %d' ),
+						$this->module->l( 'Custom fields created for list %d' ),
 						$args['list_id']
 					)
 				);
@@ -108,7 +108,7 @@ final class EmailchefAjaxRequest {
 
 			$this->module->log(
 				sprintf(
-					$this->module->l( 'Tentativo fallito di creazione dei custom fields per la lista %d' ),
+					$this->module->l( 'Failed attempt to create custom fields for list %d' ),
 					$args['list_id']
 				),
 				3
@@ -146,7 +146,7 @@ final class EmailchefAjaxRequest {
 
 			$this->module->log(
 				sprintf(
-					$this->module->l( 'Avviata esportazione dei carrelli abbandonati per la lista %d' ),
+					$this->module->l( 'Started exporting abandoned carts for list %d' ),
 					$list_id
 				)
 			);
@@ -193,7 +193,7 @@ final class EmailchefAjaxRequest {
 
 			$response = array(
 				'status' => 'success',
-				'msg'    => $this->module->l( 'Esportazione carrelli abbandonati avvenuta con successo.' ),
+				'msg'    => $this->module->l( 'Abandoned cart export completed successfully.' ),
 				'abandoned' => $abandoned
 			);
 
@@ -203,12 +203,12 @@ final class EmailchefAjaxRequest {
 		else {
 			$response = array(
 				'type' => 'error',
-				'msg'  => $this->module->l( 'Username o password non corretti.' )
+				'msg'  => $this->module->l( 'Username or password are wrong.' )
 			);
 
 			$this->module->log(
 				sprintf(
-					$this->module->l( 'Esportazione dei carrelli abbandonati per la lista %d non avvenuta. Motivo errore: %s' ),
+					$this->module->l( 'Abandoned cart export for list %d failed. Error reason: %s' ),
 					$list_id,
 					$response['msg']
 				)
@@ -231,13 +231,13 @@ final class EmailchefAjaxRequest {
 
 		$response = array(
 			'type' => 'error',
-			'msg'  => $this->module->l( 'Username o password non corretti.' )
+			'msg'  => $this->module->l( 'Username or password are wrong.' )
 		);
 
 		if ( $psec->isLogged() ) {
 
 			if ( ! $args['list_name'] || empty( $args['list_name'] ) ) {
-				$response['msg'] = $this->module->l( 'Inserisci un nome e una descrizione per la nuova lista' );
+				$response['msg'] = $this->module->l( 'Enter a name and description for the new list.' );
 
 				return $response;
 			}
@@ -253,12 +253,12 @@ final class EmailchefAjaxRequest {
 			if ( $list_id !== false ) {
 
 				$response['type']    = "success";
-				$response['msg']     = $this->module->l( "Lista creata con successo." );
+				$response['msg']     = $this->module->l( "List created successfully." );
 				$response['list_id'] = $list_id;
 
 				$this->module->log(
 					sprintf(
-						$this->module->l( 'Creata lista %d (Name: %s, Descrizione: %s)' ),
+						$this->module->l( 'List %d created (Name: %s, Description: %s)' ),
 						$list_id,
 						$args['list_name'],
 						$args['list_desc']
@@ -273,7 +273,7 @@ final class EmailchefAjaxRequest {
 
 			$this->module->log(
 				sprintf(
-					$this->module->l( 'Tentativo fallito di creazione della lista %d (Name: %s, Descrizione: %s)' ),
+					$this->module->l( 'Failed attempt to create list %d (Name: %s, Description: %s)' ),
 					$list_id,
 					$args['list_name'],
 					$args['list_desc']
@@ -299,7 +299,7 @@ final class EmailchefAjaxRequest {
 
 			$response = array(
 				'status' => 'success',
-				'msg'    => $this->module->l( 'Utente loggato con successo.' ),
+				'msg'    => $this->module->l( 'User logged in successfully.' ),
 				'policy' => $psec->get_policy(),
 				'lists'  => $psec->get_lists()
 			);
@@ -313,7 +313,7 @@ final class EmailchefAjaxRequest {
 
 			$response = array(
 				'type' => 'error',
-				'msg'  => $this->module->l( 'Username o password non corretti.' )
+				'msg'  => $this->module->l( 'Username or password are wrong.' )
 			);
 
 		}
@@ -333,7 +333,7 @@ final class EmailchefAjaxRequest {
 
 		$this->module->log(
 			sprintf(
-				$this->module->l( 'Avviata sincronizzazione iniziale per la lista %d' ),
+				$this->module->l( 'Initial synchronization started for list %d.' ),
 				$list_id
 			)
 		);
@@ -388,12 +388,12 @@ final class EmailchefAjaxRequest {
 
 			$response = array(
 				'status' => 'success',
-				'msg'    => $this->module->l( 'Esportazione iniziale avvenuta con successo.' ),
+				'msg'    => $this->module->l( 'Initial export completed successfully.' ),
 			);
 
 			$this->module->log(
 				sprintf(
-					$this->module->l( 'Esportazione per la lista %d avvenuta con successo.' ),
+					$this->module->l( 'Export for list %d completed successfully.' ),
 					$list_id
 				)
 			);
@@ -403,12 +403,12 @@ final class EmailchefAjaxRequest {
 
 			$response = array(
 				'type' => 'error',
-				'msg'  => $this->module->l( 'Username o password non corretti.' )
+				'msg'  => $this->module->l( 'Username or password are wrong.' )
 			);
 
 			$this->module->log(
 				sprintf(
-					$this->module->l( 'Esportazione per la lista %d non avvenuta. Motivo errore: %s' ),
+					$this->module->l( 'Export for list %d failed. Error reason: %s' ),
 					$list_id,
 					$response['msg']
 				)
