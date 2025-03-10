@@ -61,7 +61,7 @@ class Emailchef extends Module {
 		$this->category_table   = _DB_PREFIX_ . "emailchef_abcart_synced";
 		$this->displayName      = $this->l( 'eMailChef' );
 		$this->description      = 'Using this PrestaShop module, eMailChef can communicate with your online store and it creates easy, simply and automatic targeted campaigns.';
-		$this->confirmUninstall = $this->l( 'Sei sicuro di voler disinstallare questo modulo?' );
+		$this->confirmUninstall = $this->l( 'Do you really want to uninstall this module?' );
 		$this->emailchef();
 	}
 
@@ -182,13 +182,13 @@ class Emailchef extends Module {
 			$ec_list_old = $this->_getConf( "list" );
 
 			if ( ! $ec_username || empty( $ec_username ) || ! Validate::isGenericName( $ec_username ) ) {
-				$output .= $this->displayError( $this->l( 'Inserisci uno username valido.' ) );
+				$output .= $this->displayError( $this->l( 'Please, enter a valid username.' ) );
 			} else {
 				if ( ! $ec_password || empty( $ec_password ) || ! Validate::isGenericName( $ec_password ) ) {
-					$output .= $this->displayError( $this->l( 'Inserisci una password valida.' ) );
+					$output .= $this->displayError( $this->l( 'Please, enter a valid password.' ) );
 				} else {
 					if ( ! $ec_list || empty( $ec_list ) ) {
-						$output .= $this->displayError( $this->l( 'Devi scegliere una lista.' ) );
+						$output .= $this->displayError( $this->l( 'Choose a list.' ) );
 					} else {
 						Configuration::updateValue( $this->prefix_setting( 'lang' ), $ec_lang );
 						Configuration::updateValue( $this->prefix_setting( 'username' ), $ec_username );
@@ -196,7 +196,7 @@ class Emailchef extends Module {
 						Configuration::updateValue( $this->prefix_setting( 'list' ), $ec_list );
 						Configuration::updateValue( $this->prefix_setting( 'policy_type' ), $ec_policy_type );
 
-						$output             .= $this->displayConfirmation( $this->l( 'Impostazioni salvate con successo.' ) );
+						$output             .= $this->displayConfirmation( $this->l( 'Settings saved.' ) );
 						$emailchef_cron_url = $this->_path . "/ajax.php";
 						$output             .= <<<EOF
 <script>
@@ -204,7 +204,7 @@ class Emailchef extends Module {
 </script>
 EOF;
 						if ( $ec_list_old != $ec_list ) {
-							$output .= $this->adminDisplayInformation( $this->l( "E' in esecuzione un processo automatico di esportazione dei dati relativi ai tuoi clienti verso eMailChef" ) );
+							$output .= $this->adminDisplayInformation( $this->l( "Your customer data is now being transferred to your eMailChef account." ) );
 
 							$this->context->controller->addJs( $this->_path . "js/plugins/emailchef/jquery.emailchef.cron.js" );
 						}
@@ -281,7 +281,7 @@ EOF;
 			return array(
 				array(
 					'id'   => - 1,
-					'name' => $this->l( 'Accedi per visualizzare le tue liste.' )
+					'name' => $this->l( 'Log in to manage your lists.' )
 				)
 			);
 		}
@@ -296,23 +296,23 @@ EOF;
 		$fields_form[0]['form'] = array(
 
 			'legend' => array(
-				'title' => $this->l( 'Impostazioni plugin' ),
+				'title' => $this->l( 'Plugin settings.' ),
 			),
 			'input'  => array(
 				array(
 					'type'     => 'select',
-					'label'    => $this->l( 'Lingua' ),
+					'label'    => $this->l( 'Language' ),
 					'name'     => $this->prefix_setting( 'lang' ),
 					'required' => true,
 					'options'  => array(
 						'query' => array(
 							array(
 								'id'   => 'en',
-								'name' => $this->l( 'Inglese' )
+								'name' => $this->l( 'English' )
 							),
 							array(
 								'id'   => 'it',
-								'name' => $this->l( 'Italiano' )
+								'name' => $this->l( 'Italian' )
 							),
 						),
 						'id'    => 'id',
@@ -333,8 +333,8 @@ EOF;
 				),
 				array(
 					'type'     => 'select_and_create',
-					'label'    => $this->l( 'Scegli la lista' ),
-					'desc'     => $this->l( 'Lista di destinazione' ),
+					'label'    => $this->l( 'Pick a list' ),
+					'desc'     => $this->l( 'Destination list' ),
 					'name'     => $this->prefix_setting( 'list' ),
 					'required' => true,
 					'options'  => array(
@@ -345,10 +345,10 @@ EOF;
 				),
 				array(
 					'type'     => 'select',
-					'label'    => $this->l( 'Policy attiva' ),
-					'desc'     => $this->l( 'Scegli che tipo di policy vuoi adottare' ),
+					'label'    => $this->l( 'Active policy' ),
+					'desc'     => $this->l( 'Which policy would you like to use?' ),
 					'name'     => $this->prefix_setting( 'policy_type' ),
-					'hint'     => $this->l( 'Puoi scegliere tra Double Opt-in e Single Opt-in' ),
+					'hint'     => $this->l( 'You can choose between Double Opt-in and Single Opt-in' ),
 					'required' => false,
 					'options'  => array(
 						'query' => array(
@@ -367,7 +367,7 @@ EOF;
 				)
 			),
 			'submit' => array(
-				'title' => $this->l( 'Salva ed esporta i contatti' ),
+				'title' => $this->l( 'Save and export your contacts.' ),
 				'class' => 'btn btn-default pull-right'
 			)
 		);
@@ -394,30 +394,30 @@ EOF;
 		);
 
 		$this->context->smarty->assign( 'i18n', array(
-			'create_destination_list'            => $this->l( 'Crea una nuova lista di destinazione' ),
-			'language_set'                       => $this->l( 'La lingua è stata caricata, vuoi aggiornare questa pagina nella lingua scelta?' ),
-			'create_list'                        => $this->l( 'Crea lista' ),
-			'name_list'                          => $this->l( 'Nome lista' ),
-			'name_list_placeholder'              => $this->l( 'Inserisci il nome della nuova lista' ),
-			'desc_list'                          => $this->l( 'Descrizione lista' ),
-			'desc_list_placeholder'              => $this->l( 'Inserisci la descrizione della nuova lista' ),
-			'accept_privacy'                     => $this->l( 'Creando una nuova lista certifichi che è conforme alla politica Anti-SPAM e all\' informativa sulla privacy.' ),
-			'undo_btn'                           => $this->l( 'Annulla' ),
-			'check_login_data'                   => $this->l( 'Controllo dei dati di accesso in corso...' ),
-			'error_login_data'                   => $this->l( 'I dati di accesso inseriti sono errati.' ),
-			'server_failure_login_data'          => $this->l( 'Errore interno del server, riprova.' ),
-			'success_login_data'                 => $this->l( 'Login con eMailChef effettuato con successo.' ),
-			'no_list_found'                      => $this->l( 'Nessuna lista trovata.' ),
-			'check_status_list_data'             => $this->l( 'Creazione della lista in corso...' ),
+			'create_destination_list'            => $this->l( 'Add a new destination list' ),
+			'language_set'                       => $this->l( 'Language was loaded, do you want refresh this page with new language?' ),
+			'create_list'                        => $this->l( 'Add a new list' ),
+			'name_list'                          => $this->l( 'List name' ),
+			'name_list_placeholder'              => $this->l( 'Provide a name for this new list' ),
+			'desc_list'                          => $this->l( 'List description' ),
+			'desc_list_placeholder'              => $this->l( 'Write a description for this list' ),
+			'accept_privacy'                     => $this->l( 'By creating a new list, you confirm its compliance with the privacy policy and the CAN-SPAM Act.' ),
+			'undo_btn'                           => $this->l( 'Cancel' ),
+			'check_login_data'                   => $this->l( 'Verifying your login data.' ),
+			'error_login_data'                   => $this->l( 'Incorrect login credentials.' ),
+			'server_failure_login_data'          => $this->l( 'Internal server error. Please try again.' ),
+			'success_login_data'                 => $this->l( 'You have successfully logged into eMailChef.' ),
+			'no_list_found'                      => $this->l( 'No list found.' ),
+			'check_status_list_data'             => $this->l( 'Making a new list, please wait...' ),
 			'check_status_list_data_cf'          => $this->l( 'Stiamo creando i custom fields per la lista appena creata...' ),
 			'check_status_list_data_cf_change'   => $this->l( 'Stiamo sistemando i custom fields per la lista appena scelta...' ),
-			'error_status_list_data'             => $this->l( 'Errore nella creazione della lista indicata.' ),
-			'error_status_list_data_cf'          => $this->l( 'Errore nella creazione dei custom fields per la lista creata.' ),
-			'error_status_list_data_cf_change'   => $this->l( 'Errore nella sistemazione dei custom fields per la lista scelta.' ),
-			'server_error_status_list_data'      => $this->l( 'Errore interno del server, riprova.' ),
-			'success_status_list_data'           => $this->l( 'La lista è stata creata con successo, ora verranno creati i custom fields.' ),
-			'success_status_list_data_cf'        => $this->l( 'Creazione dei custom fields per la lista avvenuta con successo.' ),
-			'success_status_list_data_cf_change' => $this->l( 'Sistemazione dei custom fields per la lista avvenuta con successo.' )
+			'error_status_list_data'             => $this->l( 'An error occurred while creating this list.' ),
+			'error_status_list_data_cf'          => $this->l( 'An error occurred while defining custom fields for this newly created list.' ),
+			'error_status_list_data_cf_change'   => $this->l( 'An error occurred while modifying custom fields for the chosen list.' ),
+			'server_error_status_list_data'      => $this->l( 'Internal server error. Please try again.' ),
+			'success_status_list_data'           => $this->l( 'Your list has been created. We’re now adding the custom fields.' ),
+			'success_status_list_data_cf'        => $this->l( 'Custom fields for this list have been successfully created.' ),
+			'success_status_list_data_cf_change' => $this->l( 'Custom fields for this list have been successfully modified.' )
 		) );
 
 		$helper->default_form_language    = $default_lang;
@@ -430,13 +430,13 @@ EOF;
 		$helper->toolbar_btn    = array(
 			'save' =>
 				array(
-					'desc' => $this->l( 'Salva' ),
+					'desc' => $this->l( 'Save.' ),
 					'href' => AdminController::$currentIndex . '&configure=' . $this->name . '&save' . $this->name .
 					          '&token=' . Tools::getAdminTokenLite( 'AdminModules' ),
 				),
 			'back' => array(
 				'href' => AdminController::$currentIndex . '&token=' . Tools::getAdminTokenLite( 'AdminModules' ),
-				'desc' => $this->l( 'Vai indietro' )
+				'desc' => $this->l( 'Go Back.' )
 			)
 		);
 
@@ -489,10 +489,10 @@ EOF;
 		}
 
 		if ( ! $activated ) {
-			return $this->l( "L' email fornita è già registrata o non valida." );
+			return $this->l( "Provided email address is either already in use or invalid." );
 		}
 
-		return $this->l( 'Grazie per esserti registrato alla nostra newsletter.' );
+		return $this->l( 'Thank you for subscribing to our newsletter!' );
 	}
 
 	/**
@@ -511,10 +511,10 @@ EOF;
 		}
 
 		if ( ! $deactivated ) {
-			return $this->l( "L' email fornita è già registrata o non valida." );
+			return $this->l( "Provided email address is either already in use or invalid." );
 		}
 
-		return $this->l( 'Ti sei disiscritto con successo dalla nostra newsletter.' );
+		return $this->l( 'You have successfully unsubscribed from our newsletter. ' );
 	}
 
 	/**
@@ -562,7 +562,7 @@ EOF;
 			if ( $upsert ) {
 				$this->log(
 					sprintf(
-						$this->l( "Disiscrizione nella lista %d del cliente %d (Nome: %s Cognome: %s Email: %s)" ),
+						$this->l( "Unsubscribe from customer %d list %d (Name: %s Surname: %s Email: %s)" ),
 						$list_id,
 						$customer_id,
 						$customer->firstname,
@@ -573,7 +573,7 @@ EOF;
 			} else {
 				$this->log(
 					sprintf(
-						$this->l( "Disiscrizione non avvenuta nella lista %d del cliente %d (Nome: %s Cognome: %s Email: %s)" ),
+						$this->l( "Failed unsubscribe from customer %d list %d (Name: %s Surname: %s Email: %s)" ),
 						$list_id,
 						$customer_id,
 						$customer->firstname,
@@ -635,7 +635,7 @@ EOF;
 			if ( $upsert ) {
 				$this->log(
 					sprintf(
-						$this->l( "Conferma double opt-in nella lista %d del cliente %d (Nome: %s Cognome: %s Email: %s)" ),
+						$this->l( "Double opt-in confirmation from customer %d list %d ((Name: %s Surname: %s Email: %s)" ),
 						$list_id,
 						$customer_id,
 						$customer->firstname,
@@ -646,7 +646,7 @@ EOF;
 			} else {
 				$this->log(
 					sprintf(
-						$this->l( "Conferma double opt-in non avvenuta nella lista %d del cliente %d (Nome: %s Cognome: %s Email: %s)" ),
+						$this->l( "Failed double opt-in confirmation from client %d list %d (Name: %s Surname: %s Email: %s)" ),
 						$list_id,
 						$customer_id,
 						$customer->firstname,
@@ -705,7 +705,7 @@ EOF;
 			);
 
 			return Mail::Send( $lang_id, 'newsletter_verif_emailchef',
-				Mail::l( 'Verifica email per inserimento nella mailing list', $lang_id ), $template_vars, $email, null,
+				Mail::l('Verify email for mailing list subscription', $lang_id ), $template_vars, $email, null,
 				null, null, null, null, dirname( __FILE__ ) . '/mails/', false, $shop_id );
 
 		}
@@ -746,7 +746,7 @@ EOF;
 			if ( $upsert ) {
 				$this->log(
 					sprintf(
-						$this->l( "Inserito nella lista %d il cliente %d (Nome: %s Cognome: %s Email: %s Consenso Newsletter: %s)" ),
+						$this->l( "Added to customer %d list %d (Name: %s Surname: %s Email: %s Newsletter opt-in: %s)" ),
 						$list_id,
 						$customer->id,
 						$customer->firstname,
@@ -758,7 +758,7 @@ EOF;
 			} else {
 				$this->log(
 					sprintf(
-						$this->l( "Inserimento nella lista %d del cliente %d (Nome: %s Cognome: %s Email: %s Consenso Newsletter: %s) non avvenuto" ),
+						$this->l( "Failed to add to customer %d list %d (Name: %s Surname: %s Newsletter opt-in: %s)" ),
 						$list_id,
 						$customer->id,
 						$customer->firstname,
@@ -870,14 +870,14 @@ EOF;
 			if ( $init ) {
 				$this->log(
 					sprintf(
-						$this->l( "Aggiornati nella lista %d i custom fields relativi alla lingua" ),
+						$this->l( "Language custom fields for list %d updated." ),
 						$list_id
 					)
 				);
 			} else {
 				$this->log(
 					sprintf(
-						$this->l( "I campi della lista %d relativi alla lingua non sono stati modificati (Errore: %s)" ),
+						$this->l( "update language custom fields for list %d has failed.  (Error: %s)" ),
 						$list_id,
 						$psec->lastError
 					),
@@ -913,7 +913,7 @@ EOF;
 			if ( $upsert ) {
 				$this->log(
 					sprintf(
-						$this->l( "Aggiornati nella lista %d i campi del cliente %d (Nome: %s Cognome %s e altri %d campi)" ),
+						$this->l( "Updated customer %d data in list %d (Name: %s Surname: %s and other %d fields)" ),
 						$list_id,
 						$address->id_customer,
 						$address->firstname,
@@ -924,7 +924,7 @@ EOF;
 			} else {
 				$this->log(
 					sprintf(
-						$this->l( "I campi del cliente %d (Nome: %s Cognome %s e altri %d campi) nella lista %d non sono stati aggiornati" ),
+						$this->l( "Failed to insert updated customer %d data in list %d (Name: %s Surname: %s and other %d fields)" ),
 						$address->id_customer,
 						$address->firstname,
 						$address->lastname,
@@ -978,7 +978,7 @@ EOF;
 			if ( $upsert ) {
 				$this->log(
 					sprintf(
-						$this->l( "Aggiornati nella lista %d i campi del cliente %d (Nome: %s Cognome %s e altri %d campi)" ),
+						$this->l( "Updated customer %d data in list %d (Name: %s Surname: %s and other %d fields)" ),
 						$list_id,
 						$customer->id,
 						$customer->firstname,
@@ -989,7 +989,7 @@ EOF;
 			} else {
 				$this->log(
 					sprintf(
-						$this->l( "I campi del cliente %d (Nome: %s Cognome %s e altri %d campi) nella lista %d non sono stati aggiornati" ),
+						$this->l( "Failed to insert updated customer %d data in list %d (Name: %s Surname: %s and other %d fields)" ),
 						$customer->id,
 						$customer->firstname,
 						$customer->lastname,
@@ -1032,7 +1032,7 @@ EOF;
 			if ( $upsert ) {
 				$this->log(
 					sprintf(
-						$this->l( "Inserito nella lista %d i dati aggiornati del cliente %d (Nome: %s Cognome: %s e altri %d campi)" ),
+						$this->l( "Updated customer %d data in list %d (Name: %s Surname: %s and other %d fields)" ),
 						$list_id,
 						$syncOrderData['customer_id'],
 						$syncOrderData['first_name'],
@@ -1043,7 +1043,7 @@ EOF;
 			} else {
 				$this->log(
 					sprintf(
-						$this->l( "Inserimento nella lista %d dei dati aggiornati del cliente %d (Nome: %s Cognome: %s e altri %d campi) non avvenuto (Errore: %s)" ),
+						$this->l( "Failed to insert updated customer %d data in list %d (Name: %s Surname: %s and other %d fields) (Error: %s)" ),
 						$list_id,
 						$syncOrderData['customer_id'],
 						$syncOrderData['first_name'],

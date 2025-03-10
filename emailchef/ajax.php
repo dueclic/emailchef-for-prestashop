@@ -258,7 +258,7 @@ final class EmailchefAjaxRequest {
 
 				$this->module->log(
 					sprintf(
-						$this->module->l( 'Creata lista %d (Nome: %s, Descrizione: %s)' ),
+						$this->module->l( 'Creata lista %d (Name: %s, Descrizione: %s)' ),
 						$list_id,
 						$args['list_name'],
 						$args['list_desc']
@@ -273,7 +273,7 @@ final class EmailchefAjaxRequest {
 
 			$this->module->log(
 				sprintf(
-					$this->module->l( 'Tentativo fallito di creazione della lista %d (Nome: %s, Descrizione: %s)' ),
+					$this->module->l( 'Tentativo fallito di creazione della lista %d (Name: %s, Descrizione: %s)' ),
 					$list_id,
 					$args['list_name'],
 					$args['list_desc']
