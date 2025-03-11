@@ -23,7 +23,7 @@
                     <label for="consumer_key" class="ecps-not-logged-get-api">
                         {l s="Consumer key:" mod="emailchef"}
                         <a href="https://app.emailchef.com/build/#/settings/apikeys" target="_blank"
-                           class="ecps-get-api">{l s="Get API Key:" mod="emailchef"}</a>
+                           class="ecps-get-api">{l s="Get API Key" mod="emailchef"}</a>
                     </label>
                     <input class="ecps-input" type="text" value="" id="consumer_key" name="consumer_key">
 
