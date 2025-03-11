@@ -35,35 +35,10 @@ class PS_Emailchef_Api {
 
 	protected $api_url = "https://app.emailchef.com/api";
 	public $lastError;
-	private $isLogged = false;
-	private $authkey = false;
+	private $consumerKey = null;
+	private $consumerSecret = null;
 
-	public function __construct( $username, $password ) {
-		$this->process_login( $username, $password );
-	}
-
-	public function isLogged() {
-		return $this->isLogged;
-	}
-
-	private function process_login( $username, $password ) {
-
-		$response = $this->get( "/login", array(
-
-			'username' => $username,
-			'password' => $password
-
-		), "POST", true );
-
-		if ( ! isset( $response['authkey'] ) ) {
-			$this->lastError = $response['message'];
-		} else {
-			$this->authkey  = $response['authkey'];
-			$this->isLogged = true;
-		}
-
-	}
-
+	public function __construct( $consumer_key, $consumer_secret ) {}
 	private function getRequest( $url, $payload, $type ) {
 
 		try {
@@ -114,14 +89,18 @@ class PS_Emailchef_Api {
 		return $response;
 	}
 
-	protected function get( $route, $args = array(), $type = "POST", $encoded = false ) {
+	protected function call( $route, $args = array(), $type = "POST", $encoded = false ) {
 
 		$url  = $this->api_url . $route;
 		$auth = array();
 
-		if ( $this->authkey !== false ) {
+		if (
+            !is_null($this->consumerKey) &&
+            !is_null($this->consumerSecret)
+        ) {
 			$auth = array(
-				'authkey' => $this->authkey
+				'consumerKey' => $this->consumerKey,
+                'consumerSecret' => $this->consumerSecret
 			);
 		}
 
@@ -133,5 +112,9 @@ class PS_Emailchef_Api {
 
 		return json_decode( $this->getRequest( $url, $payload, $type ), true );
 	}
+
+    protected function json($route, $args = array(), $type = "POST"){
+        return $this->call( $route, $args, $type, true );
+    }
 
 }

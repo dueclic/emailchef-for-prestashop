@@ -49,8 +49,8 @@ var PS_Emailchef = function ($) {
         $langChange = $("#" + prefixed_setting("lang"));
         $createList = $("#" + prefixed_setting("create_list"));
         $selList = $("#" + prefixed_setting("list"));
-        $apiUser = $("#" + prefixed_setting("username"));
-        $apiPass = $("#" + prefixed_setting("password"));
+        $apiUser = $("#" + prefixed_setting("consumer_key"));
+        $apiPass = $("#" + prefixed_setting("consumer_secret"));
         $newListName = $("#" + prefixed_setting("new_name"));
         $newListDesc = $("#" + prefixed_setting("new_description"));
         $saveNewList = $("#" + prefixed_setting("new_save"));
@@ -264,7 +264,7 @@ var PS_Emailchef = function ($) {
 
     function mainListChanges() {
 
-        $("#" + prefixed_setting("username") + ", " + "#" + prefixed_setting("password")).change(function () {
+        $("#" + prefixed_setting("consumer_key") + ", " + "#" + prefixed_setting("consumer_secret")).change(function () {
             accessIsValid($apiUser.val(), $apiPass.val());
         });
 

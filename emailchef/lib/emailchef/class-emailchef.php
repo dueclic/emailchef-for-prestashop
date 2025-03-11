@@ -69,7 +69,7 @@
 		 */
 
 		public function get_policy() {
-			$account = $this->get( "/accounts/current", array(), "GET" );
+			$account = $this->json( "/accounts/current", array(), "GET" );
 
 			return $account['mode'];
 		}
@@ -81,14 +81,14 @@
 		 */
 
 		public function get_meta_integrations() {
-			$integrations = $this->get( "/meta/integrations", array(), "GET" );
+			$integrations = $this->json( "/meta/integrations", array(), "GET" );
 
 			return $integrations;
 		}
 
 
 		/**
-		 * Get integrations from eMailChef List
+		 * Get integrations from Emailchef List
 		 *
 		 * @param $list_id
 		 *
@@ -97,11 +97,11 @@
 
 		public function get_integrations( $list_id ) {
 			$route = sprintf( "/lists/%d/integrations", $list_id );
-			return $this->get( $route, array(), "GET", false, "debug" );
+			return $this->json( $route, array(), "GET" );
 		}
 
 		/**
-		 * Upsert integrations yo eMailChef List
+		 * Upsert integrations yo Emailchef List
 		 *
 		 * @param $list_id
 		 *
@@ -120,7 +120,7 @@
 		}
 
 		/**
-		 * Upsert integrations yo eMailChef List
+		 * Upsert integrations yo Emailchef List
 		 *
 		 * @param $list_id
 		 * @param $integration_id
@@ -140,7 +140,7 @@
 
 			);
 
-			$response = $this->get( "/integrations/" . $integration_id, $args, "PUT" );
+			$response = $this->json( "/integrations/" . $integration_id, $args, "PUT" );
 
 			if ( $response['status'] != "OK" ) {
 				$this->lastError    = $response['message'];
@@ -154,7 +154,7 @@
 		}
 
 		/**
-		 * Get integrations from eMailChef List
+		 * Get integrations from Emailchef List
 		 *
 		 * @param $list_id
 		 *
@@ -173,7 +173,7 @@
 
 			);
 
-			$response = $this->get( "/integrations", $args, "POST" );
+			$response = $this->json( "/integrations", $args, "POST" );
 
 			if ( $response['status'] != "OK" ) {
 				$this->lastError    = $response['message'];
@@ -187,7 +187,7 @@
 		}
 
 		/**
-		 * Get lists from eMailChef
+		 * Get lists from Emailchef
 		 *
 		 * @param array $args
 		 * @param bool $asArray
@@ -196,7 +196,7 @@
 		 */
 
 		private function lists( $args = array(), $asArray = true ) {
-			return $this->get( "/lists", $args, "GET" );
+			return $this->json( "/lists", $args, "GET" );
 		}
 
 		/**
@@ -232,7 +232,7 @@
 		}
 
 		/**
-		 * Get collection of custom fields from eMailChef List
+		 * Get collection of custom fields from Emailchef List
 		 *
 		 * @param $list_id
 		 *
@@ -242,11 +242,11 @@
 		public function get_collection( $list_id ) {
 			$route = sprintf( "/lists/%d/customfields", $list_id );
 
-			return $this->get( $route, array(), "GET" );
+			return $this->json( $route, array(), "GET" );
 		}
 
 		/**
-		 * Get ID of custom field in eMailChef collection
+		 * Get ID of custom field in Emailchef collection
 		 *
 		 * @param $list_id
 		 * @param string $placeholder
@@ -279,7 +279,7 @@
 		}
 
 		/**
-		 * Initialize custom fields for eMailChef List ID
+		 * Initialize custom fields for Emailchef List ID
 		 *
 		 * @param $list_id
 		 *
@@ -363,7 +363,7 @@
 		}
 
 		/**
-		 * Create eMailChef List
+		 * Create Emailchef List
 		 *
 		 * @param $name
 		 * @param $description
@@ -391,7 +391,7 @@
 				$args["instance_in"]["list_description"] = $description;
 			}
 
-			$response = $this->get( "/lists", $args, "POST" );
+			$response = $this->json( "/lists", $args, "POST" );
 
 			if ( $response['status'] != "OK" ) {
 				$this->lastError    = $response['message'];
@@ -416,7 +416,7 @@
 
 			$route = sprintf( "/customfields/%d", $field_id );
 
-			$status = $this->get( $route, array(), "DELETE", true );
+			$status = $this->json( $route, array(), "DELETE" );
 
 			if ( $status !== "OK" ) {
 				$this->lastError = $status['message'];
@@ -464,7 +464,7 @@
 				$args["instance_in"]["options"] = $options;
 			}
 
-			$response = $this->get( $route, $args, "POST", true );
+			$response = $this->json( $route, $args, "POST" );
 
 			if ( isset( $response['status'] ) && $response['status'] == "OK" ) {
 
@@ -533,7 +533,7 @@
 				$args["instance_in"]["options"] = $options;
 			}
 
-			$response = $this->get( $route, $args, "PUT", true );
+			$response = $this->json( $route, $args, "PUT" );
 
 			if ( isset( $response['status'] ) && $response['status'] == "OK" ) {
 
@@ -592,7 +592,7 @@
 
 			//die(print_r($args));
 
-			$response = $this->get( "/contacts", $args, "POST" );
+			$response = $this->json( "/contacts", $args, "POST" );
 
 			if ( isset( $response['contact_added_to_list'] ) && $response['contact_added_to_list'] ) {
 				return true;
@@ -618,7 +618,7 @@
 
 			);
 
-			$update = $this->get( "/lists/" . $list_id . "/import", $args, "POST" );
+			$update = $this->json( "/lists/" . $list_id . "/import", $args);
 
 			if ( isset( $update['status'] ) && $update['status'] == "OK" ) {
 				return true;
@@ -678,7 +678,7 @@
 
 			);
 
-			$update = $this->get( $route, $args, "PUT" );
+			$update = $this->json( $route, $args, "PUT" );
 
 			if ( isset( $update['status'] ) && $update['status'] == "OK" ) {
 				return true;

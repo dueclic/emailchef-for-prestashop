@@ -529,7 +529,7 @@ class PS_Emailchef_Sync
 
     private function get_platform()
     {
-        return 'eMailChef for PrestaShop';
+        return 'Emailchef for PrestaShop';
     }
 
     /**

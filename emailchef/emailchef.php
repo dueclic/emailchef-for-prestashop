@@ -25,88 +25,94 @@
  * /
  */
 
-if ( ! defined( '_CAN_LOAD_FILES_' ) ) {
-	exit;
+if (!defined('_CAN_LOAD_FILES_')) {
+    exit;
 }
 
-if ( ! defined( '_PS_VERSION_' ) ) {
-	exit;
+if (!defined('_PS_VERSION_')) {
+    exit;
 }
 
-define( 'PS_EMAILCHEF_DIR', dirname( __FILE__ ) );
-define( 'DEBUG', true );
+define('PS_EMAILCHEF_DIR', dirname(__FILE__));
+define('DEBUG', true);
 
-require( PS_EMAILCHEF_DIR . "/lib/vendor/autoload.php" );
-require( PS_EMAILCHEF_DIR . "/lib/emailchef/class-emailchef.php" );
+require(PS_EMAILCHEF_DIR . "/lib/vendor/autoload.php");
+require(PS_EMAILCHEF_DIR . "/lib/emailchef/class-emailchef.php");
 
-class Emailchef extends Module {
+class Emailchef extends Module
+{
 
-	protected $_html = '';
-	private $namespace = "ps_emailchef";
-	private $emailchef;
-	private $category_table;
-	private $newsletter_before = 0;
-	public function __construct() {
-		$this->name                   = 'emailchef';
-		$this->tab                    = 'emailing';
-		$this->version                = '2.0.0';
-		$this->author                 = 'dueclic';
-		$this->need_instance          = 0;
-		$this->bootstrap              = true;
-		$this->ps_versions_compliancy = array( 'min' => '1.6', 'max' => _PS_VERSION_ );
-		$this->controllers            = array( 'verification', 'unsubscribe' );
+    protected $_html = '';
+    private $namespace = "ps_emailchef";
+    private $emailchef;
+    private $category_table;
+    private $newsletter_before = 0;
 
-		parent::__construct();
+    public function __construct()
+    {
+        $this->name = 'emailchef';
+        $this->tab = 'emailing';
+        $this->version = '2.0.0';
+        $this->author = 'dueclic';
+        $this->need_instance = 0;
+        $this->bootstrap = true;
+        $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
+        $this->controllers = array('verification', 'unsubscribe');
 
-		$this->category_table   = _DB_PREFIX_ . "emailchef_abcart_synced";
-		$this->displayName      = $this->l( 'Emailchef' );
-		$this->description      = 'Using this PrestaShop module, eMailChef can communicate with your online store and it creates easy, simply and automatic targeted campaigns.';
-		$this->confirmUninstall = $this->l( 'Do you really want to uninstall this module?' );
-		$this->emailchef();
-	}
+        parent::__construct();
 
-	/**
-	 * Get emailchef connection object
-	 *
-	 * @param string|null $api_user
-	 * @param string|null $api_pass
-	 *
-	 * @return PS_Emailchef
-	 */
+        $this->category_table = _DB_PREFIX_ . "emailchef_abcart_synced";
+        $this->displayName = $this->l('Emailchef');
+        $this->description = 'Using this PrestaShop module, Emailchef can communicate with your online store and it creates easy, simply and automatic targeted campaigns.';
+        $this->confirmUninstall = $this->l('Do you really want to uninstall this module?');
+        $this->emailchef();
+    }
 
-	public function emailchef( $api_user = null, $api_pass = null ) {
+    /**
+     * Get emailchef connection object
+     *
+     * @param string|null $api_user
+     * @param string|null $api_pass
+     *
+     * @return PS_Emailchef
+     */
 
-		if ( empty( $this->emailchef ) || ! is_null( $api_user ) || ! is_null( $api_pass ) ) {
+    public function emailchef($api_user = null, $api_pass = null)
+    {
 
-			$api_user        = $api_user ? $api_user : $this->_getConf( "username" );
-			$api_pass        = $api_pass ? $api_pass : $this->_getConf( "password" );
-			$this->emailchef = new PS_Emailchef( $api_user, $api_pass );
+        if (empty($this->emailchef) || !is_null($api_user) || !is_null($api_pass)) {
 
-		}
+            $api_user = $api_user ? $api_user : $this->_getConf("username");
+            $api_pass = $api_pass ? $api_pass : $this->_getConf("password");
+            $this->emailchef = new PS_Emailchef($api_user, $api_pass);
 
-		return $this->emailchef;
+        }
 
-	}
+        return $this->emailchef;
 
-	private function create_emailchef_tables() {
-		$create_table_sql = 'CREATE TABLE IF NOT EXISTS `' . $this->category_table . '` (
+    }
+
+    private function create_emailchef_tables()
+    {
+        $create_table_sql = 'CREATE TABLE IF NOT EXISTS `' . $this->category_table . '` (
         `id_cart` INT UNSIGNED NOT NULL,
         `date_synced` DATETIME NOT NULL,
         UNIQUE (`id_cart`)
         ) ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci ;';
 
-		return Db::getInstance()->execute( $create_table_sql );
-	}
+        return Db::getInstance()->execute($create_table_sql);
+    }
 
-	private function drop_emailchef_tables() {
-		$drop_table_sql = 'DROP TABLE IF EXISTS `' . $this->category_table . '`';
-
-		return Db::getInstance()->execute( $drop_table_sql );
-	}
-
-	public function runUpgradeModule()
+    private function drop_emailchef_tables()
     {
-        if ( $this->emailchef()->isLogged() ) {
+        $drop_table_sql = 'DROP TABLE IF EXISTS `' . $this->category_table . '`';
+
+        return Db::getInstance()->execute($drop_table_sql);
+    }
+
+    public function runUpgradeModule()
+    {
+        if ($this->emailchef()->isLogged()) {
             $list_id = $this->_getConf("list");
             $this->emailchef()->upsert_integration($list_id);
         }
@@ -115,948 +121,984 @@ class Emailchef extends Module {
 
     public function enable($forceAll = false)
     {
-        if ( $this->emailchef()->isLogged() ) {
+        if ($this->emailchef()->isLogged()) {
             $list_id = $this->_getConf("list");
             $this->emailchef()->upsert_integration($list_id);
         }
         return parent::enable($forceAll);
     }
 
-    public function install() {
-		Configuration::updateValue( 'EC_SALT', Tools::passwdGen( 16 ) );
+    public function install()
+    {
+        Configuration::updateValue('EC_SALT', Tools::passwdGen(16));
 
-		return (
-			parent::install() &&
-			$this->registerHook( 'backOfficeHeader' ) &&
-			$this->registerHook( 'actionCustomerAccountAdd' ) &&
-			$this->registerHook( 'actionObjectCustomerUpdateBefore' ) &&
-			$this->registerHook( 'actionObjectCustomerUpdateAfter' ) &&
-			$this->registerHook( 'actionOrderStatusPostUpdate' ) &&
-			$this->registerHook( 'actionObjectAddressAddAfter' ) &&
-			$this->registerHook( 'actionObjectAddressUpdateAfter' ) &&
-			$this->registerHook( 'actionObjectLanguageAddAfter' ) &&
-			$this->registerHook( 'actionObjectLanguageUpdateAfter' ) &&
-			$this->registerHook( 'actionObjectLanguageDeleteAfter' ) &&
-			$this->registerHook( 'backOfficeFooter' ) &&
-			$this->registerHook( 'footer' ) &&
-			$this->create_emailchef_tables()
-		);
-	}
+        return (
+            parent::install() &&
+            $this->registerHook('backOfficeHeader') &&
+            $this->registerHook('actionCustomerAccountAdd') &&
+            $this->registerHook('actionObjectCustomerUpdateBefore') &&
+            $this->registerHook('actionObjectCustomerUpdateAfter') &&
+            $this->registerHook('actionOrderStatusPostUpdate') &&
+            $this->registerHook('actionObjectAddressAddAfter') &&
+            $this->registerHook('actionObjectAddressUpdateAfter') &&
+            $this->registerHook('actionObjectLanguageAddAfter') &&
+            $this->registerHook('actionObjectLanguageUpdateAfter') &&
+            $this->registerHook('actionObjectLanguageDeleteAfter') &&
+            $this->registerHook('backOfficeFooter') &&
+            $this->registerHook('footer') &&
+            $this->create_emailchef_tables()
+        );
+    }
 
-	public function uninstall() {
+    public function uninstall()
+    {
 
-		Configuration::deleteByName( $this->prefix_setting( 'username' ) );
-		Configuration::deleteByName( $this->prefix_setting( 'password' ) );
-		Configuration::deleteByName( $this->prefix_setting( 'list' ) );
-		Configuration::deleteByName( $this->prefix_setting( 'policy_type' ) );
+        Configuration::deleteByName($this->prefix_setting('username'));
+        Configuration::deleteByName($this->prefix_setting('password'));
+        Configuration::deleteByName($this->prefix_setting('list'));
+        Configuration::deleteByName($this->prefix_setting('policy_type'));
 
-		return (
-			parent::uninstall() &&
-			$this->unregisterHook( 'backOfficeHeader' ) &&
-			$this->unregisterHook( 'actionCustomerAccountAdd' ) &&
-			$this->unregisterHook( 'actionObjectCustomerUpdateBefore' ) &&
-			$this->unregisterHook( 'actionObjectCustomerUpdateAfter' ) &&
-			$this->unregisterHook( 'actionOrderStatusPostUpdate' ) &&
-			$this->unregisterHook( 'actionObjectAddressAddAfter' ) &&
-			$this->unregisterHook( 'actionObjectAddressUpdateAfter' ) &&
-			$this->unregisterHook( 'actionObjectLanguageAddAfter' ) &&
-			$this->unregisterHook( 'actionObjectLanguageUpdateAfter' ) &&
-			$this->unregisterHook( 'actionObjectLanguageDeleteAfter' ) &&
-			$this->unregisterHook( 'backOfficeFooter' ) &&
-            $this->unregisterHook( 'footer' ) &&
-			$this->drop_emailchef_tables()
-		);
-	}
+        return (
+            parent::uninstall() &&
+            $this->unregisterHook('backOfficeHeader') &&
+            $this->unregisterHook('actionCustomerAccountAdd') &&
+            $this->unregisterHook('actionObjectCustomerUpdateBefore') &&
+            $this->unregisterHook('actionObjectCustomerUpdateAfter') &&
+            $this->unregisterHook('actionOrderStatusPostUpdate') &&
+            $this->unregisterHook('actionObjectAddressAddAfter') &&
+            $this->unregisterHook('actionObjectAddressUpdateAfter') &&
+            $this->unregisterHook('actionObjectLanguageAddAfter') &&
+            $this->unregisterHook('actionObjectLanguageUpdateAfter') &&
+            $this->unregisterHook('actionObjectLanguageDeleteAfter') &&
+            $this->unregisterHook('backOfficeFooter') &&
+            $this->unregisterHook('footer') &&
+            $this->drop_emailchef_tables()
+        );
+    }
 
-	public function getContent() {
+    public function getContent()
+    {
 
-		$output = null;
+        $output = null;
 
-		if ( Tools::isSubmit( 'submit' . $this->name ) ) {
-			$ec_lang        = strval( Tools::getValue( $this->prefix_setting( 'lang' ) ) );
-			$ec_username    = strval( Tools::getValue( $this->prefix_setting( 'username' ) ) );
-			$ec_password    = strval( Tools::getValue( $this->prefix_setting( 'password' ) ) );
-			$ec_list        = intval( Tools::getValue( $this->prefix_setting( 'list' ) ) );
-			$ec_policy_type = strval( Tools::getValue( $this->prefix_setting( 'policy_type' ) ) );
+        if (
+            Tools::isSubmit('submitEmailchefSettings')
+        ) {
 
-			$ec_list_old = $this->_getConf( "list" );
+            die('qui');
 
-			if ( ! $ec_username || empty( $ec_username ) || ! Validate::isGenericName( $ec_username ) ) {
-				$output .= $this->displayError( $this->l( 'Please, enter a valid username.' ) );
-			} else {
-				if ( ! $ec_password || empty( $ec_password ) || ! Validate::isGenericName( $ec_password ) ) {
-					$output .= $this->displayError( $this->l( 'Please, enter a valid password.' ) );
-				} else {
-					if ( ! $ec_list || empty( $ec_list ) ) {
-						$output .= $this->displayError( $this->l( 'Choose a list.' ) );
-					} else {
-						Configuration::updateValue( $this->prefix_setting( 'lang' ), $ec_lang );
-						Configuration::updateValue( $this->prefix_setting( 'username' ), $ec_username );
-						Configuration::updateValue( $this->prefix_setting( 'password' ), $ec_password );
-						Configuration::updateValue( $this->prefix_setting( 'list' ), $ec_list );
-						Configuration::updateValue( $this->prefix_setting( 'policy_type' ), $ec_policy_type );
+            /*$ec_lang        = strval( Tools::getValue( $this->prefix_setting( 'lang' ) ) );
+            $ec_username    = strval( Tools::getValue( $this->prefix_setting( 'username' ) ) );
+            $ec_password    = strval( Tools::getValue( $this->prefix_setting( 'password' ) ) );
+            $ec_list        = intval( Tools::getValue( $this->prefix_setting( 'list' ) ) );
+            $ec_policy_type = strval( Tools::getValue( $this->prefix_setting( 'policy_type' ) ) );
 
-						$output             .= $this->displayConfirmation( $this->l( 'Settings saved.' ) );
-						$emailchef_cron_url = $this->_path . "/ajax.php";
-						$output             .= <<<EOF
+            $ec_list_old = $this->_getConf( "list" );
+
+            if ( ! $ec_username || empty( $ec_username ) || ! Validate::isGenericName( $ec_username ) ) {
+                $output .= $this->displayError( $this->l( 'Please, enter a valid username.' ) );
+            } else {
+                if ( ! $ec_password || empty( $ec_password ) || ! Validate::isGenericName( $ec_password ) ) {
+                    $output .= $this->displayError( $this->l( 'Please, enter a valid password.' ) );
+                } else {
+                    if ( ! $ec_list || empty( $ec_list ) ) {
+                        $output .= $this->displayError( $this->l( 'Choose a list.' ) );
+                    } else {
+                        Configuration::updateValue( $this->prefix_setting( 'lang' ), $ec_lang );
+                        Configuration::updateValue( $this->prefix_setting( 'username' ), $ec_username );
+                        Configuration::updateValue( $this->prefix_setting( 'password' ), $ec_password );
+                        Configuration::updateValue( $this->prefix_setting( 'list' ), $ec_list );
+                        Configuration::updateValue( $this->prefix_setting( 'policy_type' ), $ec_policy_type );
+
+                        $output             .= $this->displayConfirmation( $this->l( 'Settings saved.' ) );
+                        $emailchef_cron_url = $this->_path . "/ajax.php";
+                        $output             .= <<<EOF
 <script>
     var emailchef_cron_url = '$emailchef_cron_url';
 </script>
 EOF;
-						if ( $ec_list_old != $ec_list ) {
-							$output .= $this->adminDisplayInformation( $this->l( "Your customer data is now being transferred to your eMailChef account." ) );
+                        if ( $ec_list_old != $ec_list ) {
+                            $output .= $this->adminDisplayInformation( $this->l( "Your customer data is now being transferred to your Emailchef account." ) );
 
-							$this->context->controller->addJs( $this->_path . "js/plugins/emailchef/jquery.emailchef.cron.js" );
-						}
+                        }
 
 
-					}
-				}
-			}
-		}
+                    }
+                }
+            }*/
+        }
 
-		return $output . $this->displayForm() . '<script type="text/javascript" src="' . $this->_path . 'js/plugins/emailchef/jquery.emailchef.js"></script>';
-	}
 
-	private function sync_abandoned_cart() {
+        return $this->display(__FILE__, 'views/templates/admin/logged-out.tpl');
+    }
 
-		$output = "";
+    private function sync_abandoned_cart()
+    {
 
-		if ( $this->emailchef()->isLogged() ) {
+        $output = "";
 
-			require_once( dirname( __FILE__ ) . "/lib/emailchef/class-emailchef-sync.php" );
-			$sync = new PS_Emailchef_Sync();
+        if ($this->emailchef()->isLogged()) {
 
-			$abandoned_carts = $sync->getAbandonedCarts();
+            require_once(dirname(__FILE__) . "/lib/emailchef/class-emailchef-sync.php");
+            $sync = new PS_Emailchef_Sync();
 
-			if ( count( $abandoned_carts ) > 0 ) {
+            $abandoned_carts = $sync->getAbandonedCarts();
 
-				$emailchef_abandoned_url = $this->_path . "ajax.php";
-				$output                  .= <<<EOF
+            if (count($abandoned_carts) > 0) {
+
+                $emailchef_abandoned_url = $this->_path . "ajax.php";
+                $output .= <<<EOF
 				<script>
 				    var emailchef_abandoned_url = '$emailchef_abandoned_url';
 				</script>
 EOF;
-				$output                  .= '<script type="text/javascript" src="' . $this->_path . 'js/plugins/emailchef/jquery.emailchef.abandoned.js"></script>';
-			}
+                $output .= '<script type="text/javascript" src="' . $this->_path . 'js/plugins/emailchef/jquery.emailchef.abandoned.js"></script>';
+            }
 
 
-		}
+        }
 
-		return $output;
+        return $output;
 
-	}
+    }
 
-	public function hookBackOfficeFooter() {
-		return $this->sync_abandoned_cart();
-	}
+    public function hookBackOfficeFooter()
+    {
+        return $this->sync_abandoned_cart();
+    }
 
-	public function hookFooter() {
-		return $this->sync_abandoned_cart();
-	}
+    public function hookFooter()
+    {
+        return $this->sync_abandoned_cart();
+    }
 
-	/**
-	 * @param $config
-	 *
-	 * @return string
-	 */
+    /**
+     * @param $config
+     *
+     * @return string
+     */
 
-	public function _getConf( $config ) {
-		return Configuration::get( $this->prefix_setting( $config ) );
-	}
+    public function _getConf($config)
+    {
+        return Configuration::get($this->prefix_setting($config));
+    }
 
-	public function log( $message, $severity = 1, $debug = false ) {
-		if ( $debug ) {
-			return PrestaShopLogger::addLog( "[eMailChef Plugin] [Debug]" . $message, $severity, null, null, null,
-				true );
-		}
+    public function log($message, $severity = 1, $debug = false)
+    {
+        if ($debug) {
+            return PrestaShopLogger::addLog("[Emailchef Plugin] [Debug]" . $message, $severity, null, null, null,
+                true);
+        }
 
-		return PrestaShopLogger::addLog( "[eMailChef Plugin] " . $message, $severity, null, null, null, true );
-	}
+        return PrestaShopLogger::addLog("[Emailchef Plugin] " . $message, $severity, null, null, null, true);
+    }
 
-	private function get_lists() {
-		if ( $this->emailchef->isLogged() ) {
-			return $this->emailchef->get_lists();
-		} else {
-			return array(
-				array(
-					'id'   => - 1,
-					'name' => $this->l( 'Log in to manage your lists.' )
-				)
-			);
-		}
-	}
+    private function get_lists()
+    {
+        if ($this->emailchef->isLogged()) {
+            return $this->emailchef->get_lists();
+        } else {
+            return array(
+                array(
+                    'id' => -1,
+                    'name' => $this->l('Log in to manage your lists.')
+                )
+            );
+        }
+    }
 
-	public function prefix_setting( $setting ) {
-		return $this->namespace . "_" . $setting;
-	}
+    public function prefix_setting($setting)
+    {
+        return $this->namespace . "_" . $setting;
+    }
 
-	public function displayForm() {
-		$default_lang           = (int) Configuration::get( 'PS_LANG_DEFAULT' );
-		$fields_form[0]['form'] = array(
+    public function displayForm()
+    {
+        $default_lang = (int)Configuration::get('PS_LANG_DEFAULT');
+        $fields_form[0]['form'] = array(
 
-			'legend' => array(
-				'title' => $this->l( 'Plugin settings.' ),
-			),
-			'input'  => array(
-				array(
-					'type'     => 'select',
-					'label'    => $this->l( 'Language' ),
-					'name'     => $this->prefix_setting( 'lang' ),
-					'required' => true,
-					'options'  => array(
-						'query' => array(
-							array(
-								'id'   => 'en',
-								'name' => $this->l( 'English' )
-							),
-							array(
-								'id'   => 'it',
-								'name' => $this->l( 'Italian' )
-							),
-						),
-						'id'    => 'id',
-						'name'  => 'name'
-					)
-				),
-				array(
-					'type'     => 'text',
-					'label'    => $this->l( 'eMailChef username' ),
-					'name'     => $this->prefix_setting( 'username' ),
-					'required' => true
-				),
-				array(
-					'type'     => 'password',
-					'label'    => $this->l( 'eMailChef password' ),
-					'name'     => $this->prefix_setting( 'password' ),
-					'required' => true
-				),
-				array(
-					'type'     => 'select_and_create',
-					'label'    => $this->l( 'Pick a list' ),
-					'desc'     => $this->l( 'Destination list' ),
-					'name'     => $this->prefix_setting( 'list' ),
-					'required' => true,
-					'options'  => array(
-						'query' => $this->get_lists(),
-						'id'    => 'id',
-						'name'  => 'name'
-					)
-				),
-				array(
-					'type'     => 'select',
-					'label'    => $this->l( 'Active policy' ),
-					'desc'     => $this->l( 'Which policy would you like to use?' ),
-					'name'     => $this->prefix_setting( 'policy_type' ),
-					'hint'     => $this->l( 'You can choose between Double Opt-in and Single Opt-in' ),
-					'required' => false,
-					'options'  => array(
-						'query' => array(
-							array(
-								'id'   => 'dopt',
-								'name' => $this->l( 'Double opt-in' )
-							),
-							array(
-								'id'   => 'sopt',
-								'name' => $this->l( 'Single opt-in' )
-							),
-						),
-						'id'    => 'id',
-						'name'  => 'name'
-					)
-				)
-			),
-			'submit' => array(
-				'title' => $this->l( 'Save and export your contacts.' ),
-				'class' => 'btn btn-default pull-right'
-			)
-		);
+            'legend' => array(
+                'title' => $this->l('Plugin settings.'),
+            ),
+            'input' => array(
+                array(
+                    'type' => 'select',
+                    'label' => $this->l('Language'),
+                    'name' => $this->prefix_setting('lang'),
+                    'required' => true,
+                    'options' => array(
+                        'query' => array(
+                            array(
+                                'id' => 'en',
+                                'name' => $this->l('English')
+                            ),
+                            array(
+                                'id' => 'it',
+                                'name' => $this->l('Italian')
+                            ),
+                        ),
+                        'id' => 'id',
+                        'name' => 'name'
+                    )
+                ),
+                array(
+                    'type' => 'text',
+                    'label' => $this->l('Consumer Key'),
+                    'name' => $this->prefix_setting('consumer_key'),
+                    'required' => true
+                ),
+                array(
+                    'type' => 'password',
+                    'label' => $this->l('Consumer Secret'),
+                    'name' => $this->prefix_setting('consumer_secret'),
+                    'required' => true
+                ),
+                array(
+                    'type' => 'select_and_create',
+                    'label' => $this->l('Pick a list'),
+                    'desc' => $this->l('Destination list'),
+                    'name' => $this->prefix_setting('list'),
+                    'required' => true,
+                    'options' => array(
+                        'query' => $this->get_lists(),
+                        'id' => 'id',
+                        'name' => 'name'
+                    )
+                ),
+                array(
+                    'type' => 'select',
+                    'label' => $this->l('Active policy'),
+                    'desc' => $this->l('Which policy would you like to use?'),
+                    'name' => $this->prefix_setting('policy_type'),
+                    'hint' => $this->l('You can choose between Double Opt-in and Single Opt-in'),
+                    'required' => false,
+                    'options' => array(
+                        'query' => array(
+                            array(
+                                'id' => 'dopt',
+                                'name' => $this->l('Double opt-in')
+                            ),
+                            array(
+                                'id' => 'sopt',
+                                'name' => $this->l('Single opt-in')
+                            ),
+                        ),
+                        'id' => 'id',
+                        'name' => 'name'
+                    )
+                )
+            ),
+            'submit' => array(
+                'title' => $this->l('Save and export your contacts.'),
+                'class' => 'btn btn-default pull-right'
+            )
+        );
 
-		$helper = new HelperForm();
+        $helper = new HelperForm();
 
-		$helper->module          = $this;
-		$helper->name_controller = $this->name;
-		$helper->token           = Tools::getAdminTokenLite( 'AdminModules' );
+        $helper->module = $this;
+        $helper->name_controller = $this->name;
+        $helper->token = Tools::getAdminTokenLite('AdminModules');
 
-		$helper->currentIndex = AdminController::$currentIndex . '&configure=' . $this->name;
+        $helper->currentIndex = AdminController::$currentIndex . '&configure=' . $this->name;
 
-		$this->context->smarty->assign(
-			array(
-				'create_list_id' => $this->prefix_setting( 'create_list' ),
-				'new_name_id'    => $this->prefix_setting( 'new_name' ),
-				'new_desc_id'    => $this->prefix_setting( 'new_description' ),
-				'save_id'        => $this->prefix_setting( 'save' ),
-				'undo_id'        => $this->prefix_setting( 'undo' ),
-				'ajax_url'       => $this->_path . "ajax.php",
-				'password_field' => $this->prefix_setting( 'password' ),
-				'logo_url'       => $this->_path . "js/plugins/emailchef/img/emailchef.png"
-			)
-		);
+        $this->context->smarty->assign(
+            array(
+                'create_list_id' => $this->prefix_setting('create_list'),
+                'new_name_id' => $this->prefix_setting('new_name'),
+                'new_desc_id' => $this->prefix_setting('new_description'),
+                'save_id' => $this->prefix_setting('save'),
+                'undo_id' => $this->prefix_setting('undo'),
+                'ajax_url' => $this->_path . "ajax.php",
+                'password_field' => $this->prefix_setting('password'),
+                'logo_url' => $this->_path . "js/plugins/emailchef/img/emailchef.png"
+            )
+        );
 
-		$this->context->smarty->assign( 'i18n', array(
-			'create_destination_list'            => $this->l( 'Add a new destination list' ),
-			'language_set'                       => $this->l( 'Language was loaded, do you want refresh this page with new language?' ),
-			'create_list'                        => $this->l( 'Add a new list' ),
-			'name_list'                          => $this->l( 'List name' ),
-			'name_list_placeholder'              => $this->l( 'Provide a name for this new list' ),
-			'desc_list'                          => $this->l( 'List description' ),
-			'desc_list_placeholder'              => $this->l( 'Write a description for this list' ),
-			'accept_privacy'                     => $this->l( 'By creating a new list, you confirm its compliance with the privacy policy and the CAN-SPAM Act.' ),
-			'undo_btn'                           => $this->l( 'Cancel' ),
-			'check_login_data'                   => $this->l( 'Verifying your login data.' ),
-			'error_login_data'                   => $this->l( 'Incorrect login credentials.' ),
-			'server_failure_login_data'          => $this->l( 'Internal server error. Please try again.' ),
-			'success_login_data'                 => $this->l( 'You have successfully logged into eMailChef.' ),
-			'no_list_found'                      => $this->l( 'No list found.' ),
-			'check_status_list_data'             => $this->l( 'Making a new list, please wait...' ),
-			'check_status_list_data_cf'          => $this->l( 'Stiamo creando i custom fields per la lista appena creata...' ),
-			'check_status_list_data_cf_change'   => $this->l( 'Stiamo sistemando i custom fields per la lista appena scelta...' ),
-			'error_status_list_data'             => $this->l( 'An error occurred while creating this list.' ),
-			'error_status_list_data_cf'          => $this->l( 'An error occurred while defining custom fields for this newly created list.' ),
-			'error_status_list_data_cf_change'   => $this->l( 'An error occurred while modifying custom fields for the chosen list.' ),
-			'server_error_status_list_data'      => $this->l( 'Internal server error. Please try again.' ),
-			'success_status_list_data'           => $this->l( 'Your list has been created. We’re now adding the custom fields.' ),
-			'success_status_list_data_cf'        => $this->l( 'Custom fields for this list have been successfully created.' ),
-			'success_status_list_data_cf_change' => $this->l( 'Custom fields for this list have been successfully modified.' )
-		) );
+        $this->context->smarty->assign('i18n', array(
+            'create_destination_list' => $this->l('Add a new destination list'),
+            'language_set' => $this->l('Language was loaded, do you want refresh this page with new language?'),
+            'create_list' => $this->l('Add a new list'),
+            'name_list' => $this->l('List name'),
+            'name_list_placeholder' => $this->l('Provide a name for this new list'),
+            'desc_list' => $this->l('List description'),
+            'desc_list_placeholder' => $this->l('Write a description for this list'),
+            'accept_privacy' => $this->l('By creating a new list, you confirm its compliance with the privacy policy and the CAN-SPAM Act.'),
+            'undo_btn' => $this->l('Cancel'),
+            'check_login_data' => $this->l('Verifying your login data.'),
+            'error_login_data' => $this->l('Incorrect login credentials.'),
+            'server_failure_login_data' => $this->l('Internal server error. Please try again.'),
+            'success_login_data' => $this->l('You have successfully logged into Emailchef.'),
+            'no_list_found' => $this->l('No list found.'),
+            'check_status_list_data' => $this->l('Making a new list, please wait...'),
+            'check_status_list_data_cf' => $this->l('Stiamo creando i custom fields per la lista appena creata...'),
+            'check_status_list_data_cf_change' => $this->l('Stiamo sistemando i custom fields per la lista appena scelta...'),
+            'error_status_list_data' => $this->l('An error occurred while creating this list.'),
+            'error_status_list_data_cf' => $this->l('An error occurred while defining custom fields for this newly created list.'),
+            'error_status_list_data_cf_change' => $this->l('An error occurred while modifying custom fields for the chosen list.'),
+            'server_error_status_list_data' => $this->l('Internal server error. Please try again.'),
+            'success_status_list_data' => $this->l('Your list has been created. We’re now adding the custom fields.'),
+            'success_status_list_data_cf' => $this->l('Custom fields for this list have been successfully created.'),
+            'success_status_list_data_cf_change' => $this->l('Custom fields for this list have been successfully modified.')
+        ));
 
-		$helper->default_form_language    = $default_lang;
-		$helper->allow_employee_form_lang = $default_lang;
+        $helper->default_form_language = $default_lang;
+        $helper->allow_employee_form_lang = $default_lang;
 
-		$helper->title          = $this->displayName;
-		$helper->show_toolbar   = true;
-		$helper->toolbar_scroll = true;
-		$helper->submit_action  = 'submit' . $this->name;
-		$helper->toolbar_btn    = array(
-			'save' =>
-				array(
-					'desc' => $this->l( 'Save.' ),
-					'href' => AdminController::$currentIndex . '&configure=' . $this->name . '&save' . $this->name .
-					          '&token=' . Tools::getAdminTokenLite( 'AdminModules' ),
-				),
-			'back' => array(
-				'href' => AdminController::$currentIndex . '&token=' . Tools::getAdminTokenLite( 'AdminModules' ),
-				'desc' => $this->l( 'Go Back.' )
-			)
-		);
+        $helper->title = $this->displayName;
+        $helper->show_toolbar = true;
+        $helper->toolbar_scroll = true;
+        $helper->submit_action = 'submit' . $this->name;
+        $helper->toolbar_btn = array(
+            'save' =>
+                array(
+                    'desc' => $this->l('Save.'),
+                    'href' => AdminController::$currentIndex . '&configure=' . $this->name . '&save' . $this->name .
+                        '&token=' . Tools::getAdminTokenLite('AdminModules'),
+                ),
+            'back' => array(
+                'href' => AdminController::$currentIndex . '&token=' . Tools::getAdminTokenLite('AdminModules'),
+                'desc' => $this->l('Go Back.')
+            )
+        );
 
-		// Load current value
-		$helper->fields_value[ $this->prefix_setting( 'username' ) ]    = Configuration::get( $this->prefix_setting( 'username' ) );
-		$helper->fields_value[ $this->prefix_setting( 'password' ) ]    = Configuration::get( $this->prefix_setting( 'password' ) );
-		$helper->fields_value[ $this->prefix_setting( 'lang' ) ]        = Configuration::get( $this->prefix_setting( 'lang' ) );
-		$helper->fields_value[ $this->prefix_setting( 'list' ) ]        = Configuration::get( $this->prefix_setting( 'list' ) );
-		$helper->fields_value[ $this->prefix_setting( 'policy_type' ) ] = Configuration::get( $this->prefix_setting( 'policy_type' ) );
+        // Load current value
+        $helper->fields_value[$this->prefix_setting('consumer_key')] = Configuration::get($this->prefix_setting('username'));
+        $helper->fields_value[$this->prefix_setting('consumer_secret')] = Configuration::get($this->prefix_setting('password'));
+        $helper->fields_value[$this->prefix_setting('lang')] = Configuration::get($this->prefix_setting('lang'));
+        $helper->fields_value[$this->prefix_setting('list')] = Configuration::get($this->prefix_setting('list'));
+        $helper->fields_value[$this->prefix_setting('policy_type')] = Configuration::get($this->prefix_setting('policy_type'));
 
-		return $helper->generateForm( $fields_form );
+        return $helper->generateForm($fields_form);
 
-	}
+    }
 
-	public function hookBackOfficeHeader( $arr ) {
-		if ( strtolower( Tools::getValue( 'controller' ) ) == 'adminmodules' && Tools::getValue( 'configure' ) == "emailchef" ) {
-			$this->context->controller->addCSS( $this->_path . "js/plugins/emailchef/jquery.emailchef.css" );
-		}
-	}
+    public function hookBackOfficeHeader($arr)
+    {
+        if (strtolower(Tools::getValue('controller')) == 'adminmodules' && Tools::getValue('configure') == "emailchef") {
+            $this->context->controller->addCSS($this->_path . "views/css/emailchef.min.css");
+            $this->context->controller->addJS($this->_path . "views/bundle/emailchef/emailchef.min.js");
+        }
+    }
 
-	/**
-	 * Returns a customer email by token
-	 *
-	 * @param string $token
-	 *
-	 * @return string email
-	 */
-	protected function getUserEmailByToken( $token ) {
-		$sql = 'SELECT `email`
+    /**
+     * Returns a customer email by token
+     *
+     * @param string $token
+     *
+     * @return string email
+     */
+    protected function getUserEmailByToken($token)
+    {
+        $sql = 'SELECT `email`
 				FROM `' . _DB_PREFIX_ . 'customer`
-				WHERE MD5(CONCAT( `email` , `date_add`, \'' . pSQL( Configuration::get( 'EC_SALT' ) ) . '\')) = \'' . pSQL( $token ) . '\'
+				WHERE MD5(CONCAT( `email` , `date_add`, \'' . pSQL(Configuration::get('EC_SALT')) . '\')) = \'' . pSQL($token) . '\'
 				AND `newsletter` = 0';
 
-		return Db::getInstance()->getValue( $sql );
-	}
+        return Db::getInstance()->getValue($sql);
+    }
 
 
-	/**
-	 * Ends the registration process to the newsletter
-	 *
-	 * @param string $token
-	 *
-	 * @return string
-	 */
-	public function confirmEmail( $token ) {
-		$activated = false;
+    /**
+     * Ends the registration process to the newsletter
+     *
+     * @param string $token
+     *
+     * @return string
+     */
+    public function confirmEmail($token)
+    {
+        $activated = false;
 
-		if ( $email = $this->getUserEmailByToken( $token ) ) {
-			$activated = $this->registerUser( $email );
-		}
+        if ($email = $this->getUserEmailByToken($token)) {
+            $activated = $this->registerUser($email);
+        }
 
-		if ( ! $activated ) {
-			return $this->l( "Provided email address is either already in use or invalid." );
-		}
+        if (!$activated) {
+            return $this->l("Provided email address is either already in use or invalid.");
+        }
 
-		return $this->l( 'Thank you for subscribing to our newsletter!' );
-	}
+        return $this->l('Thank you for subscribing to our newsletter!');
+    }
 
-	/**
-	 * Ends the registration process to the newsletter
-	 *
-	 * @param string $token
-	 *
-	 * @return string
-	 */
-	public function unsubEmail( $token ) {
+    /**
+     * Ends the registration process to the newsletter
+     *
+     * @param string $token
+     *
+     * @return string
+     */
+    public function unsubEmail($token)
+    {
 
-		$deactivated = false;
+        $deactivated = false;
 
-		if ( $email = $this->getUserEmailByToken( $token ) ) {
-			$deactivated = $this->unregisterUser( $email );
-		}
+        if ($email = $this->getUserEmailByToken($token)) {
+            $deactivated = $this->unregisterUser($email);
+        }
 
-		if ( ! $deactivated ) {
-			return $this->l( "Provided email address is either already in use or invalid." );
-		}
+        if (!$deactivated) {
+            return $this->l("Provided email address is either already in use or invalid.");
+        }
 
-		return $this->l( 'You have successfully unsubscribed from our newsletter. ' );
-	}
+        return $this->l('You have successfully unsubscribed from our newsletter. ');
+    }
 
-	/**
-	 * Unsubscribe a customer to the newsletter
-	 *
-	 * @param string $email
-	 *
-	 * @return bool
-	 */
-	protected function unregisterUser( $email ) {
-		$sql = 'UPDATE ' . _DB_PREFIX_ . 'customer
-				SET `newsletter` = 0, newsletter_date_add = NOW(), `ip_registration_newsletter` = \'' . pSQL( Tools::getRemoteAddr() ) . '\'
-				WHERE `email` = \'' . pSQL( $email ) . '\'
+    /**
+     * Unsubscribe a customer to the newsletter
+     *
+     * @param string $email
+     *
+     * @return bool
+     */
+    protected function unregisterUser($email)
+    {
+        $sql = 'UPDATE ' . _DB_PREFIX_ . 'customer
+				SET `newsletter` = 0, newsletter_date_add = NOW(), `ip_registration_newsletter` = \'' . pSQL(Tools::getRemoteAddr()) . '\'
+				WHERE `email` = \'' . pSQL($email) . '\'
 				AND id_shop = ' . $this->context->shop->id;
 
-		$exec = Db::getInstance()->execute( $sql );
+        $exec = Db::getInstance()->execute($sql);
 
-		if ( $exec ) {
-			$list_id = $this->_getConf( "list" );
+        if ($exec) {
+            $list_id = $this->_getConf("list");
 
-			$customer_id = CustomerCore::customerExists(
-				$email,
-				true
-			);
+            $customer_id = CustomerCore::customerExists(
+                $email,
+                true
+            );
 
-			$customer = new CustomerCore( $customer_id );
+            $customer = new CustomerCore($customer_id);
 
-			try {
+            try {
 
-				$upsert = $this->emailchef()->upsert_customer(
-					$list_id,
-					array(
-						'first_name'  => $customer->firstname,
-						'last_name'   => $customer->lastname,
-						'user_email'  => $email,
-						'newsletter'  => 'no',
-						'customer_id' => $customer_id
-					)
-				);
+                $upsert = $this->emailchef()->upsert_customer(
+                    $list_id,
+                    array(
+                        'first_name' => $customer->firstname,
+                        'last_name' => $customer->lastname,
+                        'user_email' => $email,
+                        'newsletter' => 'no',
+                        'customer_id' => $customer_id
+                    )
+                );
 
-			} catch ( Exception $e ) {
-				$upsert = false;
-			}
+            } catch (Exception $e) {
+                $upsert = false;
+            }
 
-			if ( $upsert ) {
-				$this->log(
-					sprintf(
-						$this->l( "Unsubscribe from customer %d list %d (Name: %s Surname: %s Email: %s)" ),
-						$list_id,
-						$customer_id,
-						$customer->firstname,
-						$customer->lastname,
-						$email
-					)
-				);
-			} else {
-				$this->log(
-					sprintf(
-						$this->l( "Failed unsubscribe from customer %d list %d (Name: %s Surname: %s Email: %s)" ),
-						$list_id,
-						$customer_id,
-						$customer->firstname,
-						$customer->lastname,
-						$email
-					),
-					3
-				);
-			}
+            if ($upsert) {
+                $this->log(
+                    sprintf(
+                        $this->l("Unsubscribe from customer %d list %d (Name: %s Surname: %s Email: %s)"),
+                        $list_id,
+                        $customer_id,
+                        $customer->firstname,
+                        $customer->lastname,
+                        $email
+                    )
+                );
+            } else {
+                $this->log(
+                    sprintf(
+                        $this->l("Failed unsubscribe from customer %d list %d (Name: %s Surname: %s Email: %s)"),
+                        $list_id,
+                        $customer_id,
+                        $customer->firstname,
+                        $customer->lastname,
+                        $email
+                    ),
+                    3
+                );
+            }
 
-		}
+        }
 
-		return $exec;
+        return $exec;
 
-	}
+    }
 
-	/**
-	 * Subscribe a customer to the newsletter
-	 *
-	 * @param string $email
-	 *
-	 * @return bool
-	 */
-	protected function registerUser( $email ) {
-		$sql = 'UPDATE ' . _DB_PREFIX_ . 'customer
-				SET `newsletter` = 1, newsletter_date_add = NOW(), `ip_registration_newsletter` = \'' . pSQL( Tools::getRemoteAddr() ) . '\'
-				WHERE `email` = \'' . pSQL( $email ) . '\'
+    /**
+     * Subscribe a customer to the newsletter
+     *
+     * @param string $email
+     *
+     * @return bool
+     */
+    protected function registerUser($email)
+    {
+        $sql = 'UPDATE ' . _DB_PREFIX_ . 'customer
+				SET `newsletter` = 1, newsletter_date_add = NOW(), `ip_registration_newsletter` = \'' . pSQL(Tools::getRemoteAddr()) . '\'
+				WHERE `email` = \'' . pSQL($email) . '\'
 				AND id_shop = ' . $this->context->shop->id;
 
-		$exec = Db::getInstance()->execute( $sql );
+        $exec = Db::getInstance()->execute($sql);
 
-		if ( $exec ) {
-			$list_id = $this->_getConf( "list" );
+        if ($exec) {
+            $list_id = $this->_getConf("list");
 
-			$customer_id = CustomerCore::customerExists(
-				$email,
-				true
-			);
+            $customer_id = CustomerCore::customerExists(
+                $email,
+                true
+            );
 
-			$customer = new CustomerCore( $customer_id );
+            $customer = new CustomerCore($customer_id);
 
-			try {
+            try {
 
-				$upsert = $this->emailchef()->upsert_customer(
-					$list_id,
-					array(
-						'first_name'  => $customer->firstname,
-						'last_name'   => $customer->lastname,
-						'user_email'  => $email,
-						'newsletter'  => 'yes',
-						'customer_id' => $customer_id
-					)
-				);
+                $upsert = $this->emailchef()->upsert_customer(
+                    $list_id,
+                    array(
+                        'first_name' => $customer->firstname,
+                        'last_name' => $customer->lastname,
+                        'user_email' => $email,
+                        'newsletter' => 'yes',
+                        'customer_id' => $customer_id
+                    )
+                );
 
-			} catch ( Exception $e ) {
-				$upsert = false;
-			}
+            } catch (Exception $e) {
+                $upsert = false;
+            }
 
-			if ( $upsert ) {
-				$this->log(
-					sprintf(
-						$this->l( "Double opt-in confirmation from customer %d list %d ((Name: %s Surname: %s Email: %s)" ),
-						$list_id,
-						$customer_id,
-						$customer->firstname,
-						$customer->lastname,
-						$email
-					)
-				);
-			} else {
-				$this->log(
-					sprintf(
-						$this->l( "Failed double opt-in confirmation from client %d list %d (Name: %s Surname: %s Email: %s)" ),
-						$list_id,
-						$customer_id,
-						$customer->firstname,
-						$customer->lastname,
-						$email
-					),
-					3
-				);
-			}
+            if ($upsert) {
+                $this->log(
+                    sprintf(
+                        $this->l("Double opt-in confirmation from customer %d list %d ((Name: %s Surname: %s Email: %s)"),
+                        $list_id,
+                        $customer_id,
+                        $customer->firstname,
+                        $customer->lastname,
+                        $email
+                    )
+                );
+            } else {
+                $this->log(
+                    sprintf(
+                        $this->l("Failed double opt-in confirmation from client %d list %d (Name: %s Surname: %s Email: %s)"),
+                        $list_id,
+                        $customer_id,
+                        $customer->firstname,
+                        $customer->lastname,
+                        $email
+                    ),
+                    3
+                );
+            }
 
-		}
+        }
 
-		return $exec;
+        return $exec;
 
-	}
+    }
 
-	/**
-	 * Send double opt-in
-	 *
-	 * @param $email
-	 * @param $lang_id
-	 * @param $shop_id
-	 *
-	 * @return bool
-	 */
+    /**
+     * Send double opt-in
+     *
+     * @param $email
+     * @param $lang_id
+     * @param $shop_id
+     *
+     * @return bool
+     */
 
-	protected function sendDoubleOptIn( $firstname, $email, $lang_id, $shop_id ) {
+    protected function sendDoubleOptIn($firstname, $email, $lang_id, $shop_id)
+    {
 
-		$update_sql = 'UPDATE `' . _DB_PREFIX_ . 'customer` SET `newsletter` = 0 WHERE `email` = \'' . pSQL( $email ) . '\'';
+        $update_sql = 'UPDATE `' . _DB_PREFIX_ . 'customer` SET `newsletter` = 0 WHERE `email` = \'' . pSQL($email) . '\'';
 
-		if ( Db::getInstance()->execute( $update_sql ) ) {
+        if (Db::getInstance()->execute($update_sql)) {
 
-			$token_sql = 'SELECT MD5(CONCAT( `email` , `date_add`, \'' . pSQL( Configuration::get( 'EC_SALT' ) ) . '\' )) as token
+            $token_sql = 'SELECT MD5(CONCAT( `email` , `date_add`, \'' . pSQL(Configuration::get('EC_SALT')) . '\' )) as token
 						FROM `' . _DB_PREFIX_ . 'customer`
 						WHERE `newsletter` = 0
-						AND `email` = \'' . pSQL( $email ) . '\'';
-
-			$token = Db::getInstance()->getValue( $token_sql );
-
-			$verif_url = Context::getContext()->link->getModuleLink(
-				'emailchef', 'verification', array(
-					'token' => $token,
-				)
-			);
-
-			$unsub_url = Context::getContext()->link->getModuleLink(
-				'emailchef', 'unsubscribe', array(
-					'token' => $token,
-				)
-			);
-
-			$template_vars = array(
-				'{verif_url}'     => $verif_url,
-				'{unsub_url}'     => $unsub_url,
-				'{customer_name}' => $firstname
-			);
-
-			return Mail::Send( $lang_id, 'newsletter_verif_emailchef',
-				Mail::l('Verify email for mailing list subscription', $lang_id ), $template_vars, $email, null,
-				null, null, null, null, dirname( __FILE__ ) . '/mails/', false, $shop_id );
-
-		}
-
-	}
-
-	public function hookActionCustomerAccountAdd( $params ) {
-		if ( $this->emailchef()->isLogged() ) {
-
-			$customer   = $this->context->customer;
-			$newsletter = 'no';
-			$list_id    = $this->_getConf( "list" );
-
-			if ( $customer->newsletter == 1 && $this->_getConf( "policy_type" ) == "dopt" ) {
-				$this->sendDoubleOptIn(
-					$customer->firstname,
-					$customer->email,
-					$this->context->language->id,
-					$this->context->shop->id
-				);
-				$newsletter = 'pending';
-			}
-
-			if ( $customer->newsletter == 1 && $this->_getConf( "policy_type" ) == "sopt" ) {
-				$newsletter = 'yes';
-			}
-
-			require_once( dirname( __FILE__ ) . "/lib/emailchef/class-emailchef-sync.php" );
-
-			$sync                    = new PS_Emailchef_Sync();
-			$syncCustomerAccountData = $sync->getSyncCustomerAccountAdd( $customer, $newsletter );
-
-			$upsert = $this->emailchef()->upsert_customer(
-				$list_id,
-				$syncCustomerAccountData
-			);
-
-			if ( $upsert ) {
-				$this->log(
-					sprintf(
-						$this->l( "Added to customer %d list %d (Name: %s Surname: %s Email: %s Newsletter opt-in: %s)" ),
-						$list_id,
-						$customer->id,
-						$customer->firstname,
-						$customer->lastname,
-						$customer->email,
-						$newsletter
-					)
-				);
-			} else {
-				$this->log(
-					sprintf(
-						$this->l( "Failed to add to customer %d list %d (Name: %s Surname: %s Newsletter opt-in: %s)" ),
-						$list_id,
-						$customer->id,
-						$customer->firstname,
-						$customer->lastname,
-						$customer->email,
-						$newsletter
-					),
-					3
-				);
-			}
-
-		}
-	}
-
-	public function HookActionObjectCustomerUpdateBefore( $params ) {
-		if ( $this->emailchef()->isLogged() ) {
-
-			/**
-			 * @var Customer $customer
-			 */
-
-			$customerob = $params['object'];
-			$customer   = new Customer( $customerob->id );
-
-			$this->newsletter_before = (int) $customer->newsletter;
-		}
-	}
-
-	public function HookActionObjectCustomerUpdateAfter( $params ) {
-		return $this->update_info_customer( $params['object'] );
-	}
-
-	public function hookActionObjectAddressAddAfter( $params ) {
-		return $this->update_customer( $params['object'] );
-	}
-
-	public function hookActionObjectAddressUpdateAfter( $params ) {
-		return $this->update_customer( $params['object'] );
-	}
-
-	public function hookActionObjectLanguageAddAfter( $params ) {
-		$this->update_language_field( $params['object'], "add" );
-	}
-
-	public function hookActionObjectLanguageUpdateAfter( $params ) {
-		$this->update_language_field( $params['object'], "update" );
-	}
-
-	public function hookActionObjectLanguageDeleteAfter( $params ) {
-		$this->update_language_field( $params['object'], "delete" );
-	}
-
-	/**
-	 * Update Language Field
-	 *
-	 * @param \LanguageCore $language
-	 * @param $action
-	 */
-
-	private function update_language_field( $language, $action = "update" ) {
-
-		$psec = $this->emailchef();
-
-		if ( $psec->isLogged() ) {
-
-			$list_id = $this->_getConf( "list" );
-
-			$custom_fields = require( PS_EMAILCHEF_DIR . "/conf/custom_fields.php" );
-			$custom_field  = $custom_fields['lang'];
-
-			$type          = $custom_field['data_type'];
-			$name          = $custom_field['name'];
-			$options       = ( isset( $custom_field['options'] ) ? $custom_field['options'] : array() );
-			$default_value = ( isset( $custom_field['default_value'] ) ? $custom_field['default_value'] : "" );
-			$iso_code      = $language->iso_code;
-
-			$new_options = array();
-
-			if ( $action == "delete" ) {
-				foreach ( $options as $option ) {
-					if ( $option['text'] == $iso_code ) {
-						continue;
-					}
-					$new_options[] = $option;
-				}
-			} else if ( $action == "update" ) {
-				$not_found = true;
-				foreach ( $options as $option ) {
-					if ( $option['text'] == $iso_code ) {
-						$not_found = false;
-					}
-					$new_options[] = $option;
-				}
-
-				if ( $not_found ) {
-					$new_options[] = array(
-						'text' => $iso_code
-					);
-				}
-			} else {
-				$new_options   = $options;
-				$new_options[] = array(
-					'text' => $iso_code
-				);
-			}
-
-			$init = $psec->update_custom_field( $list_id, $type, $name, 'lang', $new_options, $default_value );
-
-			if ( $init ) {
-				$this->log(
-					sprintf(
-						$this->l( "Language custom fields for list %d updated." ),
-						$list_id
-					)
-				);
-			} else {
-				$this->log(
-					sprintf(
-						$this->l( "update language custom fields for list %d has failed.  (Error: %s)" ),
-						$list_id,
-						$psec->lastError
-					),
-					3
-				);
-			}
-
-		}
-	}
-
-	private function update_customer( $object ) {
-
-		if ( $this->emailchef()->isLogged() ) {
-
-			/**
-			 * @var AddressCore $address
-			 */
-
-			$address = $object;
-			$list_id = $this->_getConf( "list" );
-
-			require_once( dirname( __FILE__ ) . "/lib/emailchef/class-emailchef-sync.php" );
-
-			$sync = new PS_Emailchef_Sync();
-
-			$syncAddressData = $sync->getSyncUpdateCustomerAddress( $address );
-
-			$upsert = $this->emailchef()->upsert_customer(
-				$list_id,
-				$syncAddressData
-			);
-
-			if ( $upsert ) {
-				$this->log(
-					sprintf(
-						$this->l( "Updated customer %d data in list %d (Name: %s Surname: %s and other %d fields)" ),
-						$list_id,
-						$address->id_customer,
-						$address->firstname,
-						$address->lastname,
-						intval( count( $syncAddressData ) - 2 )
-					)
-				);
-			} else {
-				$this->log(
-					sprintf(
-						$this->l( "Failed to insert updated customer %d data in list %d (Name: %s Surname: %s and other %d fields)" ),
-						$address->id_customer,
-						$address->firstname,
-						$address->lastname,
-						intval( count( $syncAddressData ) - 2 ),
-						$list_id
-					),
-					3
-				);
-			}
-
-		}
-
-	}
-
-	private function update_info_customer( $object ) {
-
-		if ( $this->emailchef()->isLogged() ) {
-
-			/**
-			 * @var Customer $customer
-			 */
-
-			$customer = $object;
-			$list_id  = $this->_getConf( "list" );
-
-			require_once( dirname( __FILE__ ) . "/lib/emailchef/class-emailchef-sync.php" );
-
-			$sync = new PS_Emailchef_Sync();
-
-			$syncCustomerInfo = $sync->getSyncUpdateCustomerInfo( $customer );
-
-			if ( $customer->newsletter == 1 && $this->_getConf( "policy_type" ) == "dopt" && $this->newsletter_before == 0 ) {
-				$this->sendDoubleOptIn(
-					$customer->firstname,
-					$customer->email,
-					$this->context->language->id,
-					$this->context->shop->id
-				);
-				$syncCustomerInfo['newsletter'] = 'pending';
-			}
-
-			if ( $customer->newsletter == 1 && $this->_getConf( "policy_type" ) == "sopt" ) {
-				$syncCustomerInfo['newsletter'] = 'yes';
-			}
-
-			$upsert = $this->emailchef()->upsert_customer(
-				$list_id,
-				$syncCustomerInfo
-			);
-
-			if ( $upsert ) {
-				$this->log(
-					sprintf(
-						$this->l( "Updated customer %d data in list %d (Name: %s Surname: %s and other %d fields)" ),
-						$list_id,
-						$customer->id,
-						$customer->firstname,
-						$customer->lastname,
-						intval( count( $syncCustomerInfo ) - 2 )
-					)
-				);
-			} else {
-				$this->log(
-					sprintf(
-						$this->l( "Failed to insert updated customer %d data in list %d (Name: %s Surname: %s and other %d fields)" ),
-						$customer->id,
-						$customer->firstname,
-						$customer->lastname,
-						intval( count( $syncCustomerInfo ) - 2 ),
-						$list_id
-					),
-					3
-				);
-			}
-
-		}
-
-	}
-
-	public function hookActionOrderStatusPostUpdate( $params ) {
-		require_once( dirname( __FILE__ ) . "/lib/emailchef/class-emailchef-sync.php" );
-
-		$list_id = $this->_getConf( "list" );
-
-		$ecps = $this->emailchef();
-
-		if ( $ecps->isLogged() ) {
-
-			$sync          = new PS_Emailchef_Sync();
-			$syncOrderData = $sync->getSyncOrderData(
-				$params['id_order'],
-				$params['newOrderStatus']
-			);
-
-			$syncOrderData = array_merge(
-				$syncOrderData,
-				$sync->flushAbandonedCarts( $syncOrderData['customer_id'] )
-			);
-
-			$upsert = $ecps->upsert_customer(
-				$list_id,
-				$syncOrderData
-			);
-
-			if ( $upsert ) {
-				$this->log(
-					sprintf(
-						$this->l( "Updated customer %d data in list %d (Name: %s Surname: %s and other %d fields)" ),
-						$list_id,
-						$syncOrderData['customer_id'],
-						$syncOrderData['first_name'],
-						$syncOrderData['last_name'],
-						intval( count( $syncOrderData ) - 2 )
-					)
-				);
-			} else {
-				$this->log(
-					sprintf(
-						$this->l( "Failed to insert updated customer %d data in list %d (Name: %s Surname: %s and other %d fields) (Error: %s)" ),
-						$list_id,
-						$syncOrderData['customer_id'],
-						$syncOrderData['first_name'],
-						$syncOrderData['last_name'],
-						intval( count( $syncOrderData ) - 2 ),
-						$ecps->lastError
-					),
-					3
-				);
-			}
-
-		}
-
-	}
+						AND `email` = \'' . pSQL($email) . '\'';
+
+            $token = Db::getInstance()->getValue($token_sql);
+
+            $verif_url = Context::getContext()->link->getModuleLink(
+                'emailchef', 'verification', array(
+                    'token' => $token,
+                )
+            );
+
+            $unsub_url = Context::getContext()->link->getModuleLink(
+                'emailchef', 'unsubscribe', array(
+                    'token' => $token,
+                )
+            );
+
+            $template_vars = array(
+                '{verif_url}' => $verif_url,
+                '{unsub_url}' => $unsub_url,
+                '{customer_name}' => $firstname
+            );
+
+            return Mail::Send($lang_id, 'newsletter_verif_emailchef',
+                Mail::l('Verify email for mailing list subscription', $lang_id), $template_vars, $email, null,
+                null, null, null, null, dirname(__FILE__) . '/mails/', false, $shop_id);
+
+        }
+
+    }
+
+    public function hookActionCustomerAccountAdd($params)
+    {
+        if ($this->emailchef()->isLogged()) {
+
+            $customer = $this->context->customer;
+            $newsletter = 'no';
+            $list_id = $this->_getConf("list");
+
+            if ($customer->newsletter == 1 && $this->_getConf("policy_type") == "dopt") {
+                $this->sendDoubleOptIn(
+                    $customer->firstname,
+                    $customer->email,
+                    $this->context->language->id,
+                    $this->context->shop->id
+                );
+                $newsletter = 'pending';
+            }
+
+            if ($customer->newsletter == 1 && $this->_getConf("policy_type") == "sopt") {
+                $newsletter = 'yes';
+            }
+
+            require_once(dirname(__FILE__) . "/lib/emailchef/class-emailchef-sync.php");
+
+            $sync = new PS_Emailchef_Sync();
+            $syncCustomerAccountData = $sync->getSyncCustomerAccountAdd($customer, $newsletter);
+
+            $upsert = $this->emailchef()->upsert_customer(
+                $list_id,
+                $syncCustomerAccountData
+            );
+
+            if ($upsert) {
+                $this->log(
+                    sprintf(
+                        $this->l("Added to customer %d list %d (Name: %s Surname: %s Email: %s Newsletter opt-in: %s)"),
+                        $list_id,
+                        $customer->id,
+                        $customer->firstname,
+                        $customer->lastname,
+                        $customer->email,
+                        $newsletter
+                    )
+                );
+            } else {
+                $this->log(
+                    sprintf(
+                        $this->l("Failed to add to customer %d list %d (Name: %s Surname: %s Newsletter opt-in: %s)"),
+                        $list_id,
+                        $customer->id,
+                        $customer->firstname,
+                        $customer->lastname,
+                        $customer->email,
+                        $newsletter
+                    ),
+                    3
+                );
+            }
+
+        }
+    }
+
+    public function HookActionObjectCustomerUpdateBefore($params)
+    {
+        if ($this->emailchef()->isLogged()) {
+
+            /**
+             * @var Customer $customer
+             */
+
+            $customerob = $params['object'];
+            $customer = new Customer($customerob->id);
+
+            $this->newsletter_before = (int)$customer->newsletter;
+        }
+    }
+
+    public function HookActionObjectCustomerUpdateAfter($params)
+    {
+        return $this->update_info_customer($params['object']);
+    }
+
+    public function hookActionObjectAddressAddAfter($params)
+    {
+        return $this->update_customer($params['object']);
+    }
+
+    public function hookActionObjectAddressUpdateAfter($params)
+    {
+        return $this->update_customer($params['object']);
+    }
+
+    public function hookActionObjectLanguageAddAfter($params)
+    {
+        $this->update_language_field($params['object'], "add");
+    }
+
+    public function hookActionObjectLanguageUpdateAfter($params)
+    {
+        $this->update_language_field($params['object'], "update");
+    }
+
+    public function hookActionObjectLanguageDeleteAfter($params)
+    {
+        $this->update_language_field($params['object'], "delete");
+    }
+
+    /**
+     * Update Language Field
+     *
+     * @param \LanguageCore $language
+     * @param $action
+     */
+
+    private function update_language_field($language, $action = "update")
+    {
+
+        $psec = $this->emailchef();
+
+        if ($psec->isLogged()) {
+
+            $list_id = $this->_getConf("list");
+
+            $custom_fields = require(PS_EMAILCHEF_DIR . "/conf/custom_fields.php");
+            $custom_field = $custom_fields['lang'];
+
+            $type = $custom_field['data_type'];
+            $name = $custom_field['name'];
+            $options = (isset($custom_field['options']) ? $custom_field['options'] : array());
+            $default_value = (isset($custom_field['default_value']) ? $custom_field['default_value'] : "");
+            $iso_code = $language->iso_code;
+
+            $new_options = array();
+
+            if ($action == "delete") {
+                foreach ($options as $option) {
+                    if ($option['text'] == $iso_code) {
+                        continue;
+                    }
+                    $new_options[] = $option;
+                }
+            } else if ($action == "update") {
+                $not_found = true;
+                foreach ($options as $option) {
+                    if ($option['text'] == $iso_code) {
+                        $not_found = false;
+                    }
+                    $new_options[] = $option;
+                }
+
+                if ($not_found) {
+                    $new_options[] = array(
+                        'text' => $iso_code
+                    );
+                }
+            } else {
+                $new_options = $options;
+                $new_options[] = array(
+                    'text' => $iso_code
+                );
+            }
+
+            $init = $psec->update_custom_field($list_id, $type, $name, 'lang', $new_options, $default_value);
+
+            if ($init) {
+                $this->log(
+                    sprintf(
+                        $this->l("Language custom fields for list %d updated."),
+                        $list_id
+                    )
+                );
+            } else {
+                $this->log(
+                    sprintf(
+                        $this->l("update language custom fields for list %d has failed.  (Error: %s)"),
+                        $list_id,
+                        $psec->lastError
+                    ),
+                    3
+                );
+            }
+
+        }
+    }
+
+    private function update_customer($object)
+    {
+
+        if ($this->emailchef()->isLogged()) {
+
+            /**
+             * @var AddressCore $address
+             */
+
+            $address = $object;
+            $list_id = $this->_getConf("list");
+
+            require_once(dirname(__FILE__) . "/lib/emailchef/class-emailchef-sync.php");
+
+            $sync = new PS_Emailchef_Sync();
+
+            $syncAddressData = $sync->getSyncUpdateCustomerAddress($address);
+
+            $upsert = $this->emailchef()->upsert_customer(
+                $list_id,
+                $syncAddressData
+            );
+
+            if ($upsert) {
+                $this->log(
+                    sprintf(
+                        $this->l("Updated customer %d data in list %d (Name: %s Surname: %s and other %d fields)"),
+                        $list_id,
+                        $address->id_customer,
+                        $address->firstname,
+                        $address->lastname,
+                        intval(count($syncAddressData) - 2)
+                    )
+                );
+            } else {
+                $this->log(
+                    sprintf(
+                        $this->l("Failed to insert updated customer %d data in list %d (Name: %s Surname: %s and other %d fields)"),
+                        $address->id_customer,
+                        $address->firstname,
+                        $address->lastname,
+                        intval(count($syncAddressData) - 2),
+                        $list_id
+                    ),
+                    3
+                );
+            }
+
+        }
+
+    }
+
+    private function update_info_customer($object)
+    {
+
+        if ($this->emailchef()->isLogged()) {
+
+            /**
+             * @var Customer $customer
+             */
+
+            $customer = $object;
+            $list_id = $this->_getConf("list");
+
+            require_once(dirname(__FILE__) . "/lib/emailchef/class-emailchef-sync.php");
+
+            $sync = new PS_Emailchef_Sync();
+
+            $syncCustomerInfo = $sync->getSyncUpdateCustomerInfo($customer);
+
+            if ($customer->newsletter == 1 && $this->_getConf("policy_type") == "dopt" && $this->newsletter_before == 0) {
+                $this->sendDoubleOptIn(
+                    $customer->firstname,
+                    $customer->email,
+                    $this->context->language->id,
+                    $this->context->shop->id
+                );
+                $syncCustomerInfo['newsletter'] = 'pending';
+            }
+
+            if ($customer->newsletter == 1 && $this->_getConf("policy_type") == "sopt") {
+                $syncCustomerInfo['newsletter'] = 'yes';
+            }
+
+            $upsert = $this->emailchef()->upsert_customer(
+                $list_id,
+                $syncCustomerInfo
+            );
+
+            if ($upsert) {
+                $this->log(
+                    sprintf(
+                        $this->l("Updated customer %d data in list %d (Name: %s Surname: %s and other %d fields)"),
+                        $list_id,
+                        $customer->id,
+                        $customer->firstname,
+                        $customer->lastname,
+                        intval(count($syncCustomerInfo) - 2)
+                    )
+                );
+            } else {
+                $this->log(
+                    sprintf(
+                        $this->l("Failed to insert updated customer %d data in list %d (Name: %s Surname: %s and other %d fields)"),
+                        $customer->id,
+                        $customer->firstname,
+                        $customer->lastname,
+                        intval(count($syncCustomerInfo) - 2),
+                        $list_id
+                    ),
+                    3
+                );
+            }
+
+        }
+
+    }
+
+    public function hookActionOrderStatusPostUpdate($params)
+    {
+        require_once(dirname(__FILE__) . "/lib/emailchef/class-emailchef-sync.php");
+
+        $list_id = $this->_getConf("list");
+
+        $ecps = $this->emailchef();
+
+        if ($ecps->isLogged()) {
+
+            $sync = new PS_Emailchef_Sync();
+            $syncOrderData = $sync->getSyncOrderData(
+                $params['id_order'],
+                $params['newOrderStatus']
+            );
+
+            $syncOrderData = array_merge(
+                $syncOrderData,
+                $sync->flushAbandonedCarts($syncOrderData['customer_id'])
+            );
+
+            $upsert = $ecps->upsert_customer(
+                $list_id,
+                $syncOrderData
+            );
+
+            if ($upsert) {
+                $this->log(
+                    sprintf(
+                        $this->l("Updated customer %d data in list %d (Name: %s Surname: %s and other %d fields)"),
+                        $list_id,
+                        $syncOrderData['customer_id'],
+                        $syncOrderData['first_name'],
+                        $syncOrderData['last_name'],
+                        intval(count($syncOrderData) - 2)
+                    )
+                );
+            } else {
+                $this->log(
+                    sprintf(
+                        $this->l("Failed to insert updated customer %d data in list %d (Name: %s Surname: %s and other %d fields) (Error: %s)"),
+                        $list_id,
+                        $syncOrderData['customer_id'],
+                        $syncOrderData['first_name'],
+                        $syncOrderData['last_name'],
+                        intval(count($syncOrderData) - 2),
+                        $ecps->lastError
+                    ),
+                    3
+                );
+            }
+
+        }
+
+    }
 
 }

@@ -1,0 +1,397 @@
+@import "../variables";
+
+.tr-info-color {
+  color: $infoColor;
+  background-color: $infoBackgroundColor;
+  label {
+    color: #000;
+    padding-left: 21px;
+  }
+  td {
+    padding-left: 21px;
+  }
+}
+
+#check_login_data {
+  padding-left: 30px;
+  color: $infoColor;
+
+  &.success {
+    color: $successColor;
+  }
+  &.error {
+    color: $errorColor;
+    font-weight: bold;
+  }
+
+}
+
+#check_lists {
+  padding-left: 30px;
+  color: $infoColor;
+}
+
+.emailchef-logo {
+  img {
+    margin-left: 0;
+    display: block;
+  }
+}
+.social-foot {
+  text-decoration: none;
+}
+
+:root{
+  --ecps-error-color: #D73638;
+  --ecps-success-color: #01A32A;
+}
+/***/
+.truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ecps-not-logged{
+  display: block;
+  margin-top: 1em;
+  width: 280px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.ecps-not-logged-signup{
+  margin-bottom: 2.5em;
+}
+.ecps-not-logged label{
+  display: block;
+  margin-bottom: .5em;
+  font-size: 1.2em;
+}
+.ecps-not-logged input[ type="text" ],
+.ecps-not-logged input[ type="password"]{
+  display: block;
+  width: 100%;
+}
+.ecps-not-logged-control-group{
+  margin-bottom: 1.5em;
+}
+.ecps-not-logged label.ecps-not-logged-get-api{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.ecps-not-logged label.ecps-not-logged-get-api a{
+  font-size: .8em;
+}
+.ecps-text-center,
+.ecps-text-center p{
+  text-align: center;
+}
+.ecps-not-logged-password-field{
+  position: relative;
+}
+.ecps-not-logged-password-field input{
+  padding-right: 36px;
+}
+.ecps-not-logged-password-field a {
+  cursor: pointer;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  height: 32px;
+  width: 36px;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  opacity: .5;
+}
+.ecps-not-logged-password-field a:hover {
+  opacity: 1;
+}
+.ecps-not-logged-password-field a svg {
+  width: 18px;
+}
+.ecps-login-logo{
+  width: 160px;
+  margin: 3em auto 0;
+}
+
+.ecps-main-container{
+  display: flex;
+  margin-top: 1em ;
+  margin-bottom: 1em ;
+}
+.ecps-main-container > div:first-child{
+  border-right: 1px solid #dddddd;
+  padding-right: 1em;
+}
+.ecps-main-container > div:last-child{
+  padding-left: 1em;
+}
+.ecps-main-account{
+  flex-grow: 0;
+  min-width: 260px;
+}
+.ecps-main-forms{
+  flex-grow: 1;
+}
+.ecps-forms-logo{
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+  align-items: start;
+}
+.ecps-forms-logo svg{
+  width: 100px;
+}
+.ecps-account-status{
+  display: flex;
+  align-items: center;
+  gap: .5em;
+  font-size: .9em;
+  margin-bottom: 2rem;
+}
+.ecps-account-connected{
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: var(--ecps-success-color);
+}
+.ecps-account-info {
+  margin-top: .5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: .3rem;
+}
+.ecps-account-disconnect {
+  display: inline-flex;
+  border-radius: 3px;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+}
+.ecps-account-disconnect:hover {
+  background-color: #d5d5d5;
+}
+.ecps-account-disconnect svg {
+  fill: #616161;
+  height: 14px;
+  width: 14px;
+}
+.ecps-list-container{
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  margin-top: .5rem;
+
+  .ecps-list-none {
+   font-style: italic;
+   color: #CCCCCC;
+  }
+  .ecps-list-selected {
+   display:none;
+  }
+
+  &.ecps-has-list{
+    svg path{
+      fill: #F58B3E;
+    }
+    .ecps-list-none {
+      display: none;
+    }
+    .ecps-list-selected {
+      display:block;
+    }
+
+  }
+
+
+
+}
+
+.error-field{
+  color: var(--ecps-error-color);
+  display: block;
+}
+
+.emailchef-form {
+  /*width: 100% !important;*/
+  max-width: 100% !important;
+  margin-right: 1.5em;
+}
+.emailchef-form .map-reload {
+  display: none;
+}
+
+.emailchef-form .form-table td.nopadding {
+  padding: 0;
+  max-width:170px !important;
+}
+.emailchef-form .form-table input[type=text],
+.emailchef-form .form-table input[type=password],
+.emailchef-form .form-table textarea,
+.emailchef-form .form-table select
+{
+  background-color: #fff;
+  width: 200px;
+}
+.emailchef-form select {
+  max-width:100% !important;
+}
+
+.emailchef-form .save {
+  margin: 0 0 0 10px !important;
+}
+
+.emailchef-check-login-result {
+  margin-top: 1em;
+  display: none;
+}
+
+input[name="emailchef_settings\[consumer_key\]"].error,
+input[name="emailchef_settings\[consumer_secret\]"].error {
+  border-color: var(--ecps-error-color);
+}
+
+input[name="emailchef_settings\[consumer_key\]"].valid,
+input[name="emailchef_settings\[consumer_secret\]"].valid {
+  border-color: var(--ecps-success-color);
+}
+/*
+.js .emailchef-form .control-section.open .accordion-section-title{
+    color: #FFF;
+    background: #F47200;
+}
+.js .emailchef-form  .control-section.open .accordion-section-title .not-connected{
+    color: #FFF;
+}
+.control-section.open .accordion-section-title:after{
+    color: #FFF;
+}
+
+
+.accordion-section .not-connected {
+    display: inline-block;
+    float: right;
+    margin-right: 20px;
+    color: var(--ecps-error-color);
+}
+.accordion-section.active .not-connected {
+    display: none;
+}
+.accordion-section .loading{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100px;
+}
+.accordion-section-content{
+    border-left: 1px solid #dddddd;
+    border-right: 1px solid #dddddd;
+    background-color: #f8f8f8;
+}
+.accordion-section .form-table-container{
+    border:1px solid #ccc;
+    padding:.5em;
+    margin-top:.5em;
+    margin-bottom: 1em;
+}
+.accordion-section.warning .form-table-container,
+.accordion-section.warning .list-id{
+    border-color:var(--ecps-error-color);
+}
+.accordion-section .warning-select-list{
+    display:none;
+    color:var(--ecps-error-color);
+}
+.accordion-section.warning .warning-select-list{
+    display:block;
+}
+.accordion-section.warning-map .form-table-container{
+    border-color:var(--ecps-error-color);
+}
+.accordion-section.warning-map .at-least-email{
+    color:var(--ecps-error-color);
+}
+.accordion-section .form-table td,
+.accordion-section .form-table th{
+    border-bottom: 1px solid #ddd;
+}
+.accordion-section .form-table th{
+    font-size: 1.1em;
+}
+.accordion-section .form-table tr:last-child td,
+.accordion-section .form-table tr:last-child th{
+    border: none;
+}
+.accordion-section .form-table th {
+    padding: .5em;
+}
+.accordion-section .form-table td {
+    padding: .5em;
+}
+.auto-create{
+    text-align: center;
+    padding-bottom: 1em;
+}
+*/
+.ecps-new-list-container{
+  margin-top: 20px;
+  border: 1px solid #dddddd;
+  background-color: #f8f8f8;
+  padding: 1rem;
+  display: none;
+}
+.ecps-new-list-container label{
+  padding: 0;
+  margin-bottom: .4rem;
+  display: block;
+  font-weight: 600;
+}
+.ecps-new-list-container input[type=text]{
+  margin-bottom: 1rem !important;
+}
+.ecps-new-list-container .ecps-buttons-container {
+  display: flex;
+  gap: .5rem;
+  margin-top: .5rem;
+}
+.ecps-hr-separator{
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+.ecps-hr-separator-half{
+  margin-top: .75rem;
+  margin-bottom: .75rem;
+}
+
+
+@media screen and (max-width: 599px) {
+  .ecps-main-container {
+    flex-direction: column;
+    margin-right: 0;
+  }
+  .ecps-main-container > div:first-child {
+    border-right: none;
+    border-bottom: 1px solid #dddddd;
+    padding-right: 0;
+    padding-bottom: 1em;
+  }
+  .ecps-main-account {
+    flex-grow: 0;
+    width: 100%;
+  }
+  .ecps-account-status {
+    margin-bottom: .5em;
+  }
+  .ecps-main-container > div:last-child {
+    padding-left: 0;
+  }
+  .emailchef-form{
+    margin-right: 0;
+  }
+}
