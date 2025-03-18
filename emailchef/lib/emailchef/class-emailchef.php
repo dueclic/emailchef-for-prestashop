@@ -58,10 +58,35 @@
 		public $lastResponse;
 		private $new_custom_id;
 
-		public function __construct( $username, $password ) {
-			parent::__construct( $username, $password );
+        /**
+         * @var $isLogged
+         */
+        private $isLogged;
+
+		public function __construct( $consumerKey, $consumerSecret, $isLogged = false ) {
+            $this->isLogged = $isLogged;
+			parent::__construct( $consumerKey, $consumerSecret );
 			$this->api_url = "https://app.emailchef.com/apps/api/v1";
 		}
+
+        public function isLogged()
+        {
+            return $this->isLogged;
+        }
+
+        public function get_account(
+            $key = null
+        ) {
+            $account = $this->json( "/accounts/current", array(), "GET" );
+            if ($key && isset($account[$key])){
+                return $account;
+            }
+            if ($key && !isset($account[$key])){
+                return null;
+            }
+
+            return $account;
+        }
 
 		/**
 		 * Get policy of account
@@ -69,9 +94,7 @@
 		 */
 
 		public function get_policy() {
-			$account = $this->json( "/accounts/current", array(), "GET" );
-
-			return $account['mode'];
+			return $this->get_account('mode');
 		}
 
 		/**

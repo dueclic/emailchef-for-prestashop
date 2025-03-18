@@ -71,20 +71,26 @@ class Emailchef extends Module
     /**
      * Get emailchef connection object
      *
-     * @param string|null $api_user
-     * @param string|null $api_pass
+     * @param string|null $consumer_key
+     * @param string|null $consumer_secret
+     * @param bool $force
      *
      * @return PS_Emailchef
      */
 
-    public function emailchef($api_user = null, $api_pass = null)
+    public function emailchef($consumer_key = null, $consumer_secret = null, $force = false)
     {
 
-        if (empty($this->emailchef) || !is_null($api_user) || !is_null($api_pass)) {
+        if (empty($this->emailchef) || (!is_null($consumer_key) && !is_null($consumer_secret)) || $force) {
 
-            $api_user = $api_user ? $api_user : $this->_getConf("username");
-            $api_pass = $api_pass ? $api_pass : $this->_getConf("password");
-            $this->emailchef = new PS_Emailchef($api_user, $api_pass);
+            $consumer_key = $consumer_key ? $consumer_key : $this->_getConf("consumer_key");
+            $consumer_secret = $consumer_secret ? $consumer_secret : $this->_getConf("consumer_key");
+
+            $this->emailchef = new PS_Emailchef(
+                $consumer_key,
+                $consumer_secret,
+                $this->_getConf("enabled")
+            );
 
         }
 
@@ -179,57 +185,49 @@ class Emailchef extends Module
     public function getContent()
     {
 
-        $output = null;
+        $error = null;
+        $account = null;
 
         if (
             Tools::isSubmit('submitEmailchefSettings')
         ) {
 
-            die('qui');
+            $consumer_key = strval(Tools::getValue('consumer_key'));
+            $consumer_secret = strval(Tools::getValue('consumer_secret'));
 
-            /*$ec_lang        = strval( Tools::getValue( $this->prefix_setting( 'lang' ) ) );
-            $ec_username    = strval( Tools::getValue( $this->prefix_setting( 'username' ) ) );
-            $ec_password    = strval( Tools::getValue( $this->prefix_setting( 'password' ) ) );
-            $ec_list        = intval( Tools::getValue( $this->prefix_setting( 'list' ) ) );
-            $ec_policy_type = strval( Tools::getValue( $this->prefix_setting( 'policy_type' ) ) );
+            $emailchef = $this->emailchef($consumer_key, $consumer_secret, true);
 
-            $ec_list_old = $this->_getConf( "list" );
-
-            if ( ! $ec_username || empty( $ec_username ) || ! Validate::isGenericName( $ec_username ) ) {
-                $output .= $this->displayError( $this->l( 'Please, enter a valid username.' ) );
+            $account = $emailchef->get_account();
+            if (isset($account['status']) && $account['status'] === 'error') {
+                Configuration::updateValue($this->prefix_setting('consumer_key'), '');
+                Configuration::updateValue($this->prefix_setting('consumer_secret'), '');
+                Configuration::updateValue($this->prefix_setting('enabled'), false);
+                $error = $this->l('Credentials are not valid');
             } else {
-                if ( ! $ec_password || empty( $ec_password ) || ! Validate::isGenericName( $ec_password ) ) {
-                    $output .= $this->displayError( $this->l( 'Please, enter a valid password.' ) );
-                } else {
-                    if ( ! $ec_list || empty( $ec_list ) ) {
-                        $output .= $this->displayError( $this->l( 'Choose a list.' ) );
-                    } else {
-                        Configuration::updateValue( $this->prefix_setting( 'lang' ), $ec_lang );
-                        Configuration::updateValue( $this->prefix_setting( 'username' ), $ec_username );
-                        Configuration::updateValue( $this->prefix_setting( 'password' ), $ec_password );
-                        Configuration::updateValue( $this->prefix_setting( 'list' ), $ec_list );
-                        Configuration::updateValue( $this->prefix_setting( 'policy_type' ), $ec_policy_type );
+                Configuration::updateValue($this->prefix_setting('consumer_key'), $consumer_key);
+                Configuration::updateValue($this->prefix_setting('consumer_secret'), $consumer_secret);
+                Configuration::updateValue($this->prefix_setting('enabled'), true);
+            }
 
-                        $output             .= $this->displayConfirmation( $this->l( 'Settings saved.' ) );
-                        $emailchef_cron_url = $this->_path . "/ajax.php";
-                        $output             .= <<<EOF
-<script>
-    var emailchef_cron_url = '$emailchef_cron_url';
-</script>
-EOF;
-                        if ( $ec_list_old != $ec_list ) {
-                            $output .= $this->adminDisplayInformation( $this->l( "Your customer data is now being transferred to your Emailchef account." ) );
-
-                        }
-
-
-                    }
-                }
-            }*/
         }
 
+        $data = [
+            'error' => $error
+        ];
 
-        return $this->display(__FILE__, 'views/templates/admin/logged-out.tpl');
+
+        $is_enabled = $this->_getConf('enabled', false);
+
+        if ($is_enabled){
+            $data['account'] = $account;
+        }
+
+        $this->context->smarty->assign(
+            $data
+        );
+
+        return $this->display(__FILE__, 'views/templates/admin/logged-'.($is_enabled ? 'in' : 'out').'.tpl');
+
     }
 
     private function sync_abandoned_cart()
@@ -274,13 +272,20 @@ EOF;
 
     /**
      * @param $config
+     * @param bool $default
      *
      * @return string
      */
 
-    public function _getConf($config)
+    public function _getConf($config, $default = false)
     {
-        return Configuration::get($this->prefix_setting($config));
+        return Configuration::get(
+            $this->prefix_setting($config),
+            null ,
+            null,
+            null,
+            $default
+        );
     }
 
     public function log($message, $severity = 1, $debug = false)

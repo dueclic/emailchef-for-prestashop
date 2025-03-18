@@ -38,8 +38,16 @@ class PS_Emailchef_Api {
 	private $consumerKey = null;
 	private $consumerSecret = null;
 
-	public function __construct( $consumer_key, $consumer_secret ) {}
-	private function getRequest( $url, $payload, $type ) {
+	public function __construct( $consumer_key, $consumer_secret ) {
+        $this->consumerKey = $consumer_key;
+        $this->consumerSecret = $consumer_secret;
+    }
+	private function getRequest(
+        $url,
+        $payload,
+        $type,
+        $headers = []
+    ) {
 
 		try {
 
@@ -50,67 +58,83 @@ class PS_Emailchef_Api {
 				)
 			);
 
-			$response = null;
-			switch ( $type ) {
-				case 'POST':
-					$response = Request::post( $url )
-					                   ->strictSSL( 1 )
-					                   ->body( $payload, 'application/json' )
-					                   ->send();
-					break;
-				case 'DELETE':
-					$response = Request::init( Http::DELETE )
-					                   ->strictSSL( 1 )
-					                   ->uri( $url )
-					                   ->body( $payload, 'application/json' )
-					                   ->send();
-					break;
-				case 'PUT':
-					$response = Request::put( $url )
-					                   ->strictSSL( 1 )
-					                   ->body( $payload, 'application/json' )
-					                   ->send();
-					break;
-				case 'GET':
-				default:
-					$response = Request::get( $url )
-					                   ->strictSSL( 1 )
-					                   ->body( $payload, 'application/json' )
-					                   ->send();
-					break;
-			}
+            /**
+             * @var $response \Httpful\Response
+             */
+
+            if ($type == 'POST') {
+                $response = Request::post($url)
+                    ->strictSSL(1)
+                    ->body($payload, 'application/json')
+                    ->addHeaders($headers)
+                    ->send();
+            } elseif ($type == 'DELETE') {
+                $response = Request::init(Http::DELETE)
+                    ->strictSSL(1)
+                    ->uri($url)
+                    ->body($payload, 'application/json')
+                    ->addHeaders($headers)
+                    ->send();
+            } elseif ($type == 'PUT') {
+                $response = Request::put($url)
+                    ->strictSSL(1)
+                    ->body($payload, 'application/json')
+                    ->addHeaders($headers)
+                    ->send();
+            } else {
+                $response = Request::get($url)
+                    ->strictSSL(1)
+                    ->body($payload, 'application/json')
+                    ->addHeaders($headers)
+                    ->send();
+            }
+
+            if ($response->hasErrors()){
+                throw new \Exception(
+                    'request_error',
+                    $response->code
+                );
+            }
+
 		} catch ( \Exception $e ) {
-			$response = array(
+			$response_data = array(
 				'status' => 'error',
+                'code' => $e->getCode(),
 				'error'  => $e->getMessage()
 			);
+            return json_encode($response_data);
 		}
 
 		return $response;
 	}
 
-	protected function call( $route, $args = array(), $type = "POST", $encoded = false ) {
+	protected function call( $route, $payload = array(), $type = "POST", $encoded = false ) {
 
 		$url  = $this->api_url . $route;
-		$auth = array();
+		$headers = array(
+            'User-Agent' => 'Emailchef for PrestaShop'
+        );
 
 		if (
             !is_null($this->consumerKey) &&
             !is_null($this->consumerSecret)
         ) {
-			$auth = array(
+            $headers = array(
 				'consumerKey' => $this->consumerKey,
                 'consumerSecret' => $this->consumerSecret
 			);
 		}
 
-		$payload = array_merge( $auth, $args );
-
 		if ( $encoded ) {
 			$payload = json_encode( $payload );
 		}
 
-		return json_decode( $this->getRequest( $url, $payload, $type ), true );
+		return json_decode( $this->getRequest(
+            $url,
+            $payload,
+            $type,
+            $headers
+        ), true );
 	}
 
     protected function json($route, $args = array(), $type = "POST"){
