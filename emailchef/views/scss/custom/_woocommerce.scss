@@ -12,6 +12,7 @@
   }
 }
 
+
 #check_login_data {
   padding-left: 30px;
   color: $infoColor;
@@ -118,8 +119,6 @@
 
 .ecps-main-container{
   display: flex;
-  margin-top: 1em ;
-  margin-bottom: 1em ;
 }
 .ecps-main-container > div:first-child{
   border-right: 1px solid #dddddd;
@@ -129,8 +128,9 @@
   padding-left: 1em;
 }
 .ecps-main-account{
-  flex-grow: 0;
+  width: 260px;
   min-width: 260px;
+  flex-grow: 0;
 }
 .ecps-main-forms{
   flex-grow: 1;
@@ -217,7 +217,17 @@
   color: var(--ecps-error-color);
   display: block;
 }
-
+.card {
+  position: relative;
+  margin-top: 20px;
+  padding: .7em 2em 1em;
+  min-width: 255px;
+  max-width: 520px;
+  border: 1px solid #c3c4c7;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, .04);
+  background: #fff;
+  box-sizing: border-box;
+}
 .emailchef-form {
   /*width: 100% !important;*/
   max-width: 100% !important;
@@ -226,7 +236,99 @@
 .emailchef-form .map-reload {
   display: none;
 }
+.form-table {
+  border-collapse: collapse;
+  margin-top: .5em;
+  width: 100%;
+  clear: both
+}
 
+.form-table,.form-table td,.form-table td p,.form-table th {
+  /*font-size: 14px*/
+}
+
+.form-table td {
+  margin-bottom: 9px;
+  padding: 15px 10px;
+  line-height: 1.3;
+  vertical-align: middle
+}
+
+.form-table th,.form-wrap label {
+  color: #1d2327;
+  font-weight: 400;
+  text-shadow: none;
+  vertical-align: baseline
+}
+.bootstrap .form-table label {
+  font-weight: normal;
+}
+.form-table th {
+  vertical-align: top;
+  text-align: left;
+  padding: 20px 10px 20px 0;
+  width: 200px;
+  line-height: 1.3;
+  font-weight: 600
+}
+
+.form-table .td-full,.form-table th.th-full {
+  width: auto;
+  padding: 20px 10px 20px 0;
+  font-weight: 400
+}
+
+.form-table td p {
+  margin-top: 4px;
+  margin-bottom: 0
+}
+
+.form-table .date-time-doc {
+  margin-top: 1em
+}
+
+.form-table p.timezone-info {
+  margin: 1em 0;
+  display: flex;
+  flex-direction: column
+}
+
+#local-time {
+  margin-top: .5em
+}
+
+.form-table td fieldset label {
+  margin: .35em 0 .5em!important;
+  display: inline-block
+}
+
+.form-table td fieldset p label {
+  margin-top: 0!important
+}
+
+.form-table td fieldset label,.form-table td fieldset li,.form-table td fieldset p {
+  line-height: 1.4
+}
+
+.form-table input.tog,.form-table input[type=radio] {
+  margin-top: -4px;
+  margin-right: 4px;
+  float: none
+}
+
+.form-table .pre {
+  padding: 8px;
+  margin: 0
+}
+
+table.form-table td .updated {
+  font-size: 13px
+}
+
+table.form-table td .updated p {
+  font-size: 13px;
+  margin: .3em 0
+}
 .emailchef-form .form-table td.nopadding {
   padding: 0;
   max-width:170px !important;
@@ -358,17 +460,21 @@ input[name="emailchef_settings\[consumer_secret\]"].valid {
 .ecps-new-list-container .ecps-buttons-container {
   display: flex;
   gap: .5rem;
-  margin-top: .5rem;
+  margin-top: 1rem;
 }
-.ecps-hr-separator{
+hr.ecps-hr-separator{
+  border-top: 1px solid #ddd;
   margin-top: 1.5rem;
   margin-bottom: 1.5rem;
 }
-.ecps-hr-separator-half{
+hr.ecps-hr-separator-half{
+  border-top: 1px solid #ddd;
   margin-top: .75rem;
   margin-bottom: .75rem;
 }
-
+.bootstrap .ecps-submit{
+  margin-top: 1rem;
+}
 
 @media screen and (max-width: 599px) {
   .ecps-main-container {

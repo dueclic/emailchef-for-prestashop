@@ -1,7 +1,7 @@
 <div class="ecps-main-container">
     <div class="ecps-main-account">
         <div class="ecps-forms-logo">
-            <img src="{$module_dir}views/img/emailchef.png"
+            <img src="{$module_dir}views/img/logo-compact.svg"
                  alt="{l s='Emailchef' mod='emailchef'}"/>
             <div class="ecps-account-status">
                 <div>{l s='Account connected' mod='emailchef'}</div>
@@ -42,10 +42,10 @@
         <hr class="ecps-hr-separator">
         <div>
             <p>{l s="Prestashop users usually sync automatically with Emailchef. If an issue arises or you need an immediate update, use the button below for manual sync." mod='emailchef'}</p>
-            <p class="ecps-text-center">
+            <p class="ecps-text-center ecps-submit">
                 <button {if $list_id}disabled{/if} type="button"
                         id="ps_emailchef_sync_now"
-                        class="button button-secondary"
+                        class="btn btn-default btn-sm"
                         title="{if $list_id}{l s="Please select a list and save settings first" mod="emailchef"}{/if}">
                     {l s="Manual Sync Now" mod="emailchef"}
                 </button>
@@ -68,7 +68,7 @@
                 <tbody>
                     <tr>
                         <th scope="row" class="titledesc">
-                            <label for="ps_emailchef_list">{l s='Emailchef List' mod='emailchef'}</label>
+                            <label for="ps_emailchef_list"><strong>{l s='Emailchef List' mod='emailchef'}</strong></label>
                         </th>
                         <td class="forminp forminp-select">
 
@@ -87,21 +87,21 @@
                                 <a href="#" id="ps_emailchef_create_list">{l s='Add a new Emailchef destination list' mod='emailchef'}</a>
                             </p>
                             <div class="ecps-new-list-container">
-                                <label>{l s='List name' mod='emailchef'}</label>
+                                <label><strong>{l s='List name' mod='emailchef'}</strong></label>
                                 <input name="ps_emailchef_new_name" id="ps_emailchef_new_name" type="text" dir="ltr"
                                        style="min-width:350px;" value=""
                                        placeholder="{l s='Provide a name for this new list.' mod='emailchef'}">
-                                <label>{l s='List description' mod='emailchef'}</label>
+                                <label><strong>{l s='List description' mod='emailchef'}</strong></label>
                                 <input name="ps_emailchef_new_description" id="ps_emailchef_new_description" type="text"
                                        dir="ltr" style="min-width:350px;" value=""
                                        placeholder="{l s='Provide a description for this new list.' mod='emailchef'}">
                                 <p>{html_entity_decode({l s='By setting up a new list within Emailchef, you acknowledge and affirm adherence to %s and %s, as well as compliance with the CAN-SPAM Act.' mod='emailchef' sprintf=['<a href="https://emailchef.com/privacy-policy/" target="_blank">privacy policy</a>','<a href="https://emailchef.com/terms-of-use/" target="_blank">terms of use</a>']})}</p>
                                 <p class="ecps-buttons-container">
                                     <button type="button" name="ps_emailchef_save"
-                                            class="button-primary" id="ps_emailchef_new_save">
+                                            class="btn btn-primary btn-sm" id="ps_emailchef_new_save">
                                         {l s='Create List' mod='emailchef'}
                                     </button>
-                                    <button type="button" name="ps_emailchef_undo" class="button" id="ps_emailchef_undo_save">
+                                    <button type="button" name="ps_emailchef_undo" class="btn btn-default btn-sm" id="ps_emailchef_undo_save">
                                         {l s='Undo' mod='emailchef'}
                                     </button>
                                 </p>
@@ -110,15 +110,12 @@
                     </tr>
                     <tr>
                         <th scope="row" class="titledesc">
-                            {l s="Sync existing customers" mod="emailchef"}
+                            <label><strong>{l s="Sync existing customers" mod="emailchef"}</strong></label>
                         </th>
                         <td class="forminp forminp-checkbox ">
                             <fieldset>
-                                <legend class="screen-reader-text">
-                                    <span>{l s="Sync existing customers" mod="emailchef"}</span>
-                                </legend>
                                 <label for="ps_emailchef_sync_customers">
-                                    <input name="ps_emailchef_sync_customers" id="ps_emailchef_sync_customers"
+                                    <input name="ps_emailchef_sync_customers" id="ps_emailchef_sync_customers" style="margin-right: 5px;"
                                            type="checkbox" value="1"/>
                                     {l s="Sync existing PrestaShop customers on save" mod="emailchef"}
                                 </label>
@@ -138,7 +135,6 @@
                     <th scope="row" class="titledesc">
                         <label for="ps_emailchef_policy_type">
                             {l s='Policy' mod='emailchef'}
-                            {l s="Choose an existing Emailchef list to sync with, or opt to set up a brand-new list for immediate use." mod="emailchef"}
                         </label>
                     </th>
                     <td class="forminp forminp-select">
@@ -203,8 +199,8 @@
 
         -->
 
-        <div class="submit">
-            <button name="save" disabled class="prestashop-save-button components-button is-primary" type="submit"
+        <div class="ecps-submit mt-3">
+            <button name="save" disabled class="prestashop-save-button components-button is-primary btn btn-primary" type="submit"
                     value="{l s='Save changes' mod='emailchef' }">{l s='Save changes' mod='emailchef' }</button>
         </div>
     </div>
