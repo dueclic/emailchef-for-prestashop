@@ -3,6 +3,7 @@ Owning an e-commerce website positions email marketing as a highly potent and ef
 The module is compatible with **PrestaShop 1.6.X** and **PrestaShop 1.7.X**
 
 This PrestaShop module enables seamless integration with Emailchef, allowing your online store to effortlessly run simple, automated, and targeted marketing campaigns.
+
 This module enhances your online store by offering the ability to:
 
 * **Boost sales** with automated communications that:
