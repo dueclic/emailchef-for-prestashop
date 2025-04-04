@@ -22,242 +22,169 @@
 
         </div>
         <hr class="ecps-hr-separator-half">
-        <!--<div>
-            <div><strong><?php _e( "Emailchef connected list", "emailchef-for-woocommerce" ); ?></strong></div>
-            <div class="ecps-list-container <?php echo $list_id != null ? "ecps-has-list" : ""; ?>" id="listName">
+        <div>
+            <div><strong>{l s='Emailchef connected list' mod='emailchef'}</strong></div>
+            <div class="ecps-list-container {if $list_id}epcs-has-list{/if}" id="listName">
             <span>
                     <svg xmlns="http://www.w3.org/2000/svg" style="height: 16px; margin-top: 2px; display: block"
                          viewBox="0 0 640 512"><path fill="#CCCCCC"
                                                      d="M96 128a128 128 0 1 1 256 0A128 128 0 1 1 96 128zM0 482.3C0 383.8 79.8 304 178.3 304l91.4 0C368.2 304 448 383.8 448 482.3c0 16.4-13.3 29.7-29.7 29.7L29.7 512C13.3 512 0 498.7 0 482.3zM609.3 512l-137.8 0c5.4-9.4 8.6-20.3 8.6-32l0-8c0-60.7-27.1-115.2-69.8-151.8c2.4-.1 4.7-.2 7.1-.2l61.4 0C567.8 320 640 392.2 640 481.3c0 17-13.8 30.7-30.7 30.7zM432 256c-31 0-59-12.6-79.3-32.9C372.4 196.5 384 163.6 384 128c0-26.8-6.6-52.1-18.3-74.3C384.3 40.1 407.2 32 432 32c61.9 0 112 50.1 112 112s-50.1 112-112 112z"></path></svg>
 
                 </span>
-            <span class="ecps-list-none ecps-list-none" id="ecps-no-list-selected">
-                    <?php _e( "No list connected...", "emailchef-for-woocommerce" ); ?>
+                <span class="ecps-list-none ecps-list-none" id="ecps-no-list-selected">
+                   {l s='No list connected...' mod='emailchef'}
                 </span>
-            <span class="truncate ecps-list-selected" title="<?php echo $list_name; ?>" id="ecps-list-selected">
-                    <?php echo $list_name; ?>
+                <span class="truncate ecps-list-selected" title="{$list_name}" id="ecps-list-selected">
+                     {$list_name}
                 </span>
-        </div>-->
+            </div>
+        </div>
+        <hr class="ecps-hr-separator">
+        <div>
+            <p>{l s="Prestashop users usually sync automatically with Emailchef. If an issue arises or you need an immediate update, use the button below for manual sync." mod='emailchef'}</p>
+            <p class="ecps-text-center">
+                <button {if $list_id}disabled{/if} type="button"
+                        id="ps_emailchef_sync_now"
+                        class="button button-secondary"
+                        title="{if $list_id}{l s="Please select a list and save settings first" mod="emailchef"}{/if}">
+                    {l s="Manual Sync Now" mod="emailchef"}
+                </button>
+            </p>
+        </div>
+        <hr class="ecps-hr-separator">
+        <div>
+            <p>
+                <a href="{$admin_logs_link}" target="_blank">{l s="Show Logs" mod="emailchef"}</a>
+            </p>
+        </div>
     </div>
-    <hr class="ecps-hr-separator">
-    <!--
-    <div>
-        <p><?php _e( "WooCommerce users usually sync automatically with Emailchef. If an issue arises or you need an immediate update, use the button below for manual sync.", "emailchef-for-woocommerce" ); ?></p>
-        <p class="ecps-text-center">
-            <button <?php disabled( wc_ec_get_option_value( 'list' ), null ); ?> type="button"
-            id="wc_emailchef_sync_now"
-            class="button button-secondary"
-            title="<?php _e( wc_ec_get_option_value( 'list' ) == null ? "Please select a list and save settings first" : "", "emailchef-for-woocommerce" ) ?>">
-            <?php _e( "Manual Sync Now", "emailchef-for-woocommerce" ); ?>
-            </button>
-        </p>
-    </div>
-    <hr class="ecps-hr-separator">
-    <div>
-        <p>
-            <a href="<?php echo esc_url( add_query_arg(
-					[ 'source' => 'emailchef-for-woocommerce', 'paged' => 1 ],
-					admin_url( '/admin.php?page=wc-status&tab=logs' )
-				) ); ?>" target="_blank"><?php _e( "Show Logs", "emailchef-for-woocommerce" ); ?></a>
-        </p>
-    </div>
-    <?php
-		if ( isset( $_GET['debug'] ) ):
-			?>
-    <hr class="ecps-hr-separator">
-    <div>
-        <p class="ecps-text-center">
-            <a class="button button-primary"
-               href="<?php echo admin_url( '/admin.php?page=emailchef-debug' ); ?>"><?php _e( "Debug", "emailchef-for-woocommerce" ); ?></a>
-        </p>
-    </div>
-    <?php
-		endif;
-		?>
-		-->
-</div>
-<!--
-<div class="ecps-main-forms">
-    <h1><?php _e( "Emailchef for WooCommerce settings", "emailchef-for-woocommerce" ); ?></h1>
-    <p><?php _e( "Welcome to the Emailchef Integration section for WooCommerce. In this crucial WooCommerce plugin, we offer you the convenience of effortlessly synchronizing your WooCommerce customers with your preferred Emailchef list. By taking advantage of this feature, you will ensure that your email marketing efforts are always up-to-date and targeting the right audience.", "emailchef-for-woocommerce" ); ?></p>
-    <div class="emailchef-form card accordion-container">
-        <h2><?php _e( "Emailchef List Settings", "emailchef-for-woocommerce" ); ?></h2>
-        <p><?php _e( "Simply select the Emailchef list that aligns with your campaign objectives, and the plugin will handle the rest. Our seamless synchronization process automatically updates your chosen list with new users, modifications to existing user information, and any other relevant changes. This not only saves you valuable time but also enhances the effectiveness of your communication strategies.", "emailchef-for-woocommerce" ); ?></p>
-        <table class="form-table">
-            <tbody>
-            <tr>
-                <th scope="row" class="titledesc">
-                    <label for="wc_emailchef_list"><?php _e( "Emailchef List", "emailchef-for-woocommerce" ); ?><?php echo wc_help_tip( "Choose an existing Emailchef list to sync with, or opt to set up a brand-new list for immediate use.", "emailchef-for-woocommerce" ); ?></label>
-                </th>
-                <td class="forminp forminp-select">
+    <div class="ecps-main-forms">
+        <h1>{l s='Emailchef for PrestaShop settings' mod='emailchef'}</h1>
+        <p>{l s='Welcome to the Emailchef Integration section for PrestaShop. This module allows you to effortlessly synchronize your PrestaShop customers with your preferred Emailchef list, ensuring your email marketing efforts are always up-to-date and targeting the right audience.' mod='emailchef'}</p>
+        <div class="emailchef-form card accordion-container">
+            <h2>{l s='Emailchef List Settings' mod='emailchef'}</h2>
+            <p>{l s='Simply select the Emailchef list that aligns with your campaign objectives, and the module will handle the rest. Our seamless synchronization process updates your chosen list with new users, modifications to existing user information, and any other relevant changes.' mod='emailchef'}</p>
+            <table class="form-table">
+                <tbody>
+                    <tr>
+                        <th scope="row" class="titledesc">
+                            <label for="ps_emailchef_list">{l s='Emailchef List' mod='emailchef'}</label>
+                        </th>
+                        <td class="forminp forminp-select">
 
-                    <select
-                            data-placeholder="<?php _e( "Select a list...", "emailchef-for-woocommerce" ); ?>"
-                    name="<?php echo esc_attr( wc_ec_get_option_name( "list" ) ); ?>"
-                    id="<?php echo esc_attr( wc_ec_get_option_name( "list" ) ); ?>"
-                    class="wc-enhanced-select-nostd" style="min-width: 350px;" tabindex="-1"
-                    aria-hidden="true"
-                    >
-                    <option></option>
-                    <?php
-							foreach ( $lists as $list_id => $list_name ):
-                    ?>
-                    <option
-                            value="<?php echo $list_id; ?>"
-                    <?php
-									selected( wc_ec_get_option_value( "list" ), (string) $list_id );
+                            <select name="list"
+                                    id="ps_emailchef_list"
+                                    style="min-width: 350px;" tabindex="-1"
+                                    aria-hidden="true">
+                                <option value="">{l s='Select a list...' mod='emailchef'}</option>
+                                {foreach from=$lists item=$list}
+                                    <option value="{$list['id']}" {if $list_id == $list['id']}selected{/if}>
+                                        {$list['name']|escape:'html':'UTF-8'}
+                                    </option>
+                                {/foreach}
+                            </select>
+                            <p class="description" style="margin-top: 1rem">
+                                <a href="#" id="ps_emailchef_create_list">{l s='Add a new Emailchef destination list' mod='emailchef'}</a>
+                            </p>
+                            <div class="ecps-new-list-container">
+                                <label>{l s='List name' mod='emailchef'}</label>
+                                <input name="ps_emailchef_new_name" id="ps_emailchef_new_name" type="text" dir="ltr"
+                                       style="min-width:350px;" value=""
+                                       placeholder="{l s='Provide a name for this new list.' mod='emailchef'}">
+                                <label>{l s='List description' mod='emailchef'}</label>
+                                <input name="ps_emailchef_new_description" id="ps_emailchef_new_description" type="text"
+                                       dir="ltr" style="min-width:350px;" value=""
+                                       placeholder="{l s='Provide a description for this new list.' mod='emailchef'}">
+                                <p>{html_entity_decode({l s='By setting up a new list within Emailchef, you acknowledge and affirm adherence to %s and %s, as well as compliance with the CAN-SPAM Act.' mod='emailchef' sprintf=['<a href="https://emailchef.com/privacy-policy/" target="_blank">privacy policy</a>','<a href="https://emailchef.com/terms-of-use/" target="_blank">terms of use</a>']})}</p>
+                                <p class="ecps-buttons-container">
+                                    <button type="button" name="ps_emailchef_save"
+                                            class="button-primary" id="ps_emailchef_new_save">
+                                        {l s='Create List' mod='emailchef'}
+                                    </button>
+                                    <button type="button" name="ps_emailchef_undo" class="button" id="ps_emailchef_undo_save">
+                                        {l s='Undo' mod='emailchef'}
+                                    </button>
+                                </p>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row" class="titledesc">
+                            {l s="Sync existing customers" mod="emailchef"}
+                        </th>
+                        <td class="forminp forminp-checkbox ">
+                            <fieldset>
+                                <legend class="screen-reader-text">
+                                    <span>{l s="Sync existing customers" mod="emailchef"}</span>
+                                </legend>
+                                <label for="ps_emailchef_sync_customers">
+                                    <input name="ps_emailchef_sync_customers" id="ps_emailchef_sync_customers"
+                                           type="checkbox" value="1"/>
+                                    {l s="Sync existing PrestaShop customers on save" mod="emailchef"}
+                                </label>
+                            </fieldset>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
 
-									?>
-                    ><?php echo esc_html( $list_name ); ?></option>
-                    <?php
-							endforeach;
-							?>
-                    </select>
-                    <p class="description" style="margin-top: 1rem">
-                        <a href="#"
-                           id="wc_emailchef_create_list"><?php _e( "Add a new Emailchef destination list", "emailchef-for-woocommerce" ); ?></a>
-                    </p>
-                    <div class="ecps-new-list-container">
-                        <label><?php _e( "List name", "emailchef-for-woocommerce" ); ?></label>
-                        <input name="wc_emailchef_new_name" id="wc_emailchef_new_name" type="text" dir="ltr"
-                               style="min-width:350px;" value=""
-                               placeholder="<?php _e( "Provide a name for this new list.", "emailchef-for-woocommerce" ); ?>">
-                        <label><?php _e( "List description", "emailchef-for-woocommerce" ); ?></label>
-                        <input name="wc_emailchef_new_description" id="wc_emailchef_new_description" type="text"
-                               dir="ltr" style="min-width:350px;" value=""
-                               placeholder="<?php _e( "Provide a description for this new list.", "emailchef-for-woocommerce" ); ?>">
-                        <p><?php _e( 'By setting up a new list within Emailchef, you acknowledge and affirm adherence to Emailchef\'s <a href="https://emailchef.com/privacy-policy/" target="_blank">privacy policy</a> and <a href="https://emailchef.com/terms-of-use/" target="_blank">terms of use</a>, as well as compliance with the CAN-SPAM Act.', "emailchef-for-woocommerce" ); ?></p>
-                        <p class="ecps-buttons-container">
-                            <button type="button" name="wc_emailchef_save"
-                                    class="button-primary woocommerce-save-button"
-                                    id="wc_emailchef_new_save"><?php _e( "Create List", "emailchef-for-woocommerce" ); ?>
-                            </button>
-                            <button type="button" name="wc_emailchef_undo" class="button woocommerce-undo-button"
-                                    id="wc_emailchef_undo_save"><?php _e( "Undo", "emailchef-for-woocommerce" ); ?>
-                            </button>
-                        </p>
-                    </div>
-                </td>
-            </tr>
-            <tr>
-                <th scope="row"
-                    class="titledesc"><?php _e( "Sync existing customers", "emailchef-for-woocommerce" ); ?></th>
-                <td class="forminp forminp-checkbox ">
-                    <fieldset>
-                        <legend class="screen-reader-text">
-                            <span><?php _e( "Sync existing customers", "emailchef-for-woocommerce" ); ?></span>
-                        </legend>
-                        <label for="wc_emailchef_sync_customers">
-                            <input name="wc_emailchef_sync_customers" id="wc_emailchef_sync_customers"
-                                   type="checkbox"
-                                   value="1"><?php _e( "Sync existing WooCommerce customers on save", "emailchef-for-woocommerce" ); ?>
+        <div class="emailchef-form card accordion-container">
+            <h2>{l s='Emailchef Subscription Settings' mod='emailchef'}</h2>
+            <p>{l s='Customize your subscriber\'s journey by defining the pages they are directed to after subscribing or unsubscribing, and determine whether to use a single or a double opt-in approach based on your preferences and compliance requirements.' mod='emailchef'}</p>
+            <table class="form-table">
+                <tbody>
+                <tr>
+                    <th scope="row" class="titledesc">
+                        <label for="ps_emailchef_policy_type">
+                            {l s='Policy' mod='emailchef'}
+                            {l s="Choose an existing Emailchef list to sync with, or opt to set up a brand-new list for immediate use." mod="emailchef"}
                         </label>
-                    </fieldset>
-                </td>
-            </tr>
-            </tbody>
-        </table>
-    </div>
+                    </th>
+                    <td class="forminp forminp-select">
+                        <select name="policy_type" id="ps_emailchef_policy_type" aria-hidden="true">
+                            {foreach from=$policy_types key=value item=$policy}
+                                <option value="{$policy}" {if $policy_type == $policy}selected{/if}>
+                                    {$policy}
+                                </option>
+                            {/foreach}
+                        </select>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
 
-    <div class="emailchef-form card accordion-container">
-        <h2><?php _e( "Emailchef Subscription Settings", "emailchef-for-woocommerce" ); ?></h2>
-        <p><?php _e( "Customize your subscriber's journey by defining the pages they are directed to after subscribing or unsubscribing, and determine whether to use a single or a double opt-in approach based on your preferences and compliance requirements.", "emailchef-for-woocommerce" ); ?></p>
-        <table class="form-table">
-            <tbody>
 
-            <tr>
-                <th scope="row" class="titledesc">
-                    <label for="<?php echo esc_attr( wc_ec_get_option_name( "policy_type" ) ); ?>"><?php _e( "Policy", "emailchef-for-woocommerce" ); ?>
-                    <?php
-							echo wc_help_tip(
-								__( "Which policy would you like to use?", "emailchef-for-woocommerce" )
-							);
-							?>
-                    </label>
-                </th>
-                <td class="forminp forminp-select">
-                    <select name="<?php echo esc_attr( wc_ec_get_option_name( "policy_type" ) ); ?>"
-                    id="<?php echo esc_attr( wc_ec_get_option_name( "policy_type" ) ); ?>"
-                    aria-hidden="true">
+        <!--
 
-                    <?php
-							foreach ( $policy_types as $value => $name ):
-                    ?>
-                    <option value="<?php echo $value; ?>" <?php selected(
-									wc_ec_get_option_value( "policy_type" ),
-									$value
-								); ?>><?php echo esc_html( $name ); ?></option>
-                    <?php
-							endforeach;
-							?>
+        <div class="emailchef-form card accordion-container">
+            <h2><?php _e( "Abandoned Cart Settings", "emailchef-for-woocommerce" ); ?></h2>
+            <p><?php _e( "Recover lost sales with Emailchef plugin's abandoned cart feature. Connect with Emailchef and remind customers to complete their purchases by setting a time frame for abandoned carts.", "emailchef-for-woocommerce" ); ?></p>
+            <table class="form-table">
+                <tbody>
 
-                    </select>
-                </td>
-            </tr>
-            <tr class="single_select_page">
-                <th scope="row" class="titledesc">
-                    <label><?php _e( "Subscription page", "emailchef-for-woocommerce" ); ?><?php echo wc_help_tip(
-								__( "Page to redirect the customer to after confirming their subscription with the double opt-in method", "emailchef-for-woocommerce" )
-							); ?></label>
-                </th>
-                <td class="forminp">
-
-                    <?php
-						echo wc_ec_get_dropdown_pages(
-							"subscription_page",
-							[
-								'show_option_none' => ''
-                    ]
-                    );
-                    ?>
-
-                </td>
-            </tr>
-            <tr class="single_select_page">
-                <th scope="row" class="titledesc">
-                    <label><?php _e( "Unsubscription page", "emailchef-for-woocommerce" ); ?><?php echo wc_help_tip( "Page to which the customer is redirected after unsubscribing from the newsletter", "emailchef-for-woocommerce" ); ?></label>
-                </th>
-                <td class="forminp">
-                    <?php
-						echo wc_ec_get_dropdown_pages(
-							"fuck_page",
-							[
-								'show_option_none' => ''
-                    ]
-                    );
-                    ?>
-                </td>
-            </tr>
-            </tbody>
-        </table>
-    </div>
-
-    <div class="emailchef-form card accordion-container">
-        <h2><?php _e( "Abandoned Cart Settings", "emailchef-for-woocommerce" ); ?></h2>
-        <p><?php _e( "Recover lost sales with Emailchef plugin's abandoned cart feature. Connect with Emailchef and remind customers to complete their purchases by setting a time frame for abandoned carts.", "emailchef-for-woocommerce" ); ?></p>
-        <table class="form-table">
-            <tbody>
-
-            <tr>
-                <th scope="row" class="titledesc">
-                    <label for="<?php echo esc_attr( wc_ec_get_option_name( "cron_end_interval_value" ) ); ?>"><?php _e( "Cart is Abandoned After", "emailchef-for-woocommerce" ); ?>
-                    <?php
-							echo wc_help_tip(
+                <tr>
+                    <th scope="row" class="titledesc">
+                        <label for="<?php echo esc_attr( ps_ec_get_option_name( " cron_end_interval_value" ) );
+                        ?>"><?php _e( "Cart is Abandoned After", "emailchef-for-woocommerce" ); ?>
+                        <?php
+							echo ps_help_tip(
 								__( "Enter the number of hours after which a cart is considered abandoned.", "emailchef-for-woocommerce" )
 							);
 							?>
-                    </label>
-                </th>
-                <td class="forminp forminp-input">
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <input type="number" style="max-width: 100px" min="1"
-                               name="<?php echo esc_attr( wc_ec_get_option_name( "cron_end_interval_value" ) ); ?>"
-                        id="<?php echo esc_attr( wc_ec_get_option_name( "cron_end_interval_value" ) ); ?>"
-                        value="<?php echo wc_ec_get_option_value( "cron_end_interval_value" ); ?>">
-                        <?php
+                        </label>
+                    </th>
+                    <td class="forminp forminp-input">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <input type="number" style="max-width: 100px" min="1"
+                                   name="<?php echo esc_attr( ps_ec_get_option_name( " cron_end_interval_value" ) ); ?>"
+                            id="<?php echo esc_attr( ps_ec_get_option_name( "cron_end_interval_value" ) ); ?>"
+                            value="<?php echo ps_ec_get_option_value( "cron_end_interval_value" ); ?>">
+                            <?php
 
 
-							switch ( wc_ec_get_abandoned_carts_end_unit() ):
+							switch ( ps_ec_get_abandoned_carts_end_unit() ):
 								case "DAY":
 									esc_html_e( "days", "emailchef-for-woocommerce" );
 									break;
@@ -267,18 +194,22 @@
 									break;
 							endswitch;
 							?>
-                    </div>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        -->
+
+        <div class="submit">
+            <button name="save" disabled class="prestashop-save-button components-button is-primary" type="submit"
+                    value="{l s='Save changes' mod='emailchef' }">{l s='Save changes' mod='emailchef' }</button>
+        </div>
     </div>
 
-    <div class="submit">
-        <button name="save" disabled class="woocommerce-save-button components-button is-primary" type="submit"
-                value="<?php esc_attr_e( 'Save changes', 'woocommerce' ); ?>"><?php esc_html_e( 'Save changes', 'woocommerce' ); ?></button>
-    </div>
 </div>
-
-</div>
--->
+<script type="text/javascript">
+    PS_Emailchef.settings();
+</script>

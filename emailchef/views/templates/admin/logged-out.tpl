@@ -67,5 +67,5 @@
 
 </div>
 <script type="text/javascript">
-    PS_Emailchef.settings();
+    PS_Emailchef.loginPage();
 </script>

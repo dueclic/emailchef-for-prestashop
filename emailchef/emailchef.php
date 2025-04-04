@@ -44,6 +44,10 @@ class Emailchef extends Module
 
     protected $_html = '';
     private $namespace = "ps_emailchef";
+
+    /**
+     * @var PS_Emailchef $emailchef | null
+     */
     private $emailchef;
     private $category_table;
     private $newsletter_before = 0;
@@ -84,11 +88,12 @@ class Emailchef extends Module
         if (empty($this->emailchef) || (!is_null($consumer_key) && !is_null($consumer_secret)) || $force) {
 
             $consumer_key = $consumer_key ? $consumer_key : $this->_getConf("consumer_key");
-            $consumer_secret = $consumer_secret ? $consumer_secret : $this->_getConf("consumer_key");
+            $consumer_secret = $consumer_secret ? $consumer_secret : $this->_getConf("consumer_secret");
 
             $this->emailchef = new PS_Emailchef(
                 $consumer_key,
                 $consumer_secret,
+                $this->namespace,
                 $this->_getConf("enabled")
             );
 
@@ -215,18 +220,35 @@ class Emailchef extends Module
             'error' => $error
         ];
 
+        $policy_types = [
+            'sopt' => $this->l( "Single opt-in"),
+            'dopt' => $this->l( "Double opt-in")
+        ];
+
 
         $is_enabled = $this->_getConf('enabled', false);
 
-        if ($is_enabled){
+        if ($is_enabled) {
+
+            $policy    = $this->emailchef->get_policy();
+
+            if ( $policy !== 'premium' ) {
+                unset( $policy_types['sopt'] );
+            }
+
             $data['account'] = $account;
+            $data['policy_types'] = $policy_types;
+            $data['list_id'] = $this->_getConf('list', null);
+            $data['policy_type'] = $this->_getConf('policy_type', null);
+            $data['lists'] = $this->emailchef->get_lists();
+            $data['admin_logs_link'] = Context::getContext()->link->getAdminLink('AdminLogs');
         }
 
         $this->context->smarty->assign(
             $data
         );
 
-        return $this->display(__FILE__, 'views/templates/admin/logged-'.($is_enabled ? 'in' : 'out').'.tpl');
+        return $this->display(__FILE__, 'views/templates/admin/logged-' . ($is_enabled ? 'in' : 'out') . '.tpl');
 
     }
 
@@ -281,7 +303,7 @@ EOF;
     {
         return Configuration::get(
             $this->prefix_setting($config),
-            null ,
+            null,
             null,
             null,
             $default

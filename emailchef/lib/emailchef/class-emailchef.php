@@ -63,9 +63,14 @@
          */
         private $isLogged;
 
-		public function __construct( $consumerKey, $consumerSecret, $isLogged = false ) {
+		public function __construct(
+            $consumerKey,
+            $consumerSecret,
+            $namespace,
+            $isLogged = false
+        ) {
             $this->isLogged = $isLogged;
-			parent::__construct( $consumerKey, $consumerSecret );
+			parent::__construct( $consumerKey, $consumerSecret, $namespace );
 			$this->api_url = "https://app.emailchef.com/apps/api/v1";
 		}
 

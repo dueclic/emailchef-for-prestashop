@@ -38,9 +38,12 @@ class PS_Emailchef_Api {
 	private $consumerKey = null;
 	private $consumerSecret = null;
 
-	public function __construct( $consumer_key, $consumer_secret ) {
+    private $namespace = "";
+
+	public function __construct( $consumer_key, $consumer_secret, $namespace = "" ) {
         $this->consumerKey = $consumer_key;
         $this->consumerSecret = $consumer_secret;
+        $this->namespace = $namespace;
     }
 	private function getRequest(
         $url,
@@ -97,11 +100,19 @@ class PS_Emailchef_Api {
             }
 
 		} catch ( \Exception $e ) {
+
 			$response_data = array(
 				'status' => 'error',
                 'code' => $e->getCode(),
 				'error'  => $e->getMessage()
 			);
+
+            if ($e->getCode() === 401){
+                Configuration::updateValue($this->namespace."_".'consumer_key', '');
+                Configuration::updateValue($this->namespace."_".'consumer_secret', '');
+                Configuration::updateValue($this->namespace."_".'enabled', false);
+            }
+
             return json_encode($response_data);
 		}
 
