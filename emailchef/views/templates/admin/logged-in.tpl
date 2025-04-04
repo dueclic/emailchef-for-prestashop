@@ -59,10 +59,12 @@
         </div>
     </div>
     <div class="ecps-main-forms">
-        <h1>{l s='Emailchef for PrestaShop settings' mod='emailchef'}</h1>
+        <h2>{l s='Emailchef for PrestaShop settings' mod='emailchef'}</h2>
         <p>{l s='Welcome to the Emailchef Integration section for PrestaShop. This module allows you to effortlessly synchronize your PrestaShop customers with your preferred Emailchef list, ensuring your email marketing efforts are always up-to-date and targeting the right audience.' mod='emailchef'}</p>
-        <div class="emailchef-form card accordion-container">
-            <h2>{l s='Emailchef List Settings' mod='emailchef'}</h2>
+        <div class="panel" style="margin-top: 1.5rem">
+            <header class="panel-heading">
+                {l s='Emailchef List Settings' mod='emailchef'}
+            </header>
             <p>{l s='Simply select the Emailchef list that aligns with your campaign objectives, and the module will handle the rest. Our seamless synchronization process updates your chosen list with new users, modifications to existing user information, and any other relevant changes.' mod='emailchef'}</p>
             <table class="form-table">
                 <tbody>
@@ -126,19 +128,21 @@
             </table>
         </div>
 
-        <div class="emailchef-form card accordion-container">
-            <h2>{l s='Emailchef Subscription Settings' mod='emailchef'}</h2>
-            <p>{l s='Customize your subscriber\'s journey by defining the pages they are directed to after subscribing or unsubscribing, and determine whether to use a single or a double opt-in approach based on your preferences and compliance requirements.' mod='emailchef'}</p>
+        <div class="panel">
+            <header class="panel-heading">
+                {l s='Emailchef Subscription Settings' mod='emailchef'}
+            </header>
+            <p>{l s="Manage subscriber integration with your newsletter through Emailchef's plan-based options. With Single Opt-in, users join immediately. Double Opt-in, where users confirm via email, enhances audience engagement. Note that option availability varies by user plan." mod='emailchef'}</p>
             <table class="form-table">
                 <tbody>
                 <tr>
                     <th scope="row" class="titledesc">
                         <label for="ps_emailchef_policy_type">
-                            {l s='Policy' mod='emailchef'}
+                            <strong>{l s='Subscription policy' mod='emailchef'}</strong>
                         </label>
                     </th>
                     <td class="forminp forminp-select">
-                        <select name="policy_type" id="ps_emailchef_policy_type" aria-hidden="true">
+                        <select name="policy_type" id="ps_emailchef_policy_type" style="max-width: 250px" aria-hidden="true">
                             {foreach from=$policy_types key=value item=$policy}
                                 <option value="{$policy}" {if $policy_type == $policy}selected{/if}>
                                     {$policy}
