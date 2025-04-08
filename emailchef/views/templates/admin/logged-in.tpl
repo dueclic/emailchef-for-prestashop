@@ -31,12 +31,16 @@
                                                      d="M96 128a128 128 0 1 1 256 0A128 128 0 1 1 96 128zM0 482.3C0 383.8 79.8 304 178.3 304l91.4 0C368.2 304 448 383.8 448 482.3c0 16.4-13.3 29.7-29.7 29.7L29.7 512C13.3 512 0 498.7 0 482.3zM609.3 512l-137.8 0c5.4-9.4 8.6-20.3 8.6-32l0-8c0-60.7-27.1-115.2-69.8-151.8c2.4-.1 4.7-.2 7.1-.2l61.4 0C567.8 320 640 392.2 640 481.3c0 17-13.8 30.7-30.7 30.7zM432 256c-31 0-59-12.6-79.3-32.9C372.4 196.5 384 163.6 384 128c0-26.8-6.6-52.1-18.3-74.3C384.3 40.1 407.2 32 432 32c61.9 0 112 50.1 112 112s-50.1 112-112 112z"></path></svg>
 
                 </span>
-                <span class="ecps-list-none ecps-list-none" id="ecps-no-list-selected">
+
+                {if $list_id}
+                    <span class="truncate ecps-list-selected" title="{$list_name}" id="ecps-list-selected">
+                         {$list_name}
+                    </span>
+                {else}
+                    <span class="ecps-list-none ecps-list-none" id="ecps-no-list-selected">
                    {l s='No list connected...' mod='emailchef'}
                 </span>
-                <span class="truncate ecps-list-selected" title="{$list_name}" id="ecps-list-selected">
-                     {$list_name}
-                </span>
+                {/if}
             </div>
         </div>
         <hr class="ecps-hr-separator">
@@ -61,20 +65,21 @@
     <div class="ecps-main-forms">
         <h2>{l s='Emailchef for PrestaShop settings' mod='emailchef'}</h2>
         <p>{l s='Welcome to the Emailchef Integration section for PrestaShop. This module allows you to effortlessly synchronize your PrestaShop customers with your preferred Emailchef list, ensuring your email marketing efforts are always up-to-date and targeting the right audience.' mod='emailchef'}</p>
-        <div class="panel" style="margin-top: 1.5rem">
-            <header class="panel-heading">
-                {l s='Emailchef List Settings' mod='emailchef'}
-            </header>
-            <p>{l s='Simply select the Emailchef list that aligns with your campaign objectives, and the module will handle the rest. Our seamless synchronization process updates your chosen list with new users, modifications to existing user information, and any other relevant changes.' mod='emailchef'}</p>
-            <table class="form-table">
-                <tbody>
+        <form method="post" action="">
+            <div class="panel" style="margin-top: 1.5rem">
+                <header class="panel-heading">
+                    {l s='Emailchef List Settings' mod='emailchef'}
+                </header>
+                <p>{l s='Simply select the Emailchef list that aligns with your campaign objectives, and the module will handle the rest. Our seamless synchronization process updates your chosen list with new users, modifications to existing user information, and any other relevant changes.' mod='emailchef'}</p>
+                <table class="form-table">
+                    <tbody>
                     <tr>
                         <th scope="row" class="titledesc">
                             <label for="ps_emailchef_list"><strong>{l s='Emailchef List' mod='emailchef'}</strong></label>
                         </th>
                         <td class="forminp forminp-select">
 
-                            <select name="list"
+                            <select name="list_id"
                                     id="ps_emailchef_list"
                                     style="min-width: 350px;" tabindex="-1"
                                     aria-hidden="true">
@@ -86,9 +91,10 @@
                                 {/foreach}
                             </select>
                             <p class="description" style="margin-top: 1rem">
-                                <a href="#" id="ps_emailchef_create_list">{l s='Add a new Emailchef destination list' mod='emailchef'}</a>
+                                <a href="#"
+                                   id="ps_emailchef_create_list">{l s='Add a new Emailchef destination list' mod='emailchef'}</a>
                             </p>
-                            <div class="ecps-new-list-container">
+                            <div class="ecps-new-list-container" data-ajax-url="{$ajax_url}">
                                 <label><strong>{l s='List name' mod='emailchef'}</strong></label>
                                 <input name="ps_emailchef_new_name" id="ps_emailchef_new_name" type="text" dir="ltr"
                                        style="min-width:350px;" value=""
@@ -103,10 +109,172 @@
                                             class="btn btn-primary btn-sm" id="ps_emailchef_new_save">
                                         {l s='Create List' mod='emailchef'}
                                     </button>
-                                    <button type="button" name="ps_emailchef_undo" class="btn btn-default btn-sm" id="ps_emailchef_undo_save">
+                                    <button type="button" name="ps_emailchef_undo" class="btn btn-default btn-sm"
+                                            id="ps_emailchef_undo_save">
                                         {l s='Undo' mod='emailchef'}
                                     </button>
                                 </p>
+
+                                <div id="success_status_list_data" class="status-list response-list">
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <div class="alert alert-success alert-check">
+
+                                                <h4>
+                                                    {$i18n['success_status_list_data']}
+                                                </h4>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="check_status_list_data" class="check-list">
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <div class="alert alert-info alert-check">
+
+                                                <h4>
+                                                    <span class="loading-spinner-emailchef"></span> {$i18n['check_status_list_data']}
+                                                </h4>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="error_status_list_data" class="status-list response-list">
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <div class="alert alert-danger alert-check">
+
+                                                <h4>
+                                                    {$i18n['error_status_list_data']}
+                                                </h4>
+                                                <p class="reason"></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="server_error_status_list_data" class="status-list response-list">
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <div class="alert alert-danger alert-check">
+
+                                                <h4>
+                                                    {$i18n['server_error_status_list_data']}
+                                                </h4>
+                                                <p class="reason"></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--
+                                creazione custom fields
+                                -->
+                                <div id="success_status_list_data_cf" class="status-list-cf response-list-cf">
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <div class="alert alert-success alert-check">
+
+                                                <h4>
+                                                    {$i18n['success_status_list_data_cf']}
+                                                </h4>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="check_status_list_data_cf" class="check-list-cf">
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <div class="alert alert-info alert-check">
+
+                                                <h4>
+                                                    <span class="loading-spinner-emailchef"></span> {$i18n['check_status_list_data_cf']}
+                                                </h4>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="error_status_list_data_cf" class="status-list-cf response-list-cf">
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <div class="alert alert-danger alert-check">
+
+                                                <h4>
+                                                    {$i18n['error_status_list_data_cf']}
+                                                </h4>
+                                                <p class="reason"></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="server_error_status_list_data_cf" class="status-list-cf response-list-cf">
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <div class="alert alert-danger alert-check">
+
+                                                <h4>
+                                                    {$i18n['server_error_status_list_data']}
+                                                </h4>
+                                                <p class="reason"></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--
+                                    Sistemazione custom fields
+                                -->
+                                <div id="success_status_list_data_cf_change"
+                                     class="status-list-cf-change response-list-cf-change">
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <div class="alert alert-success alert-check">
+
+                                                <h4>
+                                                    {$i18n['success_status_list_data_cf_change']}
+                                                </h4>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="check_status_list_data_cf_change" class="check-list-cf-change">
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <div class="alert alert-info alert-check">
+
+                                                <h4>
+                                                    <span class="loading-spinner-emailchef"></span> {$i18n['check_status_list_data_cf_change']}
+                                                </h4>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="error_status_list_data_cf_change"
+                                     class="status-list-cf-change response-list-cf-change">
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <div class="alert alert-danger alert-check">
+
+                                                <h4>
+                                                    {$i18n['error_status_list_data_cf_change']}
+                                                </h4>
+                                                <p class="reason"></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="server_error_status_list_data_cf_change"
+                                     class="status-list-cf-change response-list-cf-change">
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <div class="alert alert-danger alert-check">
+
+                                                <h4>
+                                                    {$i18n['server_error_status_list_data']}
+                                                </h4>
+                                                <p class="reason"></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
                             </div>
                         </td>
                     </tr>
@@ -117,99 +285,60 @@
                         <td class="forminp forminp-checkbox ">
                             <fieldset>
                                 <label for="ps_emailchef_sync_customers">
-                                    <input name="ps_emailchef_sync_customers" id="ps_emailchef_sync_customers" style="margin-right: 5px;"
+                                    <input name="ps_emailchef_sync_customers" id="ps_emailchef_sync_customers"
+                                           style="margin-right: 5px;"
                                            type="checkbox" value="1"/>
                                     {l s="Sync existing PrestaShop customers on save" mod="emailchef"}
                                 </label>
                             </fieldset>
                         </td>
                     </tr>
-                </tbody>
-            </table>
-        </div>
+                    </tbody>
+                </table>
+            </div>
 
-        <div class="panel">
-            <header class="panel-heading">
-                {l s='Emailchef Subscription Settings' mod='emailchef'}
-            </header>
-            <p>{l s="Manage subscriber integration with your newsletter through Emailchef's plan-based options. With Single Opt-in, users join immediately. Double Opt-in, where users confirm via email, enhances audience engagement. Note that option availability varies by user plan." mod='emailchef'}</p>
-            <table class="form-table">
-                <tbody>
-                <tr>
-                    <th scope="row" class="titledesc">
-                        <label for="ps_emailchef_policy_type">
-                            <strong>{l s='Subscription policy' mod='emailchef'}</strong>
-                        </label>
-                    </th>
-                    <td class="forminp forminp-select">
-                        <select name="policy_type" id="ps_emailchef_policy_type" style="max-width: 250px" aria-hidden="true">
-                            {foreach from=$policy_types key=value item=$policy}
-                                <option value="{$policy}" {if $policy_type == $policy}selected{/if}>
-                                    {$policy}
-                                </option>
-                            {/foreach}
-                        </select>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
+            <div class="panel">
+                <header class="panel-heading">
+                    {l s='Emailchef Subscription Settings' mod='emailchef'}
+                </header>
+                <p>{l s="Manage subscriber integration with your newsletter through Emailchef's plan-based options. With Single Opt-in, users join immediately. Double Opt-in, where users confirm via email, enhances audience engagement. Note that option availability varies by user plan." mod='emailchef'}</p>
+                <table class="form-table">
+                    <tbody>
+                    <tr>
+                        <th scope="row" class="titledesc">
+                            <label for="ps_emailchef_policy_type">
+                                <strong>{l s='Subscription policy' mod='emailchef'}</strong>
+                            </label>
+                        </th>
+                        <td class="forminp forminp-select">
+                            <select name="policy_type" id="ps_emailchef_policy_type" style="max-width: 250px"
+                                    aria-hidden="true">
+                                {foreach from=$policy_types key=value item=$policy}
+                                    <option value="{$policy}" {if $policy_type == $policy}selected{/if}>
+                                        {$policy}
+                                    </option>
+                                {/foreach}
+                            </select>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
 
-
-        <!--
-
-        <div class="emailchef-form card accordion-container">
-            <h2><?php _e( "Abandoned Cart Settings", "emailchef-for-woocommerce" ); ?></h2>
-            <p><?php _e( "Recover lost sales with Emailchef plugin's abandoned cart feature. Connect with Emailchef and remind customers to complete their purchases by setting a time frame for abandoned carts.", "emailchef-for-woocommerce" ); ?></p>
-            <table class="form-table">
-                <tbody>
-
-                <tr>
-                    <th scope="row" class="titledesc">
-                        <label for="<?php echo esc_attr( ps_ec_get_option_name( " cron_end_interval_value" ) );
-                        ?>"><?php _e( "Cart is Abandoned After", "emailchef-for-woocommerce" ); ?>
-                        <?php
-							echo ps_help_tip(
-								__( "Enter the number of hours after which a cart is considered abandoned.", "emailchef-for-woocommerce" )
-							);
-							?>
-                        </label>
-                    </th>
-                    <td class="forminp forminp-input">
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <input type="number" style="max-width: 100px" min="1"
-                                   name="<?php echo esc_attr( ps_ec_get_option_name( " cron_end_interval_value" ) ); ?>"
-                            id="<?php echo esc_attr( ps_ec_get_option_name( "cron_end_interval_value" ) ); ?>"
-                            value="<?php echo ps_ec_get_option_value( "cron_end_interval_value" ); ?>">
-                            <?php
-
-
-							switch ( ps_ec_get_abandoned_carts_end_unit() ):
-								case "DAY":
-									esc_html_e( "days", "emailchef-for-woocommerce" );
-									break;
-								case "HOUR":
-								default:
-									esc_html_e( "hours", "emailchef-for-woocommerce" );
-									break;
-							endswitch;
-							?>
-                        </div>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-
-        -->
-
-        <div class="ecps-submit mt-3">
-            <button name="save" disabled class="prestashop-save-button components-button is-primary btn btn-primary" type="submit"
-                    value="{l s='Save changes' mod='emailchef' }">{l s='Save changes' mod='emailchef' }</button>
-        </div>
+            <div class="ecps-submit mt-3">
+                <button name="save" class="prestashop-save-button components-button is-primary btn btn-primary"
+                        type="submit"
+                        value="{l s='Save changes' mod='emailchef' }">{l s='Save changes' mod='emailchef' }</button>
+            </div>
+            <input type="hidden" name="submitEmailchefSettings" value=""/>
+        </form>
     </div>
 
 </div>
 <script type="text/javascript">
-    PS_Emailchef.settings();
+    PS_Emailchef.settings({
+        'no_list_found': '{$i18n['no_list_found']}',
+        'create_list': '{$i18n['create_list']}',
+        'language_set': '{$i18n['language_set']}'
+    });
 </script>

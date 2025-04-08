@@ -57,7 +57,7 @@
 
             </fieldset>
 
-            <input type="hidden" name="submitEmailchefSettings" value="" />
+            <input type="hidden" name="submitEmailchefLogin" value="" />
 
         </form>
 

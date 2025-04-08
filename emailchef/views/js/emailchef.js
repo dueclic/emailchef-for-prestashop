@@ -27,6 +27,7 @@
 var PS_Emailchef = function ($) {
 
     var namespace = 'ps_emailchef';
+    var i18n = {};
 
     function prefixed_setting(suffix) {
         return namespace + "_" + suffix;
@@ -58,62 +59,113 @@ var PS_Emailchef = function ($) {
             });
         }
     }
-
-    function loadLists(list_id) {
-
-        $(".ecwc-new-list-container button").attr("disabled", "disabled");
-
-        $.post('ajax_lists_add_url', {}, function (response) {
-
-            if (response.success) {
-
-                var options = [];
-
-                $.each(response.data.lists, function (id, text) {
-                    options.push({
-                        text: text,
-                        id: id
-                    });
-                });
-
-                $("#" + prefixed_setting("list")).empty().select2({
-                    data: options
-                });
-
-                $("#" + prefixed_setting("list")).val(list_id).trigger("change");
-
-            } else {
-                alert(response.data.message);
-            }
-
-        });
-
-    }
-
     function addList(listName, listDesc) {
 
-        $(".ecps-new-list-container button").attr("disabled", "disabled");
+        $(".ecps-new-list-container button").prop("disabled", true);
 
-        $.post('ajax_add_list_url', {
-            'data': {
-                'list_name': listName,
-                'list_desc': listDesc
-            }
-        }, function (response) {
+        var ajax_data = {
+            action: 'emailchefaddlist',
+            list_name: listName,
+            list_desc: listDesc
+        };
 
-            $(".ecps-new-list-container button").removeAttr("disabled");
+        var ajax_url = $(".ecps-new-list-container").data("ajax-url");
 
-            if (response.success) {
-                $(".ecps-new-list-container").hide();
-                loadLists(response.data.list_id);
-            } else {
-                alert(response.data.message);
+        var $selList =  $("#"+prefixed_setting('list'));
+
+        $(".status-list").hide();
+        $(".check-list").show();
+
+        $.ajax({
+            type: 'POST',
+            url: ajax_url,
+            data: ajax_data,
+            dataType: 'json',
+            success: function (response) {
+
+                if (response.type == 'error') {
+                    $(".status-list").hide();
+                    $("#error_status_list_data").find(".reason").text(response.msg);
+                    $("#error_status_list_data").show();
+                    return;
+                }
+
+                $(".ecps-new-list-container #"+prefixed_setting('new_save')).text(i18n.create_list);
+
+                $("#success_status_list_data").show().delay(3000).fadeOut();
+
+                if (response.list_id !== undefined) {
+                    $selList.append($('<option>').text(listName).attr('value', response.list_id))
+                    $selList.val(response.list_id).attr("selected", "selected");
+                }
+
+                createCustomFields(response.list_id);
+
+            },
+            error: function (jxqr, textStatus, thrown) {
+                $("#error_status_list_data").find(".reason").text(jxqr.error + " " + textStatus + " " + thrown);
+                $("#server_error_status_list_data").show();
+            },
+            complete: function () {
+                $(".check-list").hide();
+                $(".ecps-new-list-container button").prop("disabled", false);
             }
         });
 
     }
 
-    function settings(){
+    function createCustomFields(listId) {
+
+        $(".ecps-new-list-container button").prop("disabled", true);
+
+        var ajax_data = {
+            action: 'emailchefaddcustomfields',
+            list_id: listId
+        };
+
+        var ajax_url = $(".ecps-new-list-container").data("ajax-url");
+
+        $(".status-list-cf").hide();
+        $(".check-list-cf").show();
+
+        $.ajax({
+            type: 'POST',
+            url: ajax_url,
+            data: ajax_data,
+            dataType: 'json',
+            success: function (response) {
+
+                if (response.type == 'error') {
+                    $(".status-list-cf").hide();
+                    $("#error_status_list_data_cf").find(".reason").text(response.msg);
+                    $("#error_status_list_data_cf").show();
+                    return;
+                }
+
+                $("#success_status_list_data_cf").show().delay(3000).fadeOut();
+                $('.ecps-new-list-container').slideUp();
+
+            },
+            error: function (jxqr, textStatus, thrown) {
+                $("#error_status_list_data_cf").find(".reason").text(jxqr.error + " " + textStatus + " " + thrown);
+                $("#server_error_status_list_data_cf").show();
+                $(".ecps-new-list-container button").prop("disabled", false);
+            },
+            complete: function () {
+                $(".check-list-cf").hide();
+                $(".ecps-new-list-container button").prop("disabled", false);
+
+            }
+        });
+
+    }
+
+    function settings(
+        _i18n
+    ){
+
+        i18n = _i18n;
+
         $(document).on("click", "#"+prefixed_setting('create_list'), function (evt) {
             evt.preventDefault();
             $(".ecps-new-list-container").toggle();

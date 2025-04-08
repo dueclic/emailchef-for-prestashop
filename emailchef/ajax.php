@@ -65,11 +65,7 @@ final class EmailchefAjaxRequest {
 
 	public function ajax_emailchefaddcustomfields( $args ) {
 
-		if ( isset( $args['api_user'] ) && isset( $args['api_pass'] ) ) {
-			$psec = $this->module->emailchef( $args['api_user'], $args['api_pass'] );
-		} else {
-			$psec = $this->module->emailchef();
-		}
+        $psec = $this->module->emailchef();
 
 		$response = array(
 			'type' => 'error',
@@ -79,7 +75,7 @@ final class EmailchefAjaxRequest {
 		if ( $psec->isLogged() ) {
 
 			if ( ! $args['list_id'] || empty( $args['list_id'] ) ) {
-				$response['msg'] = $this->module->l( 'Lista provided is not valid.' );
+				$response['msg'] = $this->module->l( 'List provided is not valid.' );
 
 				return $response;
 			}
@@ -223,13 +219,10 @@ final class EmailchefAjaxRequest {
 
 		error_reporting( 0 );
 
-		if ( isset( $args['api_user'] ) && isset( $args['api_pass'] ) ) {
-			$psec = $this->module->emailchef( $args['api_user'], $args['api_pass'] );
-		} else {
-			$psec = $this->module->emailchef();
-		}
+        $psec = $this->module->emailchef();
 
-		$response = array(
+
+        $response = array(
 			'type' => 'error',
 			'msg'  => $this->module->l( 'Username or password are wrong.' )
 		);
@@ -248,7 +241,7 @@ final class EmailchefAjaxRequest {
 
 			$list_id = $psec->create_list( $args['list_name'], $args['list_desc'] );
 
-			$response['full_response'] = $psec->lastResponse;
+			$response['full_response'] = $response;
 
 			if ( $list_id !== false ) {
 

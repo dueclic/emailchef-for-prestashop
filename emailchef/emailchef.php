@@ -164,8 +164,8 @@ class Emailchef extends Module
     public function uninstall()
     {
 
-        Configuration::deleteByName($this->prefix_setting('username'));
-        Configuration::deleteByName($this->prefix_setting('password'));
+        Configuration::deleteByName($this->prefix_setting('consumer_key'));
+        Configuration::deleteByName($this->prefix_setting('consumer_secret'));
         Configuration::deleteByName($this->prefix_setting('list'));
         Configuration::deleteByName($this->prefix_setting('policy_type'));
 
@@ -194,7 +194,7 @@ class Emailchef extends Module
         $account = null;
 
         if (
-            Tools::isSubmit('submitEmailchefSettings')
+            Tools::isSubmit('submitEmailchefLogin')
         ) {
 
             $consumer_key = strval(Tools::getValue('consumer_key'));
@@ -212,6 +212,26 @@ class Emailchef extends Module
                 Configuration::updateValue($this->prefix_setting('consumer_key'), $consumer_key);
                 Configuration::updateValue($this->prefix_setting('consumer_secret'), $consumer_secret);
                 Configuration::updateValue($this->prefix_setting('enabled'), true);
+            }
+
+        }
+
+        else if (
+            Tools::isSubmit('submitEmailchefSettings')
+        ) {
+
+            $list_id = Tools::getValue('list_id');
+
+            if (empty($list_id)) {
+                $error = $this->l('You must select a valid list.');
+            } else {
+                Configuration::updateValue($this->prefix_setting('list'), $list_id);
+                $policy_type = Tools::getValue('policy_type');
+
+                if (!empty($policy_type)){
+                    Configuration::updateValue($this->prefix_setting('policy_type'), $list_id);
+                }
+
             }
 
         }
@@ -241,7 +261,38 @@ class Emailchef extends Module
             $data['list_id'] = $this->_getConf('list', null);
             $data['policy_type'] = $this->_getConf('policy_type', null);
             $data['lists'] = $this->emailchef->get_lists();
+            $data['ajax_url'] = $this->_path . "ajax.php";
+            $filtered_lists =  array_filter($data['lists'], function($_list) use ($data) {
+                return (int)$_list['id'] === (int)$data['list_id'];
+            });
+            $data['list_name'] = count($filtered_lists) > 0 ? $filtered_lists[0]['name'] : '';
             $data['admin_logs_link'] = Context::getContext()->link->getAdminLink('AdminLogs');
+            $data['i18n'] = array(
+                'create_destination_list' => $this->l('Add a new destination list'),
+                'language_set' => $this->l('Language was loaded, do you want refresh this page with new language?'),
+                'create_list' => $this->l('Add a new list'),
+                'name_list' => $this->l('List name'),
+                'name_list_placeholder' => $this->l('Provide a name for this new list'),
+                'desc_list' => $this->l('List description'),
+                'desc_list_placeholder' => $this->l('Write a description for this list'),
+                'accept_privacy' => $this->l('By creating a new list, you confirm its compliance with the privacy policy and the CAN-SPAM Act.'),
+                'undo_btn' => $this->l('Cancel'),
+                'check_login_data' => $this->l('Verifying your login data.'),
+                'error_login_data' => $this->l('Incorrect login credentials.'),
+                'server_failure_login_data' => $this->l('Internal server error. Please try again.'),
+                'success_login_data' => $this->l('You have successfully logged into Emailchef.'),
+                'no_list_found' => $this->l('No list found.'),
+                'check_status_list_data' => $this->l('Making a new list, please wait...'),
+                'check_status_list_data_cf' => $this->l('We are creating custom fields for the newly created list...'),
+                'check_status_list_data_cf_change' => $this->l('We are adjusting custom fields for the newly selected list...'),
+                'error_status_list_data' => $this->l('An error occurred while creating this list.'),
+                'error_status_list_data_cf' => $this->l('An error occurred while defining custom fields for this newly created list.'),
+                'error_status_list_data_cf_change' => $this->l('An error occurred while modifying custom fields for the chosen list.'),
+                'server_error_status_list_data' => $this->l('Internal server error. Please try again.'),
+                'success_status_list_data' => $this->l('Your list has been created. We’re now adding the custom fields.'),
+                'success_status_list_data_cf' => $this->l('Custom fields for this list have been successfully created.'),
+                'success_status_list_data_cf_change' => $this->l('Custom fields for this list have been successfully modified.')
+            );
         }
 
         $this->context->smarty->assign(
@@ -337,167 +388,6 @@ EOF;
     public function prefix_setting($setting)
     {
         return $this->namespace . "_" . $setting;
-    }
-
-    public function displayForm()
-    {
-        $default_lang = (int)Configuration::get('PS_LANG_DEFAULT');
-        $fields_form[0]['form'] = array(
-
-            'legend' => array(
-                'title' => $this->l('Plugin settings.'),
-            ),
-            'input' => array(
-                array(
-                    'type' => 'select',
-                    'label' => $this->l('Language'),
-                    'name' => $this->prefix_setting('lang'),
-                    'required' => true,
-                    'options' => array(
-                        'query' => array(
-                            array(
-                                'id' => 'en',
-                                'name' => $this->l('English')
-                            ),
-                            array(
-                                'id' => 'it',
-                                'name' => $this->l('Italian')
-                            ),
-                        ),
-                        'id' => 'id',
-                        'name' => 'name'
-                    )
-                ),
-                array(
-                    'type' => 'text',
-                    'label' => $this->l('Consumer Key'),
-                    'name' => $this->prefix_setting('consumer_key'),
-                    'required' => true
-                ),
-                array(
-                    'type' => 'password',
-                    'label' => $this->l('Consumer Secret'),
-                    'name' => $this->prefix_setting('consumer_secret'),
-                    'required' => true
-                ),
-                array(
-                    'type' => 'select_and_create',
-                    'label' => $this->l('Pick a list'),
-                    'desc' => $this->l('Destination list'),
-                    'name' => $this->prefix_setting('list'),
-                    'required' => true,
-                    'options' => array(
-                        'query' => $this->get_lists(),
-                        'id' => 'id',
-                        'name' => 'name'
-                    )
-                ),
-                array(
-                    'type' => 'select',
-                    'label' => $this->l('Active policy'),
-                    'desc' => $this->l('Which policy would you like to use?'),
-                    'name' => $this->prefix_setting('policy_type'),
-                    'hint' => $this->l('You can choose between Double Opt-in and Single Opt-in'),
-                    'required' => false,
-                    'options' => array(
-                        'query' => array(
-                            array(
-                                'id' => 'dopt',
-                                'name' => $this->l('Double opt-in')
-                            ),
-                            array(
-                                'id' => 'sopt',
-                                'name' => $this->l('Single opt-in')
-                            ),
-                        ),
-                        'id' => 'id',
-                        'name' => 'name'
-                    )
-                )
-            ),
-            'submit' => array(
-                'title' => $this->l('Save and export your contacts.'),
-                'class' => 'btn btn-default pull-right'
-            )
-        );
-
-        $helper = new HelperForm();
-
-        $helper->module = $this;
-        $helper->name_controller = $this->name;
-        $helper->token = Tools::getAdminTokenLite('AdminModules');
-
-        $helper->currentIndex = AdminController::$currentIndex . '&configure=' . $this->name;
-
-        $this->context->smarty->assign(
-            array(
-                'create_list_id' => $this->prefix_setting('create_list'),
-                'new_name_id' => $this->prefix_setting('new_name'),
-                'new_desc_id' => $this->prefix_setting('new_description'),
-                'save_id' => $this->prefix_setting('save'),
-                'undo_id' => $this->prefix_setting('undo'),
-                'ajax_url' => $this->_path . "ajax.php",
-                'password_field' => $this->prefix_setting('password'),
-                'logo_url' => $this->_path . "js/plugins/emailchef/img/emailchef.png"
-            )
-        );
-
-        $this->context->smarty->assign('i18n', array(
-            'create_destination_list' => $this->l('Add a new destination list'),
-            'language_set' => $this->l('Language was loaded, do you want refresh this page with new language?'),
-            'create_list' => $this->l('Add a new list'),
-            'name_list' => $this->l('List name'),
-            'name_list_placeholder' => $this->l('Provide a name for this new list'),
-            'desc_list' => $this->l('List description'),
-            'desc_list_placeholder' => $this->l('Write a description for this list'),
-            'accept_privacy' => $this->l('By creating a new list, you confirm its compliance with the privacy policy and the CAN-SPAM Act.'),
-            'undo_btn' => $this->l('Cancel'),
-            'check_login_data' => $this->l('Verifying your login data.'),
-            'error_login_data' => $this->l('Incorrect login credentials.'),
-            'server_failure_login_data' => $this->l('Internal server error. Please try again.'),
-            'success_login_data' => $this->l('You have successfully logged into Emailchef.'),
-            'no_list_found' => $this->l('No list found.'),
-            'check_status_list_data' => $this->l('Making a new list, please wait...'),
-            'check_status_list_data_cf' => $this->l('Stiamo creando i custom fields per la lista appena creata...'),
-            'check_status_list_data_cf_change' => $this->l('Stiamo sistemando i custom fields per la lista appena scelta...'),
-            'error_status_list_data' => $this->l('An error occurred while creating this list.'),
-            'error_status_list_data_cf' => $this->l('An error occurred while defining custom fields for this newly created list.'),
-            'error_status_list_data_cf_change' => $this->l('An error occurred while modifying custom fields for the chosen list.'),
-            'server_error_status_list_data' => $this->l('Internal server error. Please try again.'),
-            'success_status_list_data' => $this->l('Your list has been created. We’re now adding the custom fields.'),
-            'success_status_list_data_cf' => $this->l('Custom fields for this list have been successfully created.'),
-            'success_status_list_data_cf_change' => $this->l('Custom fields for this list have been successfully modified.')
-        ));
-
-        $helper->default_form_language = $default_lang;
-        $helper->allow_employee_form_lang = $default_lang;
-
-        $helper->title = $this->displayName;
-        $helper->show_toolbar = true;
-        $helper->toolbar_scroll = true;
-        $helper->submit_action = 'submit' . $this->name;
-        $helper->toolbar_btn = array(
-            'save' =>
-                array(
-                    'desc' => $this->l('Save.'),
-                    'href' => AdminController::$currentIndex . '&configure=' . $this->name . '&save' . $this->name .
-                        '&token=' . Tools::getAdminTokenLite('AdminModules'),
-                ),
-            'back' => array(
-                'href' => AdminController::$currentIndex . '&token=' . Tools::getAdminTokenLite('AdminModules'),
-                'desc' => $this->l('Go Back.')
-            )
-        );
-
-        // Load current value
-        $helper->fields_value[$this->prefix_setting('consumer_key')] = Configuration::get($this->prefix_setting('username'));
-        $helper->fields_value[$this->prefix_setting('consumer_secret')] = Configuration::get($this->prefix_setting('password'));
-        $helper->fields_value[$this->prefix_setting('lang')] = Configuration::get($this->prefix_setting('lang'));
-        $helper->fields_value[$this->prefix_setting('list')] = Configuration::get($this->prefix_setting('list'));
-        $helper->fields_value[$this->prefix_setting('policy_type')] = Configuration::get($this->prefix_setting('policy_type'));
-
-        return $helper->generateForm($fields_form);
-
     }
 
     public function hookBackOfficeHeader($arr)

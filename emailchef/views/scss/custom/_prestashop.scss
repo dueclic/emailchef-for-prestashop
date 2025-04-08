@@ -32,6 +32,10 @@
   color: $infoColor;
 }
 
+.check-login, .response-login, .check-list, .response-list, .check-list-cf, .response-list-cf, .check-list-cf-change, .response-list-cf-change  {
+  display: none;
+}
+
 .emailchef-logo {
   img {
     margin-left: 0;
@@ -191,9 +195,6 @@
   .ecps-list-none {
    font-style: italic;
    color: #CCCCCC;
-  }
-  .ecps-list-selected {
-   display:none;
   }
 
   &.ecps-has-list{
