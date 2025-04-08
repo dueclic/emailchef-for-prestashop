@@ -160,8 +160,83 @@ var PS_Emailchef = function ($) {
 
     }
 
+    function manualSync(
+        suppressAlerts = false
+    ) {
+
+        var $syncButton = $("#"+prefixed_setting('sync_now'));
+
+        $syncButton.prop("disabled", true);
+
+        var ajax_data = {
+            action: 'emailchefsync'
+        };
+
+        var ajax_url = $syncButton.data("ajax-url");
+
+
+        $.ajax({
+            type: 'POST',
+            url: ajax_url,
+            data: ajax_data,
+            dataType: 'json',
+            success: function (response) {
+
+                $syncButton.prop("disabled", false);
+
+                if (response.status === 'success' && !suppressAlerts) {
+                    alert(response.msg);
+                }
+
+            },
+            error: function (jxqr, textStatus, thrown) {
+                $syncButton.prop("disabled", false);
+
+            },
+            complete: function () {
+                $syncButton.prop("disabled", false);
+            }
+        });
+
+    }
+
+    function disconnectAccount(
+    ) {
+
+        var $disconnectButton = $("#emailchef-disconnect");
+
+        $disconnectButton.prop("disabled", true);
+
+        var ajax_data = {
+            action: 'emailchefdisconnect'
+        };
+
+        var ajax_url = $disconnectButton.data("ajax-url");
+
+
+        $.ajax({
+            type: 'POST',
+            url: ajax_url,
+            data: ajax_data,
+            dataType: 'json',
+            success: function (response) {
+               window.location.reload();
+            },
+            error: function (jxqr, textStatus, thrown) {
+                $disconnectButton.prop("disabled", false);
+
+            },
+            complete: function () {
+                $disconnectButton.prop("disabled", false);
+            }
+        });
+
+    }
+
+
     function settings(
-        _i18n
+        _i18n,
+        doManualSync = false
     ){
 
         i18n = _i18n;
@@ -183,6 +258,23 @@ var PS_Emailchef = function ($) {
                 $("#" + prefixed_setting("new_description")).val()
             );
         });
+
+        $(document).on("click",  "#"+prefixed_setting('sync_now'), function(evt){
+            evt.preventDefault();
+            manualSync();
+        });
+
+        $(document).on("click", "#emailchef-disconnect", function(evt){
+           evt.preventDefault();
+           if (confirm(i18n.are_you_sure_disconnect)){
+                disconnectAccount();
+           }
+        });
+
+        doManualSync && manualSync(
+            true
+        );
+
 
     }
 

@@ -161,13 +161,18 @@ class Emailchef extends Module
         );
     }
 
-    public function uninstall()
-    {
-
+    public function deleteConfigurations(){
         Configuration::deleteByName($this->prefix_setting('consumer_key'));
         Configuration::deleteByName($this->prefix_setting('consumer_secret'));
         Configuration::deleteByName($this->prefix_setting('list'));
         Configuration::deleteByName($this->prefix_setting('policy_type'));
+        Configuration::deleteByName($this->prefix_setting('enabled'));
+    }
+
+    public function uninstall()
+    {
+
+        $this->deleteConfigurations();
 
         return (
             parent::uninstall() &&
@@ -192,6 +197,7 @@ class Emailchef extends Module
 
         $error = null;
         $account = null;
+        $manual_sync = false;
 
         if (
             Tools::isSubmit('submitEmailchefLogin')
@@ -225,6 +231,7 @@ class Emailchef extends Module
             if (empty($list_id)) {
                 $error = $this->l('You must select a valid list.');
             } else {
+                $manual_sync = boolval(Tools::getValue('sync_customers'));
                 Configuration::updateValue($this->prefix_setting('list'), $list_id);
                 $policy_type = Tools::getValue('policy_type');
 
@@ -265,6 +272,7 @@ class Emailchef extends Module
             $filtered_lists =  array_filter($data['lists'], function($_list) use ($data) {
                 return (int)$_list['id'] === (int)$data['list_id'];
             });
+            $data['manualSync'] = $manual_sync;
             $data['list_name'] = count($filtered_lists) > 0 ? $filtered_lists[0]['name'] : '';
             $data['admin_logs_link'] = Context::getContext()->link->getAdminLink('AdminLogs');
             $data['i18n'] = array(
@@ -282,6 +290,7 @@ class Emailchef extends Module
                 'server_failure_login_data' => $this->l('Internal server error. Please try again.'),
                 'success_login_data' => $this->l('You have successfully logged into Emailchef.'),
                 'no_list_found' => $this->l('No list found.'),
+                'are_you_sure_disconnect' => $this->l('Are you sure do you want disconnect your account?'),
                 'check_status_list_data' => $this->l('Making a new list, please wait...'),
                 'check_status_list_data_cf' => $this->l('We are creating custom fields for the newly created list...'),
                 'check_status_list_data_cf_change' => $this->l('We are adjusting custom fields for the newly selected list...'),

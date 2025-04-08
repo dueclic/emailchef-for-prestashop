@@ -280,6 +280,16 @@ final class EmailchefAjaxRequest {
 
 	}
 
+    public function ajax_emailchefdisconnect( ) {
+
+        $this->module->deleteConfigurations();
+
+        return array(
+            'type' => 'success'
+        );
+
+    }
+
 	public function ajax_emailcheflogin( $args ) {
 
 		if ( isset( $args['api_user'] ) && isset( $args['api_pass'] ) ) {

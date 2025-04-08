@@ -13,7 +13,7 @@
                   title="{$account['email']}"><strong>{$account['email']}</strong>
             </span>
             <span>
-                <a id="emailchef-disconnect" class="ecps-account-disconnect"
+                <a id="emailchef-disconnect" class="ecps-account-disconnect" data-ajax-url="{$ajax_url}"
                    title="{l s='Disconnect account' mod='emailchef'}">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path
                                 d="M280 24c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 240c0 13.3 10.7 24 24 24s24-10.7 24-24l0-240zM134.2 107.3c10.7-7.9 12.9-22.9 5.1-33.6s-22.9-12.9-33.6-5.1C46.5 112.3 8 182.7 8 262C8 394.6 115.5 502 248 502s240-107.5 240-240c0-79.3-38.5-149.7-97.8-193.3c-10.7-7.9-25.7-5.6-33.6 5.1s-5.6 25.7 5.1 33.6c47.5 35 78.2 91.2 78.2 154.7c0 106-86 192-192 192S56 368 56 262c0-63.4 30.7-119.7 78.2-154.7z"></path></svg>
@@ -47,10 +47,10 @@
         <div>
             <p>{l s="Prestashop users usually sync automatically with Emailchef. If an issue arises or you need an immediate update, use the button below for manual sync." mod='emailchef'}</p>
             <p class="ecps-text-center ecps-submit">
-                <button {if $list_id}disabled{/if} type="button"
+                <button {if !$list_id}disabled{/if} type="button"  data-ajax-url="{$ajax_url}"
                         id="ps_emailchef_sync_now"
                         class="btn btn-default btn-sm"
-                        title="{if $list_id}{l s="Please select a list and save settings first" mod="emailchef"}{/if}">
+                        title="{if !$list_id}{l s="Please select a list and save settings first" mod="emailchef"}{/if}">
                     {l s="Manual Sync Now" mod="emailchef"}
                 </button>
             </p>
@@ -285,7 +285,7 @@
                         <td class="forminp forminp-checkbox ">
                             <fieldset>
                                 <label for="ps_emailchef_sync_customers">
-                                    <input name="ps_emailchef_sync_customers" id="ps_emailchef_sync_customers"
+                                    <input name="sync_customers" id="ps_emailchef_sync_customers"
                                            style="margin-right: 5px;"
                                            type="checkbox" value="1"/>
                                     {l s="Sync existing PrestaShop customers on save" mod="emailchef"}
@@ -339,6 +339,7 @@
     PS_Emailchef.settings({
         'no_list_found': '{$i18n['no_list_found']}',
         'create_list': '{$i18n['create_list']}',
-        'language_set': '{$i18n['language_set']}'
-    });
+        'language_set': '{$i18n['language_set']}',
+        'are_you_sure_disconnect': '{$i18n['are_you_sure_disconnect']}'
+    }, {$manualSync});
 </script>
