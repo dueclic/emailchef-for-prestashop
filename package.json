@@ -1,6 +1,6 @@
 {
-  "name": "emailchef-for-woocommerce",
-  "version": "2.0.0",
+  "name": "emailchef-for-prestashop",
+  "version": "2.0.1",
   "description": "Easily send emails from your WordPress website using turboSMTP's services",
   "main": "gulpfile.js",
   "scripts": {
