@@ -50,7 +50,7 @@
                 </div>
 
                 <div class="ecps-text-center submit">
-                    <button name="save" class="prestashop-save-button components-button is-primary" type="submit">
+                    <button name="save" class="btn btn-success prestashop-save-button components-button is-primary" type="submit">
                         {l s='Login' mod='emailchef'}
                     </button>
                 </div>
