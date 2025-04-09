@@ -161,7 +161,8 @@ class Emailchef extends Module
         );
     }
 
-    public function deleteConfigurations(){
+    public function deleteConfigurations()
+    {
         Configuration::deleteByName($this->prefix_setting('consumer_key'));
         Configuration::deleteByName($this->prefix_setting('consumer_secret'));
         Configuration::deleteByName($this->prefix_setting('list'));
@@ -220,9 +221,7 @@ class Emailchef extends Module
                 Configuration::updateValue($this->prefix_setting('enabled'), true);
             }
 
-        }
-
-        else if (
+        } else if (
             Tools::isSubmit('submitEmailchefSettings')
         ) {
 
@@ -235,7 +234,7 @@ class Emailchef extends Module
                 Configuration::updateValue($this->prefix_setting('list'), $list_id);
                 $policy_type = Tools::getValue('policy_type');
 
-                if (!empty($policy_type)){
+                if (!empty($policy_type)) {
                     Configuration::updateValue($this->prefix_setting('policy_type'), $list_id);
                 }
 
@@ -248,8 +247,8 @@ class Emailchef extends Module
         ];
 
         $policy_types = [
-            'sopt' => $this->l( "Single opt-in"),
-            'dopt' => $this->l( "Double opt-in")
+            'sopt' => $this->l("Single opt-in"),
+            'dopt' => $this->l("Double opt-in")
         ];
 
 
@@ -257,11 +256,11 @@ class Emailchef extends Module
 
         if ($is_enabled) {
 
-            $policy    = $this->emailchef->get_policy();
+            $policy = $this->emailchef->get_policy();
             $account = $this->emailchef->get_account();
 
-            if ( $policy !== 'premium' ) {
-                unset( $policy_types['sopt'] );
+            if ($policy !== 'premium') {
+                unset($policy_types['sopt']);
             }
 
             $data['account'] = $account;
@@ -270,7 +269,7 @@ class Emailchef extends Module
             $data['policy_type'] = $this->_getConf('policy_type', null);
             $data['lists'] = $this->emailchef->get_lists();
             $data['ajax_url'] = $this->_path . "ajax.php";
-            $filtered_lists =  array_filter($data['lists'], function($_list) use ($data) {
+            $filtered_lists = array_filter($data['lists'], function ($_list) use ($data) {
                 return (int)$_list['id'] === (int)$data['list_id'];
             });
             $data['manualSync'] = $manual_sync;
