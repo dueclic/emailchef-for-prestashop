@@ -464,6 +464,32 @@ input[name="emailchef_settings\[consumer_secret\]"].valid {
   gap: .5rem;
   margin-top: 1rem;
 }
+.ecps-new-list-status > div{
+  margin-top: 1rem;
+
+  h4{
+    margin-bottom: 0 !important;
+  }
+
+  div.alert.alert-info:before{
+    content: "\F1CE";
+    -webkit-animation: fa-spin 2s infinite linear;
+    animation: fa-spin 2s infinite linear;
+    width: auto;
+    height: auto;
+  }
+}
+
+@keyframes fa-spin {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(359deg);
+    transform: rotate(359deg);
+  }
+}
 hr.ecps-hr-separator{
   border-top: 1px solid #ddd;
   margin-top: 1.5rem;

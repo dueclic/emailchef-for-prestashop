@@ -89,6 +89,9 @@ var PS_Emailchef = (function () {
 
     async function addList(listName, listDesc) {
 
+        hideElements(".status-list");
+        hideElements(".status-list-cf");
+
         const containerSelector = ".ecps-new-list-container";
         const containerElement = document.querySelector(containerSelector);
         if (!containerElement) return;
@@ -104,8 +107,8 @@ var PS_Emailchef = (function () {
         var ajax_url = containerElement.dataset.ajaxUrl;
         var selList = document.getElementById(prefixed_setting('list'));
 
-        hideElements(".status-list");
-        showElements(".check-list", 'inline-block');
+        //hideElements(".status-list");
+        showElements(".check-list"/*, 'inline-block'*/);
 
         const response = await makeAjaxRequest(ajax_url, ajax_data);
 
@@ -133,7 +136,7 @@ var PS_Emailchef = (function () {
         const successStatusList = document.getElementById("success_status_list_data");
         if (successStatusList) {
             showElement(successStatusList);
-            setTimeout(() => hideElement(successStatusList), 3000);
+            //setTimeout(() => hideElement(successStatusList), 3000);
         }
 
         if (response.list_id !== undefined && selList) {
@@ -162,7 +165,7 @@ var PS_Emailchef = (function () {
         var ajax_url = containerElement.dataset.ajaxUrl;
 
         hideElements(".status-list-cf");
-        showElements(".check-list-cf", 'inline-block');
+        showElements(".check-list-cf" /*, 'inline-block'*/);
 
         const response = await makeAjaxRequest(ajax_url, ajax_data);
 
@@ -185,10 +188,10 @@ var PS_Emailchef = (function () {
         const successStatusListCf = document.getElementById("success_status_list_data_cf");
         if (successStatusListCf) {
             showElement(successStatusListCf);
-            setTimeout(() => hideElement(successStatusListCf), 3000);
+            //setTimeout(() => hideElement(successStatusListCf), 3000);
         }
 
-        hideElement(containerElement);
+        //hideElement(containerElement);
 
         setButtonDisabledState(containerSelector + " button", false);
 

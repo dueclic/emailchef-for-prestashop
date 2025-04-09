@@ -69,7 +69,7 @@ final class EmailchefAjaxRequest {
 
 		$response = array(
 			'type' => 'error',
-			'msg'  => $this->module->l( 'Username or password are wrong.' )
+			'msg'  => $this->module->l( 'API credentials are wrong.' )
 		);
 
 		if ( $psec->isLogged() ) {
@@ -199,7 +199,7 @@ final class EmailchefAjaxRequest {
 		else {
 			$response = array(
 				'type' => 'error',
-				'msg'  => $this->module->l( 'Username or password are wrong.' )
+				'msg'  => $this->module->l( 'API credentials are wrong.' )
 			);
 
 			$this->module->log(
@@ -224,13 +224,13 @@ final class EmailchefAjaxRequest {
 
         $response = array(
 			'type' => 'error',
-			'msg'  => $this->module->l( 'Username or password are wrong.' )
+			'msg'  => $this->module->l( 'API credentials are wrong.' )
 		);
 
 		if ( $psec->isLogged() ) {
 
 			if ( ! $args['list_name'] || empty( $args['list_name'] ) ) {
-				$response['msg'] = $this->module->l( 'Enter a name and description for the new list.' );
+				$response['msg'] = $this->module->l( 'Enter a name for the new list.' );
 
 				return $response;
 			}
@@ -316,7 +316,7 @@ final class EmailchefAjaxRequest {
 
 			$response = array(
 				'type' => 'error',
-				'msg'  => $this->module->l( 'Username or password are wrong.' )
+				'msg'  => $this->module->l( 'API credentials are wrong.' )
 			);
 
 		}
@@ -406,7 +406,7 @@ final class EmailchefAjaxRequest {
 
 			$response = array(
 				'type' => 'error',
-				'msg'  => $this->module->l( 'Username or password are wrong.' )
+				'msg'  => $this->module->l( 'API credentials are wrong.' )
 			);
 
 			$this->module->log(

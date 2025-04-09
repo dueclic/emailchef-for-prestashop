@@ -99,7 +99,7 @@
                                 <input name="ps_emailchef_new_name" id="ps_emailchef_new_name" type="text" dir="ltr"
                                        style="min-width:350px;" value=""
                                        placeholder="{l s='Provide a name for this new list.' mod='emailchef'}">
-                                <label><strong>{l s='List description' mod='emailchef'}</strong></label>
+                                <label><strong>{l s='List description' mod='emailchef'}</strong> ({l s='optional' mod='emailchef'})</label>
                                 <input name="ps_emailchef_new_description" id="ps_emailchef_new_description" type="text"
                                        dir="ltr" style="min-width:350px;" value=""
                                        placeholder="{l s='Provide a description for this new list.' mod='emailchef'}">
@@ -114,167 +114,107 @@
                                         {l s='Undo' mod='emailchef'}
                                     </button>
                                 </p>
-
-                                <div id="success_status_list_data" class="status-list response-list">
-                                    <div class="row">
-                                        <div class="col-lg-12">
-                                            <div class="alert alert-success alert-check">
-
-                                                <h4>
-                                                    {$i18n['success_status_list_data']}
-                                                </h4>
-                                            </div>
+                                <div class="ecps-new-list-status">
+                                    <div id="success_status_list_data" class="status-list response-list">
+                                        <div class="alert alert-success alert-check">
+                                            <h4>
+                                                {$i18n['success_status_list_data']}
+                                            </h4>
+                                        </div>
+                                    </div>
+                                    <div id="check_status_list_data" class="check-list">
+                                        <div class="alert alert-info alert-check">
+                                            <h4>
+                                                <span class="loading-spinner-emailchef"></span> {$i18n['check_status_list_data']}
+                                            </h4>
+                                        </div>
+                                    </div>
+                                    <div id="error_status_list_data" class="status-list response-list">
+                                        <div class="alert alert-danger alert-check">
+                                            <h4>
+                                                {$i18n['error_status_list_data']}
+                                            </h4>
+                                            <p class="reason"></p>
+                                        </div>
+                                    </div>
+                                    <div id="server_error_status_list_data" class="status-list response-list">
+                                        <div class="alert alert-danger alert-check">
+                                            <h4>
+                                                {$i18n['server_error_status_list_data']}
+                                            </h4>
+                                            <p class="reason"></p>
+                                        </div>
+                                    </div>
+                                    <!--
+                                    creazione custom fields
+                                    -->
+                                    <div id="success_status_list_data_cf" class="status-list-cf response-list-cf">
+                                        <div class="alert alert-success alert-check">
+                                            <h4>
+                                                {$i18n['success_status_list_data_cf']}
+                                            </h4>
+                                        </div>
+                                    </div>
+                                    <div id="check_status_list_data_cf" class="check-list-cf">
+                                        <div class="alert alert-info alert-check">
+                                            <h4>
+                                                <span class="loading-spinner-emailchef"></span> {$i18n['check_status_list_data_cf']}
+                                            </h4>
+                                        </div>
+                                    </div>
+                                    <div id="error_status_list_data_cf" class="status-list-cf response-list-cf">
+                                        <div class="alert alert-danger alert-check">
+                                            <h4>
+                                                {$i18n['error_status_list_data_cf']}
+                                            </h4>
+                                            <p class="reason"></p>
+                                        </div>
+                                    </div>
+                                    <div id="server_error_status_list_data_cf" class="status-list-cf response-list-cf">
+                                        <div class="alert alert-danger alert-check">
+                                            <h4>
+                                                {$i18n['server_error_status_list_data']}
+                                            </h4>
+                                            <p class="reason"></p>
+                                        </div>
+                                    </div>
+                                    <!--
+                                        Sistemazione custom fields
+                                    -->
+                                    <div id="success_status_list_data_cf_change"
+                                         class="status-list-cf-change response-list-cf-change">
+                                        <div class="alert alert-success alert-check">
+                                            <h4>
+                                                {$i18n['success_status_list_data_cf_change']}
+                                            </h4>
+                                        </div>
+                                    </div>
+                                    <div id="check_status_list_data_cf_change" class="check-list-cf-change">
+                                        <div class="alert alert-info alert-check">
+                                            <h4>
+                                                <span class="loading-spinner-emailchef"></span> {$i18n['check_status_list_data_cf_change']}
+                                            </h4>
+                                        </div>
+                                    </div>
+                                    <div id="error_status_list_data_cf_change"
+                                         class="status-list-cf-change response-list-cf-change">
+                                        <div class="alert alert-danger alert-check">
+                                            <h4>
+                                                {$i18n['error_status_list_data_cf_change']}
+                                            </h4>
+                                            <p class="reason"></p>
+                                        </div>
+                                    </div>
+                                    <div id="server_error_status_list_data_cf_change"
+                                         class="status-list-cf-change response-list-cf-change">
+                                        <div class="alert alert-danger alert-check">
+                                            <h4>
+                                                {$i18n['server_error_status_list_data']}
+                                            </h4>
+                                            <p class="reason"></p>
                                         </div>
                                     </div>
                                 </div>
-                                <div id="check_status_list_data" class="check-list">
-                                    <div class="row">
-                                        <div class="col-lg-12">
-                                            <div class="alert alert-info alert-check">
-
-                                                <h4>
-                                                    <span class="loading-spinner-emailchef"></span> {$i18n['check_status_list_data']}
-                                                </h4>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div id="error_status_list_data" class="status-list response-list">
-                                    <div class="row">
-                                        <div class="col-lg-12">
-                                            <div class="alert alert-danger alert-check">
-
-                                                <h4>
-                                                    {$i18n['error_status_list_data']}
-                                                </h4>
-                                                <p class="reason"></p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div id="server_error_status_list_data" class="status-list response-list">
-                                    <div class="row">
-                                        <div class="col-lg-12">
-                                            <div class="alert alert-danger alert-check">
-
-                                                <h4>
-                                                    {$i18n['server_error_status_list_data']}
-                                                </h4>
-                                                <p class="reason"></p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!--
-                                creazione custom fields
-                                -->
-                                <div id="success_status_list_data_cf" class="status-list-cf response-list-cf">
-                                    <div class="row">
-                                        <div class="col-lg-12">
-                                            <div class="alert alert-success alert-check">
-
-                                                <h4>
-                                                    {$i18n['success_status_list_data_cf']}
-                                                </h4>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div id="check_status_list_data_cf" class="check-list-cf">
-                                    <div class="row">
-                                        <div class="col-lg-12">
-                                            <div class="alert alert-info alert-check">
-
-                                                <h4>
-                                                    <span class="loading-spinner-emailchef"></span> {$i18n['check_status_list_data_cf']}
-                                                </h4>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div id="error_status_list_data_cf" class="status-list-cf response-list-cf">
-                                    <div class="row">
-                                        <div class="col-lg-12">
-                                            <div class="alert alert-danger alert-check">
-
-                                                <h4>
-                                                    {$i18n['error_status_list_data_cf']}
-                                                </h4>
-                                                <p class="reason"></p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div id="server_error_status_list_data_cf" class="status-list-cf response-list-cf">
-                                    <div class="row">
-                                        <div class="col-lg-12">
-                                            <div class="alert alert-danger alert-check">
-
-                                                <h4>
-                                                    {$i18n['server_error_status_list_data']}
-                                                </h4>
-                                                <p class="reason"></p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!--
-                                    Sistemazione custom fields
-                                -->
-                                <div id="success_status_list_data_cf_change"
-                                     class="status-list-cf-change response-list-cf-change">
-                                    <div class="row">
-                                        <div class="col-lg-12">
-                                            <div class="alert alert-success alert-check">
-
-                                                <h4>
-                                                    {$i18n['success_status_list_data_cf_change']}
-                                                </h4>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div id="check_status_list_data_cf_change" class="check-list-cf-change">
-                                    <div class="row">
-                                        <div class="col-lg-12">
-                                            <div class="alert alert-info alert-check">
-
-                                                <h4>
-                                                    <span class="loading-spinner-emailchef"></span> {$i18n['check_status_list_data_cf_change']}
-                                                </h4>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div id="error_status_list_data_cf_change"
-                                     class="status-list-cf-change response-list-cf-change">
-                                    <div class="row">
-                                        <div class="col-lg-12">
-                                            <div class="alert alert-danger alert-check">
-
-                                                <h4>
-                                                    {$i18n['error_status_list_data_cf_change']}
-                                                </h4>
-                                                <p class="reason"></p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div id="server_error_status_list_data_cf_change"
-                                     class="status-list-cf-change response-list-cf-change">
-                                    <div class="row">
-                                        <div class="col-lg-12">
-                                            <div class="alert alert-danger alert-check">
-
-                                                <h4>
-                                                    {$i18n['server_error_status_list_data']}
-                                                </h4>
-                                                <p class="reason"></p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
                             </div>
                         </td>
                     </tr>
