@@ -1,30 +1,4 @@
-/*
- * *
- *  2017 dueclic
- *
- *  NOTICE OF LICENSE
- *
- *  This source file is subject to the Academic Free License (AFL 3.0)
- *  that is bundled with this package in the file LICENSE.txt.
- *  It is also available through the world-wide-web at this URL:
- *  http://opensource.org/licenses/afl-3.0.php
- *  If you did not receive a copy of the license and are unable to
- *  obtain it through the world-wide-web, please send an email
- *  to license@prestashop.com so we can send you a copy immediately.
- *
- *  DISCLAIMER
- *
- *  Do not edit or add to this file if you wish to upgrade PrestaShop to newer
- *  versions in the future. If you wish to customize PrestaShop for your
- *  needs please refer to http://www.prestashop.com for more information.
- *
- *     @author    dueclic <info@dueclic.com>
- *     @copyright 2017 dueclic
- *     @license   https://www.gnu.org/licenses/gpl-3.0.html  GNU General Public License (GPL 3.0)
- * /
- */
-
-var PS_Emailchef = function ($) {
+var PS_Emailchef = (function () {
 
     var namespace = 'ps_emailchef';
     var i18n = {};
@@ -33,25 +7,78 @@ var PS_Emailchef = function ($) {
         return namespace + "_" + suffix;
     }
 
-    return {
-        loginPage: loginPage,
-        settings: settings
-    };
+    function showElement(selectorOrElement, displayType = 'block') {
+        const element = typeof selectorOrElement === 'string' ? document.querySelector(selectorOrElement) : selectorOrElement;
+        if (element) {
+            element.style.display = displayType;
+        }
+    }
 
-    function loginPage(){
+    function hideElement(selectorOrElement) {
+        const element = typeof selectorOrElement === 'string' ? document.querySelector(selectorOrElement) : selectorOrElement;
+        if (element) {
+            element.style.display = 'none';
+        }
+    }
+
+    function showElements(selector, displayType = 'block') {
+        document.querySelectorAll(selector).forEach(el => el.style.display = displayType);
+    }
+
+    function hideElements(selector) {
+        document.querySelectorAll(selector).forEach(el => el.style.display = 'none');
+    }
+
+    function toggleElement(selectorOrElement, displayType = 'block') {
+        const element = typeof selectorOrElement === 'string' ? document.querySelector(selectorOrElement) : selectorOrElement;
+        if (element) {
+            if (window.getComputedStyle(element).display === 'none') {
+                element.style.display = displayType;
+            } else {
+                element.style.display = 'none';
+            }
+        }
+    }
+
+    function setButtonDisabledState(selector, disabled) {
+        document.querySelectorAll(selector).forEach(button => button.disabled = disabled);
+    }
+
+    async function makeAjaxRequest(url, data) {
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams(data)
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const responseData = await response.json();
+            return responseData;
+
+        } catch (error) {
+            console.error('Fetch Error:', error);
+            return { type: 'error', msg: error.message || 'Network or parsing error' };
+        }
+    }
+
+    function loginPage() {
         var showPasswordButton = document.getElementById('showPassword');
         var hidePasswordButton = document.getElementById('hidePassword');
         var consumerSecretInput = document.getElementById("consumer_secret");
 
-        if (showPasswordButton) {
+        if (showPasswordButton && hidePasswordButton && consumerSecretInput) {
             showPasswordButton.addEventListener('click', () => {
                 consumerSecretInput.setAttribute('type', 'text');
                 showPasswordButton.style.display = 'none';
                 hidePasswordButton.style.display = 'flex';
             });
-        }
 
-        if (hidePasswordButton) {
             hidePasswordButton.addEventListener('click', () => {
                 consumerSecretInput.setAttribute('type', 'password');
                 showPasswordButton.style.display = 'flex';
@@ -59,9 +86,14 @@ var PS_Emailchef = function ($) {
             });
         }
     }
-    function addList(listName, listDesc) {
 
-        $(".ecps-new-list-container button").prop("disabled", true);
+    async function addList(listName, listDesc) {
+
+        const containerSelector = ".ecps-new-list-container";
+        const containerElement = document.querySelector(containerSelector);
+        if (!containerElement) return;
+
+        setButtonDisabledState(containerSelector + " button", true);
 
         var ajax_data = {
             action: 'emailchefaddlist',
@@ -69,216 +101,204 @@ var PS_Emailchef = function ($) {
             list_desc: listDesc
         };
 
-        var ajax_url = $(".ecps-new-list-container").data("ajax-url");
+        var ajax_url = containerElement.dataset.ajaxUrl;
+        var selList = document.getElementById(prefixed_setting('list'));
 
-        var $selList =  $("#"+prefixed_setting('list'));
+        hideElements(".status-list");
+        showElements(".check-list", 'inline-block');
 
-        $(".status-list").hide();
-        $(".check-list").show();
+        const response = await makeAjaxRequest(ajax_url, ajax_data);
 
-        $.ajax({
-            type: 'POST',
-            url: ajax_url,
-            data: ajax_data,
-            dataType: 'json',
-            success: function (response) {
+        hideElements(".check-list");
 
-                if (response.type == 'error') {
-                    $(".status-list").hide();
-                    $("#error_status_list_data").find(".reason").text(response.msg);
-                    $("#error_status_list_data").show();
-                    return;
+        if (response.type == 'error') {
+            hideElements(".status-list");
+            const errorStatusList = document.getElementById("error_status_list_data");
+            if (errorStatusList) {
+                const reasonElement = errorStatusList.querySelector(".reason");
+                if (reasonElement) {
+                    reasonElement.textContent = response.msg;
                 }
-
-                $(".ecps-new-list-container #"+prefixed_setting('new_save')).text(i18n.create_list);
-
-                $("#success_status_list_data").show().delay(3000).fadeOut();
-
-                if (response.list_id !== undefined) {
-                    $selList.append($('<option>').text(listName).attr('value', response.list_id))
-                    $selList.val(response.list_id).attr("selected", "selected");
-                }
-
-                createCustomFields(response.list_id);
-
-            },
-            error: function (jxqr, textStatus, thrown) {
-                $("#error_status_list_data").find(".reason").text(jxqr.error + " " + textStatus + " " + thrown);
-                $("#server_error_status_list_data").show();
-            },
-            complete: function () {
-                $(".check-list").hide();
-                $(".ecps-new-list-container button").prop("disabled", false);
+                showElement(errorStatusList);
             }
-        });
+            setButtonDisabledState(containerSelector + " button", false);
+            return;
+        }
+
+        const newSaveButton = containerElement.querySelector("#" + prefixed_setting('new_save'));
+        if (newSaveButton) {
+            newSaveButton.textContent = i18n.create_list;
+        }
+
+        const successStatusList = document.getElementById("success_status_list_data");
+        if (successStatusList) {
+            showElement(successStatusList);
+            setTimeout(() => hideElement(successStatusList), 3000);
+        }
+
+        if (response.list_id !== undefined && selList) {
+            const newOption = document.createElement('option');
+            newOption.textContent = listName;
+            newOption.value = response.list_id;
+            selList.appendChild(newOption);
+            selList.value = response.list_id;
+        }
+
+        await createCustomFields(response.list_id);
 
     }
 
-    function createCustomFields(listId) {
+    async function createCustomFields(listId) {
 
-        $(".ecps-new-list-container button").prop("disabled", true);
+        const containerSelector = ".ecps-new-list-container";
+        const containerElement = document.querySelector(containerSelector);
+        if (!containerElement) return;
 
         var ajax_data = {
             action: 'emailchefaddcustomfields',
             list_id: listId
         };
 
-        var ajax_url = $(".ecps-new-list-container").data("ajax-url");
+        var ajax_url = containerElement.dataset.ajaxUrl;
 
-        $(".status-list-cf").hide();
-        $(".check-list-cf").show();
+        hideElements(".status-list-cf");
+        showElements(".check-list-cf", 'inline-block');
 
-        $.ajax({
-            type: 'POST',
-            url: ajax_url,
-            data: ajax_data,
-            dataType: 'json',
-            success: function (response) {
+        const response = await makeAjaxRequest(ajax_url, ajax_data);
 
-                if (response.type == 'error') {
-                    $(".status-list-cf").hide();
-                    $("#error_status_list_data_cf").find(".reason").text(response.msg);
-                    $("#error_status_list_data_cf").show();
-                    return;
+        hideElements(".check-list-cf");
+
+        if (response.type == 'error') {
+            hideElements(".status-list-cf");
+            const errorStatusListCf = document.getElementById("error_status_list_data_cf");
+            if (errorStatusListCf) {
+                const reasonElement = errorStatusListCf.querySelector(".reason");
+                if (reasonElement) {
+                    reasonElement.textContent = response.msg;
                 }
-
-                $("#success_status_list_data_cf").show().delay(3000).fadeOut();
-                $('.ecps-new-list-container').slideUp();
-
-            },
-            error: function (jxqr, textStatus, thrown) {
-                $("#error_status_list_data_cf").find(".reason").text(jxqr.error + " " + textStatus + " " + thrown);
-                $("#server_error_status_list_data_cf").show();
-                $(".ecps-new-list-container button").prop("disabled", false);
-            },
-            complete: function () {
-                $(".check-list-cf").hide();
-                $(".ecps-new-list-container button").prop("disabled", false);
-
+                showElement(errorStatusListCf);
             }
-        });
+            setButtonDisabledState(containerSelector + " button", false);
+            return;
+        }
+
+        const successStatusListCf = document.getElementById("success_status_list_data_cf");
+        if (successStatusListCf) {
+            showElement(successStatusListCf);
+            setTimeout(() => hideElement(successStatusListCf), 3000);
+        }
+
+        hideElement(containerElement);
+
+        setButtonDisabledState(containerSelector + " button", false);
 
     }
 
-    function manualSync(
-        suppressAlerts = false
-    ) {
+    async function manualSync(suppressAlerts = false) {
 
-        var $syncButton = $("#"+prefixed_setting('sync_now'));
+        var syncButton = document.getElementById(prefixed_setting('sync_now'));
+        if (!syncButton) return;
 
-        $syncButton.prop("disabled", true);
+        syncButton.disabled = true;
 
         var ajax_data = {
             action: 'emailchefsync'
         };
 
-        var ajax_url = $syncButton.data("ajax-url");
+        var ajax_url = syncButton.dataset.ajaxUrl;
 
+        const response = await makeAjaxRequest(ajax_url, ajax_data);
 
-        $.ajax({
-            type: 'POST',
-            url: ajax_url,
-            data: ajax_data,
-            dataType: 'json',
-            success: function (response) {
+        syncButton.disabled = false;
 
-                $syncButton.prop("disabled", false);
-
-                if (response.status === 'success' && !suppressAlerts) {
-                    alert(response.msg);
-                }
-
-            },
-            error: function (jxqr, textStatus, thrown) {
-                $syncButton.prop("disabled", false);
-
-            },
-            complete: function () {
-                $syncButton.prop("disabled", false);
-            }
-        });
-
+        if (response.status === 'success' && !suppressAlerts) {
+            alert(response.msg);
+        }
     }
 
-    function disconnectAccount(
-    ) {
+    async function disconnectAccount() {
 
-        var $disconnectButton = $("#emailchef-disconnect");
+        var disconnectButton = document.getElementById("emailchef-disconnect");
+        if (!disconnectButton) return;
 
-        $disconnectButton.prop("disabled", true);
+        disconnectButton.disabled = true;
 
         var ajax_data = {
             action: 'emailchefdisconnect'
         };
 
-        var ajax_url = $disconnectButton.data("ajax-url");
+        var ajax_url = disconnectButton.dataset.ajaxUrl;
 
+        const response = await makeAjaxRequest(ajax_url, ajax_data);
 
-        $.ajax({
-            type: 'POST',
-            url: ajax_url,
-            data: ajax_data,
-            dataType: 'json',
-            success: function (response) {
-               window.location.reload();
-            },
-            error: function (jxqr, textStatus, thrown) {
-                $disconnectButton.prop("disabled", false);
-
-            },
-            complete: function () {
-                $disconnectButton.prop("disabled", false);
-            }
-        });
-
+        if (response) {
+            window.location.reload();
+        } else {
+            disconnectButton.disabled = false;
+        }
     }
 
-
-    function settings(
-        _i18n,
-        doManualSync = false
-    ){
+    function settings(_i18n, doManualSync = false) {
 
         i18n = _i18n;
 
-        $(document).on("click", "#"+prefixed_setting('create_list'), function (evt) {
-            evt.preventDefault();
-            $(".ecps-new-list-container").toggle();
-        });
+        const createListButton = document.getElementById(prefixed_setting('create_list'));
+        const newListContainer = document.querySelector(".ecps-new-list-container");
+        const undoSaveButton = document.querySelector(".ecps-new-list-container #" + prefixed_setting('undo_save'));
+        const newSaveButton = document.querySelector(".ecps-new-list-container #" + prefixed_setting('new_save'));
+        const syncNowButton = document.getElementById(prefixed_setting('sync_now'));
+        const disconnectButton = document.getElementById('emailchef-disconnect');
+        const newListNameInput = document.getElementById(prefixed_setting("new_name"));
+        const newListDescInput = document.getElementById(prefixed_setting("new_description"));
 
-        $(document).on("click", ".ecps-new-list-container #"+prefixed_setting('undo_save'), function (evt) {
-            evt.preventDefault();
-            $(".ecps-new-list-container").hide();
-        });
-        $(document).on("click", ".ecps-new-list-container #"+prefixed_setting('new_save'), function (evt) {
-            evt.preventDefault();
-            $(this).attr("disabled", "disabled");
-            addList(
-                $("#" + prefixed_setting("new_name")).val(),
-                $("#" + prefixed_setting("new_description")).val()
-            );
-        });
+        if (createListButton && newListContainer) {
+            createListButton.addEventListener("click", function (evt) {
+                evt.preventDefault();
+                toggleElement(newListContainer);
+            });
+        }
 
-        $(document).on("click",  "#"+prefixed_setting('sync_now'), function(evt){
-            evt.preventDefault();
-            manualSync();
-        });
+        if (undoSaveButton && newListContainer) {
+            undoSaveButton.addEventListener("click", function (evt) {
+                evt.preventDefault();
+                hideElement(newListContainer);
+            });
+        }
 
-        $(document).on("click", "#emailchef-disconnect", function(evt){
-           evt.preventDefault();
-           if (confirm(i18n.are_you_sure_disconnect)){
-                disconnectAccount();
-           }
-        });
+        if (newSaveButton && newListNameInput && newListDescInput) {
+            newSaveButton.addEventListener("click", function (evt) {
+                evt.preventDefault();
+                addList(
+                    newListNameInput.value,
+                    newListDescInput.value
+                );
+            });
+        }
 
-        doManualSync && manualSync(
-            true
-        );
+        if (syncNowButton) {
+            syncNowButton.addEventListener("click", function (evt) {
+                evt.preventDefault();
+                manualSync();
+            });
+        }
 
+        if (disconnectButton) {
+            disconnectButton.addEventListener("click", function (evt) {
+                evt.preventDefault();
+                if (confirm(i18n.are_you_sure_disconnect)) {
+                    disconnectAccount();
+                }
+            });
+        }
 
+        if (doManualSync) {
+            manualSync(true);
+        }
     }
 
-}(jQuery);
+    return {
+        loginPage: loginPage,
+        settings: settings
+    };
 
-
-
+})();
