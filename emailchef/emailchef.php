@@ -258,6 +258,7 @@ class Emailchef extends Module
         if ($is_enabled) {
 
             $policy    = $this->emailchef->get_policy();
+            $account = $this->emailchef->get_account();
 
             if ( $policy !== 'premium' ) {
                 unset( $policy_types['sopt'] );
