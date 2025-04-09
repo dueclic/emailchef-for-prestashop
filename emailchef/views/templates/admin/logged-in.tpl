@@ -45,20 +45,20 @@
         </div>
         <hr class="ecps-hr-separator">
         <div>
-            <p>{l s="Prestashop users usually sync automatically with Emailchef. If an issue arises or you need an immediate update, use the button below for manual sync." mod='emailchef'}</p>
+            <p>{l s='Prestashop users usually sync automatically with Emailchef. If an issue arises or you need an immediate update, use the button below for manual sync.' mod='emailchef'}</p>
             <p class="ecps-text-center ecps-submit">
                 <button {if !$list_id}disabled{/if} type="button"  data-ajax-url="{$ajax_url}"
                         id="ps_emailchef_sync_now"
                         class="btn btn-default btn-sm"
-                        title="{if !$list_id}{l s="Please select a list and save settings first" mod="emailchef"}{/if}">
-                    {l s="Manual Sync Now" mod="emailchef"}
+                        title="{if !$list_id}{l s='Please select a list and save settings first' mod='emailchef'}{/if}">
+                    {l s='Manual Sync Now' mod='emailchef'}
                 </button>
             </p>
         </div>
         <hr class="ecps-hr-separator">
         <div>
             <p>
-                <a href="{$admin_logs_link}" target="_blank">{l s="Show Logs" mod="emailchef"}</a>
+                <a href="{$admin_logs_link}" target="_blank">{l s='Show Logs' mod='emailchef'}</a>
             </p>
         </div>
     </div>
@@ -220,7 +220,7 @@
                     </tr>
                     <tr>
                         <th scope="row" class="titledesc">
-                            <label><strong>{l s="Sync existing customers" mod="emailchef"}</strong></label>
+                            <label><strong>{l s='Sync existing customers' mod='emailchef'}</strong></label>
                         </th>
                         <td class="forminp forminp-checkbox ">
                             <fieldset>
@@ -228,7 +228,7 @@
                                     <input name="sync_customers" id="ps_emailchef_sync_customers"
                                            style="margin-right: 5px;"
                                            type="checkbox" value="1"/>
-                                    {l s="Sync existing PrestaShop customers on save" mod="emailchef"}
+                                    {l s='Sync existing PrestaShop customers on save' mod='emailchef'}
                                 </label>
                             </fieldset>
                         </td>
@@ -241,7 +241,7 @@
                 <header class="panel-heading">
                     {l s='Emailchef Subscription Settings' mod='emailchef'}
                 </header>
-                <p>{l s="Manage subscriber integration with your newsletter through Emailchef's plan-based options. With Single Opt-in, users join immediately. Double Opt-in, where users confirm via email, enhances audience engagement. Note that option availability varies by user plan." mod='emailchef'}</p>
+                <p>{l s='Manage subscriber integration with your newsletter through Emailchef\'s plan-based options. With Single Opt-in, users join immediately. Double Opt-in, where users confirm via email, enhances audience engagement. Note that option availability varies by user plan.' mod='emailchef'}</p>
                 <table class="form-table">
                     <tbody>
                     <tr>
