@@ -21,10 +21,10 @@
             </span>
 
         </div>
-        <hr class="ecps-hr-separator-half">
+        <hr class="ecps-hr-separator">
         <div>
             <div><strong>{l s='Emailchef connected list' mod='emailchef'}</strong></div>
-            <div class="ecps-list-container {if $list_id}epcs-has-list{/if}" id="listName">
+            <div class="ecps-list-container {if $list_id}ecps-has-list{/if}" id="listName">
             <span>
                     <svg xmlns="http://www.w3.org/2000/svg" style="height: 16px; margin-top: 2px; display: block"
                          viewBox="0 0 640 512"><path fill="#CCCCCC"
