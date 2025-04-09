@@ -269,9 +269,11 @@ class Emailchef extends Module
             $data['policy_type'] = $this->_getConf('policy_type', null);
             $data['lists'] = $this->emailchef->get_lists();
             $data['ajax_url'] = $this->_path . "ajax.php";
-            $filtered_lists = array_filter($data['lists'], function ($_list) use ($data) {
-                return (int)$_list['id'] === (int)$data['list_id'];
-            });
+            $filtered_lists = array_values(
+                array_filter($data['lists'], function ($_list) use ($data) {
+                    return (int)$_list['id'] === (int)$data['list_id'];
+                })
+            );
             $data['manualSync'] = $manual_sync;
             $data['list_name'] = count($filtered_lists) > 0 ? $filtered_lists[0]['name'] : '';
             $data['admin_logs_link'] = Context::getContext()->link->getAdminLink('AdminLogs');
