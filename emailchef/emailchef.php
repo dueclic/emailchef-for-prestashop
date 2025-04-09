@@ -214,7 +214,7 @@ class Emailchef extends Module
                 Configuration::updateValue($this->prefix_setting('consumer_key'), '');
                 Configuration::updateValue($this->prefix_setting('consumer_secret'), '');
                 Configuration::updateValue($this->prefix_setting('enabled'), false);
-                $error = $this->l('Credentials are not valid');
+                $error = $this->l('API keys are not valid');
             } else {
                 Configuration::updateValue($this->prefix_setting('consumer_key'), $consumer_key);
                 Configuration::updateValue($this->prefix_setting('consumer_secret'), $consumer_secret);
@@ -279,7 +279,7 @@ class Emailchef extends Module
             $data['admin_logs_link'] = Context::getContext()->link->getAdminLink('AdminLogs');
             $data['i18n'] = array(
                 'create_destination_list' => $this->l('Add a new destination list'),
-                'language_set' => $this->l('Language was loaded, do you want refresh this page with new language?'),
+                'language_set' => $this->l('The language has been loaded. Do you want to refresh the page with the new language?'),
                 'create_list' => $this->l('Add a new list'),
                 'name_list' => $this->l('List name'),
                 'name_list_placeholder' => $this->l('Provide a name for this new list'),
@@ -292,8 +292,8 @@ class Emailchef extends Module
                 'server_failure_login_data' => $this->l('Internal server error. Please try again.'),
                 'success_login_data' => $this->l('You have successfully logged into Emailchef.'),
                 'no_list_found' => $this->l('No list found.'),
-                'are_you_sure_disconnect' => $this->l('Are you sure do you want disconnect your account?'),
-                'check_status_list_data' => $this->l('Making a new list, please wait...'),
+                'are_you_sure_disconnect' => $this->l('Are you sure you want to disconnect your account?'),
+                'check_status_list_data' => $this->l('Creating a new list, please wait...'),
                 'check_status_list_data_cf' => $this->l('We are creating custom fields for the newly created list...'),
                 'check_status_list_data_cf_change' => $this->l('We are adjusting custom fields for the newly selected list...'),
                 'error_status_list_data' => $this->l('An error occurred while creating this list.'),

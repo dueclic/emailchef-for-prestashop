@@ -235,12 +235,12 @@ return array(
         'ord'       => 19,
     ),
     'total_ordered_30d'           => array(
-        'name'      => $mod->l('Subtotal negli ultimi 30 giorni'),
+        'name'      => $mod->l('Subtotal in the last 30 days'),
         'data_type' => 'number',
         'ord'       => 20,
     ),
     'total_ordered_12m'           => array(
-        'name'      => $mod->l('Subtotal negli ultimi 12 mesi'),
+        'name'      => $mod->l('Subtotal in the last 12 months'),
         'data_type' => 'number',
         'ord'       => 21,
     ),
@@ -276,7 +276,7 @@ return array(
         'ord'       => 27,
     ),
     'latest_order_product_ids'    => array(
-        'name'      => $mod->l('Last order - ID prodotti'),
+        'name'      => $mod->l('Last order - Products IDs'),
         'data_type' => 'text',
         'ord'       => 28,
     ),
@@ -302,7 +302,7 @@ return array(
         'ord'       => 32,
     ),
     'ab_cart_prod_name_pr_hr'     => array(
-        'name'      => $mod->l('Carrello abbandonato - Name prodotto più caro'),
+        'name'      => $mod->l('Abandoned cart - Most expensive product name'),
         'data_type' => 'text',
         'ord'       => 33,
     ),
@@ -312,7 +312,7 @@ return array(
         'ord'       => 34,
     ),
     'ab_cart_prod_pr_pr_hr'       => array(
-        'name'      => $mod->l('Abandoned cart - Most expensive pricing product'),
+        'name'      => $mod->l('Abandoned cart - Most expensive product price'),
         'data_type' => 'number',
         'ord'       => 35,
     ),
