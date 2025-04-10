@@ -163,6 +163,9 @@ class Emailchef extends Module
 
     public function deleteConfigurations()
     {
+
+        var_dump($this->prefix_setting('consumer_key'));
+
         Configuration::deleteByName($this->prefix_setting('consumer_key'));
         Configuration::deleteByName($this->prefix_setting('consumer_secret'));
         Configuration::deleteByName($this->prefix_setting('list'));
@@ -252,7 +255,7 @@ class Emailchef extends Module
         ];
 
 
-        $is_enabled = $this->_getConf('enabled', false);
+        $is_enabled = (bool)$this->_getConf('enabled', false);
 
         if ($is_enabled) {
 
@@ -363,13 +366,17 @@ EOF;
 
     public function _getConf($config, $default = false)
     {
-        return Configuration::get(
+        $conf = Configuration::get(
             $this->prefix_setting($config),
             null,
             null,
             null,
             $default
         );
+        if (!$conf){
+            return $default;
+        }
+        return $conf;
     }
 
     public function log($message, $severity = 1, $debug = false)

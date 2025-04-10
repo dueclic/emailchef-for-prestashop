@@ -235,7 +235,7 @@ var PS_Emailchef = (function () {
         const response = await makeAjaxRequest(ajax_url, ajax_data);
 
         if (response) {
-            window.location.reload();
+            location.href = location.href + (location.href.includes('?') ? '&' : '?') + '_=' + Date.now();
         } else {
             disconnectButton.disabled = false;
         }
